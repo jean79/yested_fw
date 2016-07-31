@@ -1,10 +1,8 @@
 package net.yested.ext.bootstrap3
 
+import net.yested.core.html.p
 import net.yested.core.properties.ReadOnlyProperty
-import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLFormElement
-import org.w3c.dom.HTMLLabelElement
+import org.w3c.dom.*
 import kotlin.dom.appendText
 
 class BtsFormItemContext(val labelId: String, val labelElement: HTMLLabelElement, val inputElement: HTMLDivElement) {
@@ -72,6 +70,27 @@ class BtsFormContext(
                 init(labelId)
             }
         }
+    }
+
+    fun btsFormStatic(label: String = "", init:HTMLParagraphElement.()->Unit) {
+
+        element.formGroup {
+            btsLabel(width = labelWidth) {
+                appendText(label)
+            }
+            if (format == FormFormat.Horizontal) {
+                col(width = inputWidth!!) {
+                    p { className = "form-control-static"
+                        init()
+                    }
+                }
+            } else {
+                p { className = "form-control-static"
+                    init()
+                }
+            }
+        }
+
     }
 
 }

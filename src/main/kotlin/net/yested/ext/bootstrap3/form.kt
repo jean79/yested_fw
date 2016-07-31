@@ -24,6 +24,7 @@ class State(
 
 fun HTMLElement.formGroup(
         state: ReadOnlyProperty<State> = State(status = Status.Default, errorMessage = null).toProperty(),
+        //TODO: velikost
         init: HTMLDivElement.()->Unit) {
     div {
         state.onNext {

@@ -94,13 +94,16 @@ fun main(args: Array<String>) {
                 }
                 btsFormHorizontal(labelWidth = Col.Width.Lg(4), inputWidth = Col.Width.Lg(8)) {
                     btsFormItem(state = validation) {
-                        btsFormLabel { appendText("Label") }
+                        btsFormLabel { appendText("Readonly field") }
                         btsFormInput {
-                            textInput(id = labelId, value = p)
+                            textInput(id = labelId, value = p, readonly = true.toProperty() )
                         }
                     }
                     btsFormItemSimple(state = validation, label = "Test2") { labelId ->
-                        textInput(id = labelId, value = p)
+                        textInput(id = labelId, value = p, disabled = true.toProperty())
+                    }
+                    btsFormStatic(label = "Static Label") {
+                        appendText("Static text in form")
                     }
                 }
                 btsFormInline {
@@ -142,8 +145,16 @@ fun main(args: Array<String>) {
             p {
                 textInput(value = p, id = "ii") //add validation
             }
+            row {
+                col(width = Col.Width.Lg(4)) {
+                    singleSelectInput(selected = city, options = Property(City.values().toList()), render = { appendText(it.name) })
+                }
+                col(width = Col.Width.Lg(8)) {
+                    text(city.map { it.name })
+                }
+            }
             p {
-                selectInput(selected = city, options = Property(City.values().toList()), render = { appendText(it.name) })
+
             }
             p {
                 btsButton(look = ButtonLook.Primary, disabled = active.not(), onclick = { p.set("reset") }) {
