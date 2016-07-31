@@ -4,14 +4,23 @@ import net.yested.core.utils.with
 import net.yested.ext.bootstrap3.*
 import org.w3c.dom.HTMLElement
 import kotlin.browser.document
-import kotlin.dom.plus
+import kotlin.dom.appendText
 
 enum class City { Prague, London }
+
+fun ReadOnlyProperty<ValidationStatus>.message() =
+    this.map {
+        if (it.success) {
+            State(status = Status.Default, errorMessage = null)
+        } else {
+            State(status = Status.Error, errorMessage = it.errorMessage)
+        }
+    }
 
 fun main(args: Array<String>) {
 
     val p = Property("hello")
-    val validation = p.validate(errorMessage = "Name is required") { it.size > 0 } debug { "validator: $it" }
+    val validation = p.validate(errorMessage = "Name is required") { it.size > 0 }.message()
     val city = Property(City.Prague)
     val active = Property(false)
 
@@ -22,75 +31,86 @@ fun main(args: Array<String>) {
     element with {
         navbar(inverted = true) {
             brand {
-                plus("Sample Application")
+                appendText("Sample Application")
             }
             menu {
                 item(active = Property(true)) {
                     a { href = "#firstItem"
-                        plus("First Item")
+                        appendText("First Item")
                     }
                 }
                 item {
                     a {
-                        plus("Second item")
+                        appendText("Second item")
                     }
                 }
                 dropDown(label = "Drop") {
                     item {
-                        a { plus("bla") }
+                        a { appendText("bla") }
                     }
                     separator()
-                    dropDownHeader { plus("subheader") }
+                    dropDownHeader { appendText("subheader") }
                     item {
-                        a { plus("tri") }
+                        a { appendText("tri") }
                     }
                     item {
-                        a { plus("ctyri") }
+                        a { appendText("ctyri") }
                     }
                 }
             }
             button(position = NavbarPosition.Right) {
-                plus("Tlacitko")
+                appendText("Tlacitko")
             }
             text(position = NavbarPosition.Right) {
-                plus("some text")
+                appendText("some text")
             }
         }
 
         container {
             jumbotron {
                 h1 {
-                    plus("some header")
+                    appendText("some header")
                 }
                 p {
-                    plus("some text")
+                    appendText("some text")
                 }
             }
             row {
-                col(Col.Width.Xs(3), Col.Width.Lg(3)) {
-                    plus("ahoj")
+                col(Col.Width.Xs(3) and Col.Width.Lg(3)) {
+                    appendText("hello")
                 }
             }
             p {
                 btsForm(format = FormFormat.Horizontal) {
-                    formGroup {
-                        label { className = Col.Width.Lg(4).css()
-                            plus("Label")
+                    formGroup(state = validation) {
+                        btsLabel(htmlFor = "ii", width = Col.Width.Lg(4)) {
+                            appendText("Label")
                         }
                         col(Col.Width.Lg(4)) {
-                            textInput(value = Property("Hello"), className = "form-control".toProperty())
+                            textInput(id = "ii", value = p)
                         }
                     }
-                    btsButton { plus("Submit") }
+                    btsButton { appendText("Submit") }
+                }
+                btsFormHorizontal(labelWidth = Col.Width.Lg(4), inputWidth = Col.Width.Lg(8)) {
+                    btsFormItem(state = validation) {
+                        btsFormLabel { appendText("Label") }
+                        btsFormInput {
+                            textInput(id = labelId, value = p)
+                        }
+                    }
+                    btsFormItemSimple(state = validation, label = "Test2") { labelId ->
+                        textInput(id = labelId, value = p)
+                    }
                 }
             }
             p {
                 navTabs {
                     item(active = active) {
-                        a { plus("Jedna") }
+                        a { appendText("Jedna") }
                     }
                     item(active = active.not()) {
-                        a { plus("Dva") }
+                        a { appendText("Dva") }
                     }
                 }
             }
@@ -98,27 +118,27 @@ fun main(args: Array<String>) {
                 glyphicon(icon = "eur")
             }
             p {
-                textInput(value = p, validation = validation)
+                textInput(value = p, id = "ii") //add validation
             }
             p {
-                selectInput(selected = city, options = Property(City.values().toList()), render = { plus(it.name) })
+                selectInput(selected = city, options = Property(City.values().toList()), render = { appendText(it.name) })
             }
             p {
                 btsButton(look = ButtonLook.Primary, disabled = active.not(), onclick = { p.set("reset") }) {
-                     plus("button text")
+                     appendText("button text")
                 }
                 btsButton(active = active) {
-                    plus("selectable")
+                    appendText("selectable")
                 }
             }
             p {
                 dropdown(label = "dropdown") {
                     item {
-                        a { plus("bla") }
+                        a { appendText("bla") }
                     }
                     separator()
                     item {
-                        a { plus("dva") }
+                        a { appendText("dva") }
                     }
                 }
             }
@@ -126,11 +146,11 @@ fun main(args: Array<String>) {
                 inputGroup {
                     dropdown(label = "Hello") {
                         item {
-                            a { plus("bla") }
+                            a { appendText("bla") }
                         }
                     }
                     input {
-                        textInput(value = Property("sample"), className = Property("form-control"))
+                        textInput(value = Property("sample"), id = "ii")
                     }
                     addon { glyphicon(icon = "eur") }
                 }
@@ -138,36 +158,36 @@ fun main(args: Array<String>) {
             p {
                 buttonGroup {
                     button(look = ButtonLook.Primary, disabled = active.not(), onclick = { p.set("reset") }) {
-                        plus("button text")
+                        appendText("button text")
                     }
                     button(active = active) {
-                        plus("selectable")
+                        appendText("selectable")
                     }
                 }
                 buttonToolbar {
                     group {
                         button(look = ButtonLook.Primary, disabled = active.not(), onclick = { p.set("reset") }) {
-                            plus("button text")
+                            appendText("button text")
                         }
                         button(active = active) {
-                            plus("selectable")
+                            appendText("selectable")
                         }
                         dropdown(label = "Ahoj") {
                             item {
-                                a { plus("bla") }
+                                a { appendText("bla") }
                             }
                             separator()
                             item {
-                                a { plus("dva") }
+                                a { appendText("dva") }
                             }
                         }
                     }
                     group {
                         button(look = ButtonLook.Primary, disabled = active.not(), onclick = { p.set("reset") }) {
-                            plus("button text")
+                            appendText("button text")
                         }
                         button(active = active) {
-                            plus("selectable")
+                            appendText("selectable")
                         }
                     }
                 }
@@ -186,10 +206,10 @@ fun main(args: Array<String>) {
             thead {
                 tr {
                     th {
-                        plus("Col1")
+                        appendText("Col1")
                     }
                     th {
-                        plus("Col2")
+                        appendText("Col2")
                     }
                 }
             }
@@ -197,7 +217,7 @@ fun main(args: Array<String>) {
                 tr {
                     td {
                         a {
-                            plus("http://www.seznam.cz")
+                            appendText("http://www.seznam.cz")
                             onClick {
                                 js("alert('hh')")
                             }
@@ -207,8 +227,8 @@ fun main(args: Array<String>) {
                         text(p)
                     }
                     td {
-                        selectInput(selected = city, options = Property(City.values().toList()), render = { plus(it.name) })
-                        plus("Selected city: ")
+                        selectInput(selected = city, options = Property(City.values().toList()), render = { appendText(it.name) })
+                        appendText("Selected city: ")
                         text(value = city.map { it.name })
                     }
                 }

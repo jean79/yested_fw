@@ -5,91 +5,92 @@ import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 
 interface ColumnDefinition {
-    val code: String
-    val width: Int
+    val css: String
 }
 
 sealed class Col {
     class Width {
-        class Xs(override val width: Int) : ColumnDefinition {
-            override val code: String = "xs"
+        class Xs(width: Int) : ColumnDefinition {
+            override val css: String =  "col-xs-$width"
         }
 
-        class Sm(override val width: Int) : ColumnDefinition {
-            override val code: String = "sm"
+        class Sm(val width: Int) : ColumnDefinition {
+            override val css: String =  "col-sm-$width"
         }
 
-        class Md(override val width: Int) : ColumnDefinition {
-            override val code: String = "md"
+        class Md(val width: Int) : ColumnDefinition {
+            override val css: String =  "col-md-$width"
         }
 
-        class Lg(override val width: Int) : ColumnDefinition {
-            override val code: String = "lg"
+        class Lg(val width: Int) : ColumnDefinition {
+            override val css: String =  "col-lg-$width"
         }
     }
     class Offset {
-        class Xs(override val width: Int) : ColumnDefinition {
-            override val code: String = "xs-offset"
+        class Xs(width: Int) : ColumnDefinition {
+            override val css: String =  "col-xs-offset-$width"
         }
 
-        class Sm(override val width: Int) : ColumnDefinition {
-            override val code: String = "sm-offset"
+        class Sm(width: Int) : ColumnDefinition {
+            override val css: String =  "col-sm-offset-$width"
         }
 
-        class Md(override val width: Int) : ColumnDefinition {
-            override val code: String = "md-offset"
+        class Md(width: Int) : ColumnDefinition {
+            override val css: String =  "col-md-offset-$width"
         }
 
-        class Lg(override val width: Int) : ColumnDefinition {
-            override val code: String = "lg-offset"
+        class Lg(width: Int) : ColumnDefinition {
+            override val css: String =  "col-lg-offset-$width"
         }
     }
     class Push {
-        class Xs(override val width: Int) : ColumnDefinition {
-            override val code: String = "xs-push"
+        class Xs(width: Int) : ColumnDefinition {
+            override val css: String =  "col-xs-push-$width"
         }
 
-        class Sm(override val width: Int) : ColumnDefinition {
-            override val code: String = "sm-push"
+        class Sm(width: Int) : ColumnDefinition {
+            override val css: String =  "col-sm-push-$width"
         }
 
-        class Md(override val width: Int) : ColumnDefinition {
-            override val code: String = "md-push"
+        class Md(width: Int) : ColumnDefinition {
+            override val css: String =  "col-md-push-$width"
         }
 
-        class Lg(override val width: Int) : ColumnDefinition {
-            override val code: String = "lg-push"
+        class Lg(width: Int) : ColumnDefinition {
+            override val css: String =  "col-lg-push-$width"
         }
     }
     class Pull {
-        class Xs(override val width: Int) : ColumnDefinition {
-            override val code: String = "xs-pull"
+        class Xs(width: Int) : ColumnDefinition {
+            override val css: String =  "col-xs-pull-$width"
         }
 
-        class Sm(override val width: Int) : ColumnDefinition {
-            override val code: String = "sm-pull"
+        class Sm(width: Int) : ColumnDefinition {
+            override val css: String =  "col-sm-pull-$width"
         }
 
-        class Md(override val width: Int) : ColumnDefinition {
-            override val code: String = "md-pull"
+        class Md(width: Int) : ColumnDefinition {
+            override val css: String =  "col-md-pull-$width"
         }
 
-        class Lg(override val width: Int) : ColumnDefinition {
-            override val code: String = "lg-pull"
+        class Lg(width: Int) : ColumnDefinition {
+            override val css: String =  "col-lg-pull-$width"
         }
     }
 }
 
-fun ColumnDefinition.css() = "col-$code-$width"
-
+infix fun ColumnDefinition.and(other: ColumnDefinition) = object: ColumnDefinition {
+    override val css: String = this@and.css + other.css
+}
+        
 fun HTMLElement.row(init:HTMLDivElement.()->Unit) {
     div { className = "row"
         init()
     }
 }
 
-fun HTMLElement.col(vararg width: ColumnDefinition, init: HTMLDivElement.()->Unit) {
-    div { className = width.map { it.css() }.joinToString(separator = " ")
+fun HTMLElement.col(width: ColumnDefinition, init: HTMLDivElement.()->Unit) {
+    div { className = width.css
         init()
     }
 }
