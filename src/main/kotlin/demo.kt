@@ -103,6 +103,28 @@ fun main(args: Array<String>) {
                         textInput(id = labelId, value = p)
                     }
                 }
+                btsFormInline {
+                    btsFormItem(state = validation) {
+                        btsFormLabel { appendText("Label") }
+                        btsFormInput {
+                            textInput(id = labelId, value = p)
+                        }
+                    }
+                    btsFormItemSimple(state = validation, label = "Test2") { labelId ->
+                        textInput(id = labelId, value = p)
+                    }
+                }
+                btsFormDefault {
+                    btsFormItem(state = validation) {
+                        btsFormLabel { appendText("Label") }
+                        btsFormInput {
+                            textInput(id = labelId, value = p)
+                        }
+                    }
+                    btsFormItemSimple(state = validation, label = "Test2") { labelId ->
+                        textInput(id = labelId, value = p)
+                    }
+                }
             }
             p {
                 navTabs {
