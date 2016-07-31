@@ -47,7 +47,7 @@ fun HTMLElement.btsForm(format: FormFormat = FormFormat.Default, init: HTMLFormE
 
 fun HTMLElement.btsLabel(width: ColumnDefinition? = null, htmlFor: String? = null, init:HTMLLabelElement.()->Unit) {
     label {
-        className =  "control-label ${width?.let { width.css} }"
+        className =  "control-label ${width?.css ?: ""}"
         htmlFor?.let { this.htmlFor = it}
         init()
     }

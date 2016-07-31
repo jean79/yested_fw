@@ -7,7 +7,6 @@ import org.w3c.dom.HTMLFormElement
 import org.w3c.dom.HTMLLabelElement
 import kotlin.dom.appendText
 
-
 class BtsFormItemContext(val labelId: String, val labelElement: HTMLLabelElement, val inputElement: HTMLDivElement) {
 
     fun btsFormLabel(init: HTMLElement.()->Unit) {
