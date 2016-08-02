@@ -81,6 +81,9 @@ fun main(args: Array<String>) {
                 }
             }
             p {
+                btsButton(onclick = { openSampleDialog() }) { appendText("Open dialog")}
+            }
+            p {
                 btsForm(format = FormFormat.Horizontal) {
                     formGroup(state = validation) {
                         btsLabel(htmlFor = "ii", width = Col.Width.Lg(4)) {
@@ -269,4 +272,18 @@ fun main(args: Array<String>) {
         }*/
     }
 
+}
+
+fun openSampleDialog() {
+    openDialog { dialog->
+        header { appendText("Sample popup") }
+        body { p {
+            appendText("sample text")
+        }}
+        footer {
+            btsButton(look = ButtonLook.Primary, onclick = { dialog.closeDialog() }) {
+                appendText("Submit")
+            }
+        }
+    }
 }

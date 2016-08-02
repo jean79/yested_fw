@@ -47,10 +47,11 @@ fun <T> HTMLElement.selectInput(
         options: Property<List<T>>,
         disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
         multiple: Boolean,
+        size: Size = Size.Default,
         render: HTMLElement.(T)->Unit) {
 
     val element = document.createElement("select") as HTMLSelectElement
-    element.className = "form-control"
+    element.className = "form-control input-${size.code}"
     element.multiple = multiple
     options.onNext {
         element.removeAllChildElements()

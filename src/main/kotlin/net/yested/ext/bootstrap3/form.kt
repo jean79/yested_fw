@@ -22,13 +22,19 @@ class State(
         val errorMessage: String?
 )
 
+enum class Size(val code: String) {
+    Large("lg"),
+    Small("sm"),
+    Default("")
+}
+
 fun HTMLElement.formGroup(
         state: ReadOnlyProperty<State> = State(status = Status.Default, errorMessage = null).toProperty(),
-        //TODO: velikost
+        size: Size = Size.Default,
         init: HTMLDivElement.()->Unit) {
     div {
         state.onNext {
-            className = "form-group ${it.status.code}"
+            className = "form-group ${it.status.code} form-group-${size.code}"
         }
         init()
     }
