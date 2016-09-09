@@ -23,8 +23,8 @@ fun HTMLElement.textInput(
         value: Property<String>,
         disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
         readonly: ReadOnlyProperty<Boolean> = false.toProperty(),
-
-        id: String? = null) {
+        id: String? = null,
+        init: (HTMLInputElement.() -> Unit)? = null) {
 
     val element = document.createElement("input") as HTMLInputElement
 
@@ -38,8 +38,8 @@ fun HTMLElement.textInput(
     element.addEventListener("keyup", { value.set(element.value) }, false)
     disabled.onNext { element.disabled = it }
     readonly.onNext { element.readOnly = it }
+    if (init != null) element.init()
     this.appendChild(element)
-
 }
 
 fun <T> HTMLElement.selectInput(
