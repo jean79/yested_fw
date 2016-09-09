@@ -63,10 +63,7 @@ class InputGroupContext(val el: HTMLDivElement) {
 }
 
 fun HTMLElement.inputGroup(size: InputGroupSize = InputGroupSize.Default, init: InputGroupContext.()->Unit) {
-    var el: HTMLDivElement? = null
-    div { className = "input-group ${size.code}"
-       el = this
-    }
-    InputGroupContext(el!!).init()
+    val el = div { className = "input-group ${size.code}" }
+    InputGroupContext(el).init()
 }
 

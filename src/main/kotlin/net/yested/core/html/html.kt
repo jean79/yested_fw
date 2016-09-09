@@ -3,10 +3,11 @@ package net.yested.core.html
 import org.w3c.dom.*
 import kotlin.browser.document
 
-fun <T : HTMLElement> tag(parent: Element, tagName: String, init:(T.()->Unit)? = null) {
+fun <T : HTMLElement> tag(parent: Element, tagName: String, init:(T.()->Unit)? = null): T {
     val element:T = document.createElement(tagName).asDynamic()
     parent.appendChild(element)
     init?.let { element.init() }
+    return element
 }
 
 fun HTMLElement.div(init:(HTMLDivElement.()->Unit)? = null) = tag(this, tagName = "div", init = init)
