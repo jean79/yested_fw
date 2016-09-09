@@ -44,9 +44,6 @@ enum class TabsFormat(val code: String) {
 }
 
 fun HTMLElement.navTabs(format: TabsFormat = TabsFormat.Tabs, justified: Boolean = false, init: NavContext.()->Unit) {
-    var el:HTMLUListElement? = null
-    ul { className = "nav ${format.code} ${if (justified) "nav-justified" else ""}"
-       el = this
-    }
-    NavContext(el!!).init()
+    val el = ul { className = "nav ${format.code} ${if (justified) "nav-justified" else ""}" }
+    NavContext(el).init()
 }

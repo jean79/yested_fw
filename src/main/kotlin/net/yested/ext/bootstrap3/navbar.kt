@@ -59,9 +59,8 @@ class NavbarMenu(val ul: HTMLUListElement) {
                     plus(label)
                     span { className = "caret" }
                 }
-                ul {
+                el = ul {
                     className = "dropdown-menu"
-                    el = this
                 }
             }
         }

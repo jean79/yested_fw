@@ -79,7 +79,6 @@ enum class Orientation(val code: String) {
 }
 
 fun HTMLDivElement.generateDropdownInto(label: String, init: DropDownContext.() -> Unit) {
-    var el: HTMLUListElement? = null
     button {
         className = "btn btn-default dropdown-toggle"; type = "button"
         setAttribute("data-toggle", "dropdown")
@@ -87,11 +86,8 @@ fun HTMLDivElement.generateDropdownInto(label: String, init: DropDownContext.() 
         plus(" ")
         span { className = "caret" }
     }
-    ul {
-        className = "dropdown-menu"
-        el = this
-    }
-    DropDownContext(el!!).init()
+    val el = ul { className = "dropdown-menu" }
+    DropDownContext(el).init()
 }
 
 fun HTMLElement.dropdown(
@@ -147,11 +143,8 @@ class ButtonGroupContext(val context: HTMLElement) {
 }
 
 fun HTMLElement.buttonGroup(size: ButtonGroupSize = ButtonGroupSize.Default, init: ButtonGroupContext.()->Unit) {
-    var el: HTMLElement? = null
-    div { className = "btn-group ${size.code}"
-        el = this
-    }
-    ButtonGroupContext(el!!).init()
+    val el = div { className = "btn-group ${size.code}" }
+    ButtonGroupContext(el).init()
 }
 
 class ButtonToolbarContext(val size: ButtonGroupSize = ButtonGroupSize.Default, val context: HTMLElement) {
@@ -161,9 +154,6 @@ class ButtonToolbarContext(val size: ButtonGroupSize = ButtonGroupSize.Default, 
 }
 
 fun HTMLElement.buttonToolbar(size: ButtonGroupSize = ButtonGroupSize.Default, init: ButtonToolbarContext.()->Unit) {
-    var el: HTMLElement? = null
-    div { className = "btn-toolbar"
-        el = this
-    }
-    ButtonToolbarContext(size = size, context = el!!).init()
+    val el = div { className = "btn-toolbar" }
+    ButtonToolbarContext(size = size, context = el).init()
 }
