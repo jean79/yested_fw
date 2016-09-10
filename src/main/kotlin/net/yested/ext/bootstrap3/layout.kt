@@ -20,11 +20,15 @@ fun HTMLElement.container(
     }
 }
 
+fun HTMLElement.pageHeader(init: HTMLDivElement.() -> Unit) {
+    div { className = "page-header"
+        init()
+    }
+}
+
 class PageContext(val element: HTMLElement, val layout: ContainerWidth) {
     fun header(init: HTMLDivElement.() -> Unit) {
-        element.div { className = "page-header"
-            init()
-        }
+        element.pageHeader(init)
     }
 
     fun navbar(
@@ -47,6 +51,11 @@ class PageContext(val element: HTMLElement, val layout: ContainerWidth) {
             init()
         }
    }
+}
+
+fun HTMLElement.page(layout: ContainerWidth = ContainerWidth.Fixed, init: PageContext.() -> Unit) {
+    className = layout.code
+    PageContext(this, layout).init()
 }
 
 fun page(placeholderElementId:String, layout: ContainerWidth = ContainerWidth.Fixed, init: PageContext.() -> Unit) {
