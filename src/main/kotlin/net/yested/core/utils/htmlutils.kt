@@ -1,7 +1,9 @@
 package net.yested.core.utils
 
+import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Node
+import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.dom.appendText
 
@@ -48,4 +50,11 @@ fun repeatWithDelayUntil(check:()->Boolean, millisecondInterval:Int, run:()->Uni
    } else {
        window.setTimeout({repeatWithDelayUntil(check, millisecondInterval, run)}, millisecondInterval)
    }
+}
+
+/** Creates a Div that is not attached to any parent HTMLElement yet. */
+fun Div(init:(HTMLDivElement.()->Unit)? = null): HTMLDivElement {
+    val element: HTMLDivElement = document.createElement("div").asDynamic()
+    init?.let { element.init() }
+    return element
 }

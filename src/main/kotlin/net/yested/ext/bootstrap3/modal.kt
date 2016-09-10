@@ -6,10 +6,9 @@ import net.yested.core.html.button
 import net.yested.core.html.div
 import net.yested.core.html.h4
 import net.yested.core.html.span
-import net.yested.core.utils.with
+import net.yested.core.utils.Div
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLHeadingElement
-import kotlin.browser.document
 import kotlin.dom.appendText
 
 interface DialogInterface {
@@ -46,7 +45,7 @@ fun openDialog(size: DialogSize = DialogSize.Default, init:DialogContext.(dialog
     var body: HTMLDivElement? = null
     var footer: HTMLDivElement? = null
 
-    val dialogElement = document.createElement("div") as HTMLDivElement with {
+    val dialogElement = Div {
         className = "modal fade"
         div { className = "modal-dialog modal-${size.code}"
             div {
