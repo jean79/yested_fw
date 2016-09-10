@@ -20,7 +20,11 @@ enum class Status(val code: String) {
 class State(
         val status: Status,
         val errorMessage: String?
-)
+) {
+    companion object {
+        val Default = State(Status.Default, null)
+    }
+}
 
 enum class Size(val code: String) {
     Large("lg"),
