@@ -26,9 +26,9 @@ fun main(args: Array<String>) {
 
     console.info("hello")
 
-    val element: HTMLElement = document.getElementById("main").asDynamic()
+    val element: HTMLElement? = document.getElementById("main") as HTMLElement?
 
-    element with {
+    element?.with {
         navbar(inverted = true) {
             brand {
                 appendText("Sample Application")
