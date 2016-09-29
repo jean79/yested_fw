@@ -26,14 +26,17 @@ fun HTMLElement.textInput(
 
     val element = document.createElement("input") as HTMLInputElement
 
+    var updating = false
     id?.let { element.id = id }
     element.className = "form-control"
     element.type = "text"
     value.onNext {
-        element.value = it
+        if (!updating) {
+            element.value = it
+        }
     }
-    element.addEventListener("change", { value.set(element.value)  }, false)
-    element.addEventListener("keyup", { value.set(element.value) }, false)
+    element.addEventListener("change", { updating = true; value.set(element.value); updating = false }, false)
+    element.addEventListener("keyup", { updating = true; value.set(element.value); updating = false }, false)
     disabled.onNext { element.disabled = it }
     readonly.onNext { element.readOnly = it }
     if (init != null) element.init()
