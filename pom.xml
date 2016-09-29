@@ -74,6 +74,12 @@
                             <goal>js</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>test-js</id>
+                        <goals>
+                            <goal>test-js</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
 

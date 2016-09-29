@@ -63,6 +63,27 @@ fun <IN, OUT> ReadOnlyProperty<IN>.mapAsDefault(transform: (IN)->OUT): Property<
     return property
 }
 
+/**
+ * Map a Property to another Property and vice-versa.
+ * This is useful when either property can be modified and the other property should reflect the change,
+ * but it should not circle back to again update the property that was modified.
+ */
+fun <IN, OUT> Property<IN>.mapBidirectionally(transform: (IN)->OUT, reverse: (OUT)->IN): Property<OUT> {
+    var updating = false
+    val transformedProperty = Property(transform(this.get()))
+    this.onNext {
+        if (!updating) {
+            transformedProperty.set(transform(it))
+        }
+    }
+    transformedProperty.onNext {
+        updating = true
+        try { this.set(reverse(it)) }
+        finally { updating = false }
+    }
+    return transformedProperty
+}
+
 fun ReadOnlyProperty<Boolean>.not() = this.map { !it }
 
 /** Combines two properties into another one that pairs them together. */
