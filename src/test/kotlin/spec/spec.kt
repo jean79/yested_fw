@@ -50,8 +50,11 @@ private fun <T> T.equalTo(expected: T): Boolean {
 }
 
 fun String?.mustContain(expectedSubstring: String) {
-    if (this == null || !contains(expectedSubstring)) {
+    val contains = this != null && contains(expectedSubstring)
+    if (!contains) {
         fail("expected string containing '$expectedSubstring' but actual was '${this}'")
+    } else {
+        QUnit.assert.equal(contains, true)
     }
 }
 
