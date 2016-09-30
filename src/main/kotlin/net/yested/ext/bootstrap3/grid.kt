@@ -1,8 +1,11 @@
 package net.yested.ext.bootstrap3
 
-import net.yested.core.html.div
-import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.HTMLElement
+import net.yested.core.html.*
+import net.yested.core.properties.*
+import net.yested.core.utils.removeChildByName
+import net.yested.core.utils.with
+import org.w3c.dom.*
+import java.util.*
 
 interface ColumnDefinition {
     val css: String
@@ -92,5 +95,113 @@ fun HTMLElement.row(init:HTMLDivElement.()->Unit) {
 fun HTMLElement.col(width: ColumnDefinition, init: HTMLDivElement.()->Unit) {
     div { className = width.css
         init()
+    }
+}
+
+data class Column<in T>(
+        val label: HTMLElement.() -> Unit,
+        val sortFunction: ((T, T) -> Int)? = null,
+        val align: Align = Align.LEFT,
+        val sortAscending: Boolean? = null,
+        val render: HTMLElement.(T) -> Unit) {
+    init {
+        if ((sortFunction == null) != (sortAscending == null)) {
+            if (sortFunction == null) {
+                throw IllegalArgumentException("sortFunction must be specified when sortAscending is specified")
+            } else {
+                throw IllegalArgumentException("sortAscending must be specified when sortFunction is specified")
+            }
+        }
+    }
+}
+
+/** A Grid of data with a column per field, and the allowing the user to sort, if configured. */
+fun <T> HTMLElement.grid(responsive: Boolean = false, columns: Array<Column<T>>, data: ReadOnlyProperty<Iterable<T>?>) {
+    if (responsive) {
+        div { className = "table-responsive"
+            gridTable(columns, data)
+        }
+    } else {
+        gridTable(columns, data)
+    }
+}
+
+private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyProperty<Iterable<T>?>) {
+    data class ColumnSort<T>(val column: Column<T>, val ascending: Boolean)
+
+    val firstColumn = columns.filter { it.sortAscending != null }.firstOrNull()
+    val sortColumn: Property<ColumnSort<T>>? = firstColumn?.let { ColumnSort(firstColumn, firstColumn.sortAscending!!).toProperty() }
+
+    fun sortData(toSort:Iterable<T>?, columnSort: ColumnSort<T>?):Iterable<T>? {
+        val sortFunction = columnSort?.column?.sortFunction
+        if (sortFunction == null || toSort == null) {
+            return toSort
+        }
+        val ascending = columnSort?.ascending ?: true
+        //return toSort.sortedWith(comparator = Comparator { t, t ->  })
+        return toSort.sortedWith(comparator = Comparator { obj1: T, obj2: T ->  (sortFunction(obj1, obj2)) * (if (ascending) 1 else -1)})
+    }
+
+    val sortedData: ReadOnlyProperty<Iterable<T>?>
+    if (sortColumn != null) {
+        sortedData = data.combineLatest<Iterable<T>?, ColumnSort<T>>(sortColumn).map { sortData(it.first, it.second) }
+    } else {
+        sortedData = data
+    }
+
+    fun sortByColumn(column: Column<T>) {
+        if (column == sortColumn?.get()?.column) {
+            val columnSort = sortColumn?.get()!!
+            sortColumn!!.set(columnSort.copy(ascending = !columnSort.ascending))
+        } else {
+            sortColumn!!.set(ColumnSort(column, ascending = true))
+        }
+    }
+
+    val tableElement = table() { className = "table table-striped table-hover table-condensed"
+        thead {
+            tr {
+                columns.forEach { column ->
+                    th { className = "text-${column.align.code}"
+                        if (column.sortAscending == null) {
+                            (column.label)()
+                        } else {
+                            a {
+                                "style".."cursor: pointer;"
+                                onclick = { sortByColumn(column) }
+                                (column.label)()
+                            }
+                            span {
+                                val icon = sortColumn!!.map { sortColumn ->
+                                    if (sortColumn.column != column) null
+                                    else if (sortColumn.ascending) "arrow-up" else "arrow-down"
+                                }
+                                glyphicon(icon)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    sortedData.onNext { values ->
+        tableElement.removeChildByName("tbody")
+        values?.let {
+            tableElement.with {
+                tbody {
+                    values.forEach { item ->
+                        tr {
+                            columns.forEach { column ->
+                                td {
+                                    "class" .. "text-${column.align.code}";
+                                    (column.render)(item)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
