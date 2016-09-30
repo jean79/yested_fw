@@ -37,3 +37,9 @@ fun HTMLElement.strong(init:(HTMLSpanElement.()->Unit)? = null) = tag(this, tagN
 fun HTMLElement.button(init:(HTMLButtonElement.()->Unit)? = null) = tag(this, tagName = "button", init = init)
 fun HTMLElement.form(init:(HTMLFormElement.()->Unit)? = null) = tag(this, tagName = "form", init = init)
 fun HTMLElement.label(init:(HTMLLabelElement.()->Unit)? = null) = tag(this, tagName = "label", init = init)
+
+enum class Align(val code:String) {
+   LEFT("left"),
+   CENTER("center"),
+   RIGHT("right")
+}
