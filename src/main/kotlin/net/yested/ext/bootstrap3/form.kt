@@ -4,6 +4,7 @@ import net.yested.core.html.div
 import net.yested.core.html.form
 import net.yested.core.html.label
 import net.yested.core.properties.ReadOnlyProperty
+import net.yested.core.properties.ValidationStatus
 import net.yested.core.properties.toProperty
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
@@ -17,10 +18,15 @@ enum class Status(val code: String) {
     Error("has-error"),
 }
 
-class State(
-        val status: Status,
-        val errorMessage: String?
-)
+class State(val status: Status, val errorMessage: String?) {
+    companion object {
+        val Default = State(Status.Default, null)
+    }
+}
+
+fun ValidationStatus.toState(): State {
+    return State(if (success) Status.Success else Status.Error, errorMessage)
+}
 
 enum class Size(val code: String) {
     Large("lg"),

@@ -1,8 +1,6 @@
 package net.yested.ext.bootstrap3
 
-import net.yested.core.properties.Property
-import net.yested.core.properties.ReadOnlyProperty
-import net.yested.core.properties.toProperty
+import net.yested.core.properties.*
 import net.yested.core.utils.removeAllChildElements
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
@@ -23,23 +21,26 @@ fun HTMLElement.textInput(
         value: Property<String>,
         disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
         readonly: ReadOnlyProperty<Boolean> = false.toProperty(),
-
-        id: String? = null) {
+        id: String? = null,
+        init: (HTMLInputElement.() -> Unit)? = null) {
 
     val element = document.createElement("input") as HTMLInputElement
 
+    var updating = false
     id?.let { element.id = id }
     element.className = "form-control"
     element.type = "text"
     value.onNext {
-        element.value = it
+        if (!updating) {
+            element.value = it
+        }
     }
-    element.addEventListener("change", { value.set(element.value)  }, false)
-    element.addEventListener("keyup", { value.set(element.value) }, false)
+    element.addEventListener("change", { updating = true; value.set(element.value); updating = false }, false)
+    element.addEventListener("keyup", { updating = true; value.set(element.value); updating = false }, false)
     disabled.onNext { element.disabled = it }
     readonly.onNext { element.readOnly = it }
+    if (init != null) element.init()
     this.appendChild(element)
-
 }
 
 fun <T> HTMLElement.selectInput(
@@ -110,4 +111,15 @@ fun <T> HTMLElement.singleSelectInput(
             disabled = disabled,
             render = render)
 
+}
+
+fun HTMLElement.intInput(value: Property<Int?>,
+        disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
+        readonly: ReadOnlyProperty<Boolean> = false.toProperty(),
+        id: String? = null,
+        init: (HTMLInputElement.() -> Unit)? = null) {
+    val textValue = value.mapBidirectionally(
+            transform = { if (it == null) "" else it.toString() },
+            reverse = { if (!it.isEmpty()) parseInt(it) else null })
+    textInput(textValue, disabled, readonly, id, init)
 }

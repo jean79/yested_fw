@@ -8,7 +8,7 @@
     <artifactId>Yested</artifactId>
     <version>SNAPSHOT-1</version>
     <properties>
-        <kotlin.version>1.0.3</kotlin.version>
+        <kotlin.version>1.0.4</kotlin.version>
         <build.number>0.1.0.0</build.number>
     </properties>
     <packaging>jar</packaging>
@@ -72,6 +72,12 @@
                         <id>js</id>
                         <goals>
                             <goal>js</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-js</id>
+                        <goals>
+                            <goal>test-js</goal>
                         </goals>
                     </execution>
                 </executions>

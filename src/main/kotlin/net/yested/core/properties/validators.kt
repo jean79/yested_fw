@@ -14,3 +14,7 @@ fun <T> ReadOnlyProperty<T>.validate(errorMessage: String, condition: (T) -> Boo
                 ValidationStatus(success = false, errorMessage = errorMessage)
             }
         }
+
+fun ReadOnlyProperty<ValidationStatus>.isValid(): Boolean {
+    return get().success
+}

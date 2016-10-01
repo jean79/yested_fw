@@ -2,6 +2,7 @@ package net.yested.core.html
 
 import org.w3c.dom.*
 import kotlin.browser.document
+import kotlin.dom.appendText
 
 fun <T : HTMLElement> tag(parent: Element, tagName: String, init:(T.()->Unit)? = null): T {
     val element:T = document.createElement(tagName).asDynamic()
@@ -30,6 +31,15 @@ fun HTMLElement.h3(init:(HTMLHeadingElement.()->Unit)? = null) = tag(this, tagNa
 fun HTMLElement.h4(init:(HTMLHeadingElement.()->Unit)? = null) = tag(this, tagName = "h4", init = init)
 fun HTMLElement.h5(init:(HTMLHeadingElement.()->Unit)? = null) = tag(this, tagName = "h5", init = init)
 fun HTMLElement.h6(init:(HTMLHeadingElement.()->Unit)? = null) = tag(this, tagName = "h6", init = init)
+fun HTMLElement.nbsp(count: Int = 1) = (1..count).forEach { appendText(Typography.nbsp.toString()) }
+fun HTMLElement.hr() = tag<HTMLHRElement>(this, tagName = "hr")
+fun HTMLElement.strong(init:(HTMLSpanElement.()->Unit)? = null) = tag(this, tagName = "strong", init = init)
 fun HTMLElement.button(init:(HTMLButtonElement.()->Unit)? = null) = tag(this, tagName = "button", init = init)
 fun HTMLElement.form(init:(HTMLFormElement.()->Unit)? = null) = tag(this, tagName = "form", init = init)
 fun HTMLElement.label(init:(HTMLLabelElement.()->Unit)? = null) = tag(this, tagName = "label", init = init)
+
+enum class Align(val code:String) {
+   LEFT("left"),
+   CENTER("center"),
+   RIGHT("right")
+}
