@@ -92,8 +92,8 @@ fun HTMLElement.row(init:HTMLDivElement.()->Unit) {
     }
 }
 
-fun HTMLElement.col(width: ColumnDefinition, init: HTMLDivElement.()->Unit) {
-    div { className = width.css
+fun HTMLElement.col(width: ColumnDefinition, init: HTMLDivElement.()->Unit): HTMLDivElement {
+    return div { className = width.css
         init()
     }
 }

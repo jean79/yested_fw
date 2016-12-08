@@ -7,11 +7,11 @@ import kotlin.dom.appendText
 
 class BtsFormItemContext(val labelId: String, val labelElement: HTMLLabelElement, val inputElement: HTMLDivElement) {
 
-    fun btsFormLabel(init: HTMLElement.()->Unit) {
+    fun btsFormLabel(init: HTMLLabelElement.()->Unit) {
         labelElement.init()
     }
 
-    fun btsFormInput(init: HTMLElement.()->Unit) {
+    fun btsFormInput(init: HTMLDivElement.()->Unit) {
         inputElement.init()
     }
 }
@@ -27,36 +27,25 @@ class BtsFormContext(
     fun btsFormItem(
             labelId: String = "${++labelIdSequence}",
             state: ReadOnlyProperty<State>,
-            init: BtsFormItemContext.()->Unit) {
-
-        var labelElement: HTMLLabelElement? = null
-        var inputElement: HTMLDivElement? = null
+            init: BtsFormItemContext.() -> Unit) {
 
         element.formGroup(state = state) {
-            btsLabel(width = labelWidth, htmlFor = labelId) {
-                labelElement = this
-            }
-            if (format == FormFormat.Horizontal) {
-                col(width = inputWidth!!) {
-                    inputElement = this
-                }
+            val labelElement = btsLabel(width = labelWidth, htmlFor = labelId) {}
+            val inputElement = if (format == FormFormat.Horizontal) {
+                col(width = inputWidth!!) {}
             } else {
-                inputElement = this
+                this
             }
+            BtsFormItemContext(labelId = labelId, labelElement = labelElement, inputElement = inputElement)
+                    .init()
         }
-
-        BtsFormItemContext(
-                labelId = labelId,
-                labelElement = labelElement!!,
-                inputElement = inputElement!!).init()
-
     }
 
     fun btsFormItemSimple(
             labelId: String = "${++labelIdSequence}",
             state: ReadOnlyProperty<State>,
             label: String = "",
-            init: HTMLDivElement.(labelId: String)->Unit) {
+            init: HTMLDivElement.(labelId: String) -> Unit) {
 
         element.formGroup(state = state) {
             btsLabel(width = labelWidth, htmlFor = labelId) {
@@ -72,7 +61,7 @@ class BtsFormContext(
         }
     }
 
-    fun btsFormStatic(label: String = "", init:HTMLParagraphElement.()->Unit) {
+    fun btsFormStatic(label: String = "", init: HTMLParagraphElement.() -> Unit) {
 
         element.formGroup {
             btsLabel(width = labelWidth) {

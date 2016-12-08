@@ -35,7 +35,8 @@ fun HTMLElement.btsButton(
         active: Property<Boolean>? = null,
         disabled: ReadOnlyProperty<Boolean>? = null,
         init: HTMLButtonElement.()->Unit) {
-    button { className = "btn btn-${look.code} ${size.code} ${if (block) "btn-block" else ""}"; type = "submit"
+    button { className = "btn btn-${look.code} ${size.code} ${if (block) "btn-block" else ""}"
+        type = if (onclick != null) "button" else "submit"
         addEventListener("click", {  event ->
             onclick?.let { onclick(event) }
             active?.set(!active.get())
