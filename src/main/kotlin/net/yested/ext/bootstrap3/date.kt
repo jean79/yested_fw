@@ -31,7 +31,7 @@ fun HTMLElement.dateInput(data: Property<Moment?>, placeholder: String? = null, 
     var inputElement: HTMLInputElement? = null
 
     val element = div { className = "input-group date"
-        textInput(text) {
+        textInput(text) { size = formatString.length
             inputElement = this
             if (placeholder != null) { this.placeholder = placeholder }
         }

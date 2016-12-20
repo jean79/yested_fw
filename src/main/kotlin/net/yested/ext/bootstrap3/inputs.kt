@@ -8,6 +8,7 @@ import org.w3c.dom.HTMLOptionElement
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.HTMLSpanElement
 import kotlin.browser.document
+import kotlin.dom.addClass
 
 fun HTMLElement.text(value: ReadOnlyProperty<String>) {
     val element = document.createElement("span") as HTMLSpanElement
@@ -121,5 +122,9 @@ fun HTMLElement.intInput(value: Property<Int?>,
     val textValue = value.mapBidirectionally(
             transform = { if (it == null) "" else it.toString() },
             reverse = { if (!it.isEmpty()) parseInt(it) else null })
-    textInput(textValue, disabled, readonly, id, init)
+    textInput(textValue, disabled, readonly, id) {
+        type = "number"; step = "1"
+        addClass("number int")
+        if (init != null) init()
+    }
 }
