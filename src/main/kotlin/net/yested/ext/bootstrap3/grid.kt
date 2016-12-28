@@ -144,7 +144,7 @@ private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyP
 
     val sortedData: ReadOnlyProperty<Iterable<T>?>
     if (sortColumn != null) {
-        sortedData = data.combineLatest<Iterable<T>?, ColumnSort<T>>(sortColumn).map { sortData(it.first, it.second) }
+        sortedData = data.zip<Iterable<T>?, ColumnSort<T>>(sortColumn).map { sortData(it.first, it.second) }
     } else {
         sortedData = data
     }

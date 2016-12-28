@@ -90,8 +90,8 @@ fun <IN, OUT> Property<IN>.mapBidirectionally(transform: (IN)->OUT, reverse: (OU
 
 fun ReadOnlyProperty<Boolean>.not() = this.map { !it }
 
-/** Combines two properties into another one that pairs them together. */
-fun <T,T2> ReadOnlyProperty<T>.combineLatest(property2: ReadOnlyProperty<T2>): ReadOnlyProperty<Pair<T,T2>> {
+/** Zips two properties together into a Pair. */
+fun <T,T2> ReadOnlyProperty<T>.zip(property2: ReadOnlyProperty<T2>): ReadOnlyProperty<Pair<T,T2>> {
     var value1 = this.get()
     var value2 = property2.get()
     val combined = Property(Pair(value1, value2))
@@ -104,6 +104,14 @@ fun <T,T2> ReadOnlyProperty<T>.combineLatest(property2: ReadOnlyProperty<T2>): R
         combined.set(Pair(value1, value2))
     }
     return combined
+}
+
+/**
+ * Combines two properties into another one that pairs them together.
+ * @deprecated use [zip] which has the exact same behavior.
+ */
+fun <V1, V2> ReadOnlyProperty<V1>.combineLatest(other: ReadOnlyProperty<V2>): ReadOnlyProperty<Pair<V1,V2>> {
+    return zip(other)
 }
 
 infix fun <T> ReadOnlyProperty<T>.debug(render: (T)->String):ReadOnlyProperty<T> {
