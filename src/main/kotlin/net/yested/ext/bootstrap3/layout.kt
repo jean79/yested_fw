@@ -40,7 +40,7 @@ class PageContext(val element: HTMLElement, val layout: ContainerWidth) {
 
     fun content(init: HTMLDivElement.() -> Unit) {
         element.div {
-            "class"..layout.code
+            className = layout.code
             init()
         }
    }

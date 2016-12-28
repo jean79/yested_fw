@@ -167,7 +167,7 @@ private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyP
                             (column.label)()
                         } else {
                             a {
-                                "style".."cursor: pointer;"
+                                setAttribute("style", "cursor: pointer;")
                                 onclick = { sortByColumn(column) }
                                 (column.label)()
                             }
@@ -194,7 +194,7 @@ private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyP
                         tr {
                             columns.forEach { column ->
                                 td {
-                                    "class" .. "text-${column.align.code}";
+                                    className = "text-${column.align.code}"
                                     (column.render)(item)
                                 }
                             }
