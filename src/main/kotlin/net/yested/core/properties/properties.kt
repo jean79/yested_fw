@@ -106,6 +106,27 @@ fun <T,T2> ReadOnlyProperty<T>.zip(property2: ReadOnlyProperty<T2>): ReadOnlyPro
     return combined
 }
 
+/** Zips three properties together into a Triple. */
+fun <T,T2,T3> ReadOnlyProperty<T>.zip(property2: ReadOnlyProperty<T2>, property3: ReadOnlyProperty<T3>): ReadOnlyProperty<Triple<T,T2,T3>> {
+    var value1 = this.get()
+    var value2 = property2.get()
+    var value3 = property3.get()
+    val combined = Property(Triple(value1, value2, value3))
+    this.onNext {
+        value1 = it
+        combined.set(Triple(value1, value2, value3))
+    }
+    property2.onNext {
+        value2 = it
+        combined.set(Triple(value1, value2, value3))
+    }
+    property3.onNext {
+        value3 = it
+        combined.set(Triple(value1, value2, value3))
+    }
+    return combined
+}
+
 /**
  * Combines two properties into another one that pairs them together.
  * @deprecated use [zip] which has the exact same behavior.
