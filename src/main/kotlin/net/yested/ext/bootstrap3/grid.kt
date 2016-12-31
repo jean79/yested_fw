@@ -92,8 +92,8 @@ fun HTMLElement.row(init:HTMLDivElement.()->Unit) {
     }
 }
 
-fun HTMLElement.col(width: ColumnDefinition, init: HTMLDivElement.()->Unit) {
-    div { className = width.css
+fun HTMLElement.col(width: ColumnDefinition, init: HTMLDivElement.()->Unit): HTMLDivElement {
+    return div { className = width.css
         init()
     }
 }
@@ -144,7 +144,7 @@ private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyP
 
     val sortedData: ReadOnlyProperty<Iterable<T>?>
     if (sortColumn != null) {
-        sortedData = data.combineLatest<Iterable<T>?, ColumnSort<T>>(sortColumn).map { sortData(it.first, it.second) }
+        sortedData = data.zip<Iterable<T>?, ColumnSort<T>>(sortColumn).map { sortData(it.first, it.second) }
     } else {
         sortedData = data
     }
@@ -167,7 +167,7 @@ private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyP
                             (column.label)()
                         } else {
                             a {
-                                "style".."cursor: pointer;"
+                                setAttribute("style", "cursor: pointer;")
                                 onclick = { sortByColumn(column) }
                                 (column.label)()
                             }
@@ -194,7 +194,7 @@ private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyP
                         tr {
                             columns.forEach { column ->
                                 td {
-                                    "class" .. "text-${column.align.code}";
+                                    className = "text-${column.align.code}"
                                     (column.render)(item)
                                 }
                             }

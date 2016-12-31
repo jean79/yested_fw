@@ -8,6 +8,7 @@ import org.w3c.dom.HTMLOptionElement
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.HTMLSpanElement
 import kotlin.browser.document
+import kotlin.dom.addClass
 
 fun HTMLElement.text(value: ReadOnlyProperty<String>) {
     val element = document.createElement("span") as HTMLSpanElement
@@ -59,7 +60,7 @@ fun <T> HTMLElement.selectInput(
         it.forEachIndexed { index, item ->
             val option: HTMLOptionElement = document.createElement("option").asDynamic()
             option.value = "$index"
-            if (item == selected.get().filter { it == item}.isNotEmpty()) {
+            if (selected.get().filter { it == item}.isNotEmpty()) {
                 option.selected = true
             }
             option.render(item)
@@ -90,19 +91,7 @@ fun <T> HTMLElement.singleSelectInput(
         disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
         render: HTMLElement.(T)->Unit) {
 
-    val multipleSelected = Property<List<T>>(listOf())
-
-    var changingHere = false
-    selected.onNext {
-        changingHere = true
-        multipleSelected.set(listOf(it))
-        changingHere = false
-    }
-    multipleSelected.onNext {
-        if (!changingHere) {
-            selected.set(it.first())
-        }
-    }
+    val multipleSelected = selected.mapBidirectionally({ if (it == null) emptyList() else listOf(it) }, { it.firstOrNull() as T })
 
     selectInput(
             selected = multipleSelected,
@@ -121,5 +110,9 @@ fun HTMLElement.intInput(value: Property<Int?>,
     val textValue = value.mapBidirectionally(
             transform = { if (it == null) "" else it.toString() },
             reverse = { if (!it.isEmpty()) parseInt(it) else null })
-    textInput(textValue, disabled, readonly, id, init)
+    textInput(textValue, disabled, readonly, id) {
+        type = "number"; step = "1"
+        addClass("number int")
+        if (init != null) init()
+    }
 }

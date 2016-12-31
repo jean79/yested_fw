@@ -47,6 +47,44 @@ class PropertyTest {
     }
 
     @Test
+    fun zip() {
+        val int1Property = 123.toProperty()
+        val int2Property = 456.toProperty()
+        val textProperty = int1Property.zip(int2Property).map { pair ->
+            val (int1, int2) = pair
+            "" + int1 + int2
+        }
+        textProperty.get().mustBe("123456")
+
+        int1Property.set(999)
+        textProperty.get().mustBe("999456")
+
+        int2Property.set(555)
+        textProperty.get().mustBe("999555")
+    }
+
+    @Test
+    fun zip_triple() {
+        val int1Property = 123.toProperty()
+        val int2Property = 456.toProperty()
+        val stringProperty = "hello".toProperty()
+        val textProperty = int1Property.zip(int2Property, stringProperty).map { triple ->
+            val (int1, int2, string) = triple
+            "" + int1 + int2 + string
+        }
+        textProperty.get().mustBe("123456hello")
+
+        int1Property.set(999)
+        textProperty.get().mustBe("999456hello")
+
+        int2Property.set(555)
+        textProperty.get().mustBe("999555hello")
+
+        stringProperty.set("bye")
+        textProperty.get().mustBe("999555bye")
+    }
+
+    @Test
     fun mapBidirectionally_shouldUpdateTheNewProperty() {
         val intProperty = 123.toProperty()
         val textProperty = intProperty.mapBidirectionally(
