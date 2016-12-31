@@ -60,7 +60,7 @@ fun <T> HTMLElement.selectInput(
         it.forEachIndexed { index, item ->
             val option: HTMLOptionElement = document.createElement("option").asDynamic()
             option.value = "$index"
-            if (item == selected.get().filter { it == item}.isNotEmpty()) {
+            if (selected.get().filter { it == item}.isNotEmpty()) {
                 option.selected = true
             }
             option.render(item)
@@ -91,19 +91,7 @@ fun <T> HTMLElement.singleSelectInput(
         disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
         render: HTMLElement.(T)->Unit) {
 
-    val multipleSelected = Property<List<T>>(listOf())
-
-    var changingHere = false
-    selected.onNext {
-        changingHere = true
-        multipleSelected.set(listOf(it))
-        changingHere = false
-    }
-    multipleSelected.onNext {
-        if (!changingHere) {
-            selected.set(it.first())
-        }
-    }
+    val multipleSelected = selected.mapBidirectionally({ if (it == null) emptyList() else listOf(it) }, { it.firstOrNull() as T })
 
     selectInput(
             selected = multipleSelected,
