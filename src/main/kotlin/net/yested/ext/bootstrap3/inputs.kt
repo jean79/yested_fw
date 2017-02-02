@@ -24,7 +24,7 @@ fun HTMLElement.textInput(
         readonly: ReadOnlyProperty<Boolean> = false.toProperty(),
         id: String? = null,
         inputTypeClass: String = "text",
-        init: (HTMLInputElement.() -> Unit)? = null) {
+        init: (HTMLInputElement.() -> Unit)? = null): HTMLInputElement {
 
     val element = document.createElement("input") as HTMLInputElement
 
@@ -44,6 +44,7 @@ fun HTMLElement.textInput(
     readonly.onNext { element.readOnly = it }
     if (init != null) element.init()
     this.appendChild(element)
+    return element
 }
 
 fun <T> HTMLElement.selectInput(
