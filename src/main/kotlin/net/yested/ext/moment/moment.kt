@@ -1,4 +1,7 @@
-package net.yested.ext.bootstrap3.utils
+package net.yested.ext.moment
+
+import net.yested.core.properties.Property
+import net.yested.core.properties.bind
 
 @native("moment") private fun moment_js(): MomentJs = noImpl
 @native("moment") private fun moment_js(millisecondsSinceUnixEpoch: Long): MomentJs = noImpl
@@ -91,7 +94,7 @@ class Moment(private val moment: MomentJs) {
 
         fun parse(input: String, format: String): Moment = Moment(moment_js(input, format))
 
-        fun parseMillisecondsSinceUnixEpoch(millisecondsSinceUnixEpoch: Long): Moment{
+        fun parseMillisecondsSinceUnixEpoch(millisecondsSinceUnixEpoch: Long): Moment {
             requireNotNull(millisecondsSinceUnixEpoch)
             return Moment(moment_js(millisecondsSinceUnixEpoch))
         }
@@ -127,7 +130,7 @@ class FormatString(private val elements: MutableList<FormatElement> = arrayListO
     override fun toString(): String = elements.map { it.str }.joinToString(separator = "")
 }
 
-class Digit(private val oneDigitFactory: ()->FormatElement, private val twoDigitsFactory: ()->FormatElement, private val fourDigitsFactory: ()->FormatElement) {
+class Digit(private val oneDigitFactory: ()-> FormatElement, private val twoDigitsFactory: ()-> FormatElement, private val fourDigitsFactory: ()-> FormatElement) {
     val oneDigit: FormatElement
         get() = oneDigitFactory()
     val twoDigits: FormatElement
@@ -148,4 +151,10 @@ class FormatStringBuilder() {
 
 fun format(init: FormatStringBuilder.() -> FormatString): FormatString {
     return FormatStringBuilder().init()
+}
+
+fun Property<Moment?>.asText(formatString: String): Property<String> {
+    return this.bind(
+                transform = { if (it == null) "" else it.format(formatString) },
+                reverse = { if (it.isEmpty()) null else Moment.parse(it, formatString) })
 }

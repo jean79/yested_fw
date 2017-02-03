@@ -1,18 +1,17 @@
-package net.yested.ext.bootstrap3
+package net.yested.ext.moment
 
 import net.yested.core.properties.Property
 import net.yested.core.properties.toProperty
-import net.yested.ext.bootstrap3.utils.*
 import org.junit.Test
 import spec.*
 
 /**
- * A test for [dateInput], etc.
+ * A test for [Moment], etc.
  * @author Eric Pabst (epabst@gmail.com)
  * Date: 9/29/16
  * Time: 1:51 PM
  */
-class InputTest {
+class MomentTest {
     @Test
     fun MomentProperty_asText_shouldKeepInSync() {
         val builder = FormatStringBuilder()
