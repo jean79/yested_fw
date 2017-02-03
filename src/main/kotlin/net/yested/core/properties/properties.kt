@@ -72,7 +72,7 @@ fun <IN, OUT> ReadOnlyProperty<IN>.mapAsDefault(transform: (IN)->OUT): Property<
  * This is useful when either property can be modified and the other property should reflect the change,
  * but it should not circle back to again update the property that was modified.
  */
-fun <IN, OUT> Property<IN>.mapBidirectionally(transform: (IN)->OUT, reverse: (OUT)->IN): Property<OUT> {
+fun <IN, OUT> Property<IN>.bind(transform: (IN)->OUT, reverse: (OUT)->IN): Property<OUT> {
     var updating = false
     val transformedProperty = Property(transform(this.get()))
     this.onNext {
@@ -93,7 +93,7 @@ fun <IN, OUT> Property<IN>.mapBidirectionally(transform: (IN)->OUT, reverse: (OU
  * This is useful when either property can be modified and the other property should reflect the change,
  * but it should not circle back to again update the property that was modified.
  */
-fun <IN, OUT1, OUT2> Property<IN>.mapPartsBidirectionally(transform1: (IN)->OUT1, transform2: (IN)->OUT2, reverse: (OUT1, OUT2)->IN): Pair<Property<OUT1>, Property<OUT2>> {
+fun <IN, OUT1, OUT2> Property<IN>.bindParts(transform1: (IN)->OUT1, transform2: (IN)->OUT2, reverse: (OUT1, OUT2)->IN): Pair<Property<OUT1>, Property<OUT2>> {
     var updating = false
     val transformedProperty1 = Property(transform1(this.get()))
     val transformedProperty2 = Property(transform2(this.get()))

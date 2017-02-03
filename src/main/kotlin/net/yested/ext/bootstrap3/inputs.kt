@@ -90,7 +90,7 @@ fun <T> HTMLElement.singleSelectInput(
         disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
         render: HTMLElement.(T)->Unit) {
 
-    val multipleSelected = selected.mapBidirectionally({ if (it == null) emptyList() else listOf(it) }, { it.firstOrNull() as T })
+    val multipleSelected = selected.bind({ if (it == null) emptyList() else listOf(it) }, { it.firstOrNull() as T })
 
     selectInput(
             selected = multipleSelected,
@@ -106,7 +106,7 @@ fun HTMLElement.intInput(value: Property<Int?>,
         readonly: ReadOnlyProperty<Boolean> = false.toProperty(),
         id: String? = null,
         init: (HTMLInputElement.() -> Unit)? = null) {
-    val textValue = value.mapBidirectionally(
+    val textValue = value.bind(
             transform = { if (it == null) "" else it.toString() },
             reverse = { if (!it.isEmpty()) parseInt(it) else null })
     textInput(textValue, disabled, readonly, id, inputTypeClass = "number int") {

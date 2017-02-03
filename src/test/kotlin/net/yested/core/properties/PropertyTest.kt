@@ -85,27 +85,27 @@ class PropertyTest {
     }
 
     @Test
-    fun mapBidirectionally_shouldUpdateTheNewProperty() {
+    fun bind_shouldUpdateTheNewProperty() {
         val intProperty = 123.toProperty()
-        val textProperty = intProperty.mapBidirectionally(
+        val textProperty = intProperty.bind(
                 transform = { it.toString() }, reverse = { parseInt(it) })
         intProperty.set(456)
         textProperty.get().mustBe("456")
     }
 
     @Test
-    fun mapBidirectionally_shouldUpdateTheOriginalProperty() {
+    fun bind_shouldUpdateTheOriginalProperty() {
         val intProperty = 123.toProperty()
-        val textProperty = intProperty.mapBidirectionally(
+        val textProperty = intProperty.bind(
                 transform = { it.toString() }, reverse = { parseInt(it) })
         textProperty.set("456")
         intProperty.get().mustBe(456)
     }
 
     @Test
-    fun mapBidirectionally_shouldNotUpdateThePropertyBeingChanged() {
+    fun bind_shouldNotUpdateThePropertyBeingChanged() {
         val intProperty = 123.toProperty()
-        val textProperty = intProperty.mapBidirectionally(
+        val textProperty = intProperty.bind(
                 transform = { it.toString() }, reverse = { parseInt(it) })
         textProperty.set("00456")
         intProperty.get().mustBe(456)
@@ -113,9 +113,9 @@ class PropertyTest {
     }
 
     @Test
-    fun mapPartsBidirectionally_shouldUpdateTheNewProperties() {
+    fun bindParts_shouldUpdateTheNewProperties() {
         val intProperty = 123.toProperty()
-        val (negativeProperty, absProperty) = intProperty.mapPartsBidirectionally(
+        val (negativeProperty, absProperty) = intProperty.bindParts(
                 { it < 0.00 }, { it.abs() },
                 { negative, abs -> abs * (if (negative) -1 else 1) })
         intProperty.set(-456)
@@ -124,9 +124,9 @@ class PropertyTest {
     }
 
     @Test
-    fun mapPartsBidirectionally_shouldUpdateTheOriginalProperty() {
+    fun bindParts_shouldUpdateTheOriginalProperty() {
         val intProperty = 123.toProperty()
-        val (negativeProperty, absProperty) = intProperty.mapPartsBidirectionally(
+        val (negativeProperty, absProperty) = intProperty.bindParts(
                 { it < 0.00 }, { it.abs() },
                 { negative, abs -> abs * (if (negative) -1 else 1) })
         negativeProperty.set(true)
