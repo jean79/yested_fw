@@ -1,5 +1,8 @@
 package net.yested.ext.bootstrap3
 
+import net.yested.core.html.bind
+import net.yested.core.html.setDisabled
+import net.yested.core.html.setReadOnly
 import net.yested.core.properties.*
 import net.yested.core.utils.removeAllChildElements
 import org.w3c.dom.HTMLElement
@@ -28,20 +31,13 @@ fun HTMLElement.textInput(
 
     val element = document.createElement("input") as HTMLInputElement
 
-    var updating = false
     id?.let { element.id = id }
     element.className = "form-control"
     element.addClass(inputTypeClass)
     element.type = "text"
-    value.onNext {
-        if (!updating) {
-            element.value = it
-        }
-    }
-    element.addEventListener("change", { updating = true; value.set(element.value); updating = false }, false)
-    element.addEventListener("keyup", { updating = true; value.set(element.value); updating = false }, false)
-    disabled.onNext { element.disabled = it }
-    readonly.onNext { element.readOnly = it }
+    element.bind(value)
+    element.setDisabled(disabled)
+    element.setReadOnly(readonly)
     if (init != null) element.init()
     this.appendChild(element)
     return element
@@ -71,7 +67,7 @@ fun <T> HTMLElement.selectInput(
         }
     }
 
-    disabled.onNext { element.disabled = it }
+    element.setDisabled(disabled)
 
     element.addEventListener("change", {
 

@@ -1,5 +1,6 @@
 package net.yested.ext.bootstrap3
 
+import net.yested.core.html.setClassPresence
 import net.yested.core.html.li
 import net.yested.core.html.ul
 import net.yested.core.properties.ReadOnlyProperty
@@ -17,20 +18,8 @@ class NavContext(val el: HTMLUListElement) {
             disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
             init: HTMLLIElement.()->Unit) {
         el.li {
-            active.onNext {
-                if (it) {
-                    addClass("active")
-                } else {
-                    removeClass("active")
-                }
-            }
-            disabled.onNext {
-                if (it) {
-                    addClass("disabled")
-                } else {
-                    removeClass("disabled")
-                }
-            }
+            setClassPresence("active", active)
+            setClassPresence("disabled", disabled)
             init()
         }
     }
