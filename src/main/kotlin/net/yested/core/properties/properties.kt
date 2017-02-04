@@ -1,5 +1,6 @@
 package net.yested.core.properties
 
+import net.yested.core.utils.SortSpecification
 import java.util.*
 
 interface Disposable {
@@ -232,6 +233,10 @@ fun <T> Property<List<T>>.modifyList(operation: (ArrayList<T>) -> Unit) {
 fun <T> Property<List<T>>.clear() { modifyList { it.clear() } }
 fun <T> Property<List<T>>.removeAt(index: Int) { modifyList { it.removeAt(index) } }
 fun <T> Property<List<T>>.add(item: T) { modifyList { it.add(item) } }
+
+fun <T> ReadOnlyProperty<Iterable<T>?>.sortedWith(sortSpecification: ReadOnlyProperty<SortSpecification<T>?>): ReadOnlyProperty<Iterable<T>?> {
+    return sortedWith(sortSpecification.map { it?.fullComparator })
+}
 
 fun <T> ReadOnlyProperty<Iterable<T>?>.sortedWith(comparator: ReadOnlyProperty<Comparator<T>?>): ReadOnlyProperty<Iterable<T>?> {
     return mapWith(comparator) { toSort, comparator ->

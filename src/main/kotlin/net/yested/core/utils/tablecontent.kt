@@ -1,0 +1,105 @@
+package net.yested.core.utils
+
+import net.yested.core.html.*
+import net.yested.core.properties.Property
+import net.yested.core.properties.ReadOnlyProperty
+import net.yested.core.properties.mapAsDefault
+import org.w3c.dom.*
+import java.util.*
+import kotlin.comparisons.*
+
+/**
+ * Makes a [th] be sortable.
+ * @param currentSort the Property that controls the sorting of a list. See [net.yested.core.properties.sortedWith].
+ * @param comparator see [kotlin.comparisons.compareByValue]
+ * @return a Boolean Property that is null if inactive, true if ascending, and false if descending.
+ * It is useful for displaying an arrow or other indicator or for modifying the currentSort as a Boolean? for convenience.
+ * Example:<pre>
+ *   val currentSort = Property<SortSpecification<String>?>(null)
+ *   val sortedData = data.sortedWith(currentSort)
+ *   table {
+ *       thead {
+ *           th { sortControl(currentSort, compareBy<Item> { it.name }) { appendText("Name") } }
+ *           th { sortControl(currentSort, compareBy<item> { it.quantity }) { appendText("Quantity") } }
+ *       }
+ *       tbody(sortedData) { item -> ... }
+ *   }
+ * </pre>
+ *
+ * @author Eric Pabst (epabst@gmail.com)
+ * Date: 2/3/17
+ * Time: 4:51 PM
+ */
+fun <T> HTMLTableHeaderCellElement.sortControl(currentSort: Property<SortSpecification<T>?>,
+                                               comparator: Comparator<T>, sortAscending: Boolean = true,
+                                               sortNow: Boolean = false, init: HTMLElement.() -> Unit): Property<Boolean?> {
+    val sortSpecification = SortSpecification(comparator, sortAscending)
+    val sortControlProperty = currentSort.mapAsDefault {
+        if (it == null || it.sortableId != sortSpecification.sortableId) null else it.ascending
+    }
+    sortControlProperty.onNext {
+        if (it != null) {
+            currentSort.set(if (it) sortSpecification else sortSpecification.reverse)
+        } else if (currentSort.get()?.sortableId == sortSpecification.sortableId) {
+            currentSort.set(null)
+        } // else leave it alone
+    }
+    if (sortNow) sortControlProperty.set(sortAscending)
+    a {
+        setAttribute("style", "cursor: pointer;")
+        onclick = { sortControlProperty.set(sortControlProperty.get()?.let { !it } ?: sortAscending) }
+        init()
+    }
+    return sortControlProperty
+}
+
+class SortSpecification<T> private constructor (val comparator: Comparator<T>, val ascending: Boolean, val sortableId: Int) {
+    constructor(comparator: Comparator<T>, ascending: Boolean = true) : this(comparator, ascending, nextSortableId++)
+
+    val fullComparator: Comparator<T>? = if (ascending) comparator else comparator.reversed()
+    val reverse: SortSpecification<T> by lazy { SortSpecification(comparator, !ascending, sortableId) }
+
+    private companion object {
+        private var nextSortableId: Int = 1
+    }
+}
+
+/**
+ * A library-agnostic definition of table content.
+ * Example:<pre>
+ *   table {
+ *       thead {
+ *           th { appendText("Name") }
+ *           th { appendText("Value") }
+ *       }
+ *       tbody(myData) { index, item ->
+ *           tr { className = if (index % 2 == 0) "even" else "odd"
+ *               td { appendText(item.name) }
+ *               td { appendText(item.value) }
+ *           }
+ *       }
+ *   }
+ * </pre>
+ */
+
+fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, tbodyItemInit: HTMLTableSectionElement.(Int, T)->Unit) {
+    orderedData.onNext { values ->
+        removeChildByName("tbody")
+        tbody {
+            values?.forEachIndexed { index, item ->
+                tbodyItemInit(index, item)
+            }
+        }
+    }
+}
+
+fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, tbodyItemInit: HTMLTableSectionElement.(T)->Unit) {
+    orderedData.onNext { values ->
+        removeChildByName("tbody")
+        tbody {
+            values?.forEach { item ->
+                tbodyItemInit(item)
+            }
+        }
+    }
+}
