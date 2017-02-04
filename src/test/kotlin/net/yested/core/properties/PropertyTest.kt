@@ -111,4 +111,33 @@ class PropertyTest {
         intProperty.get().mustBe(456)
         textProperty.get().mustBe("00456")
     }
+
+    @Test
+    fun mapPartsBidirectionally_shouldUpdateTheNewProperties() {
+        val intProperty = 123.toProperty()
+        val (negativeProperty, absProperty) = intProperty.mapPartsBidirectionally(
+                { it < 0.00 }, { it.abs() },
+                { negative, abs -> abs * (if (negative) -1 else 1) })
+        intProperty.set(-456)
+        negativeProperty.get().mustBe(true)
+        absProperty.get().mustBe(456)
+    }
+
+    @Test
+    fun mapPartsBidirectionally_shouldUpdateTheOriginalProperty() {
+        val intProperty = 123.toProperty()
+        val (negativeProperty, absProperty) = intProperty.mapPartsBidirectionally(
+                { it < 0.00 }, { it.abs() },
+                { negative, abs -> abs * (if (negative) -1 else 1) })
+        negativeProperty.set(true)
+        intProperty.get().mustBe(-123)
+
+        absProperty.set(342)
+        intProperty.get().mustBe(-342)
+
+        negativeProperty.set(false)
+        intProperty.get().mustBe(342)
+    }
+
+    fun Int.abs(): Int = if (this < 0) -1 * this else this
 }

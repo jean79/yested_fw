@@ -23,13 +23,15 @@ fun HTMLElement.textInput(
         disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
         readonly: ReadOnlyProperty<Boolean> = false.toProperty(),
         id: String? = null,
-        init: (HTMLInputElement.() -> Unit)? = null) {
+        inputTypeClass: String = "text",
+        init: (HTMLInputElement.() -> Unit)? = null): HTMLInputElement {
 
     val element = document.createElement("input") as HTMLInputElement
 
     var updating = false
     id?.let { element.id = id }
     element.className = "form-control"
+    element.addClass(inputTypeClass)
     element.type = "text"
     value.onNext {
         if (!updating) {
@@ -42,6 +44,7 @@ fun HTMLElement.textInput(
     readonly.onNext { element.readOnly = it }
     if (init != null) element.init()
     this.appendChild(element)
+    return element
 }
 
 fun <T> HTMLElement.selectInput(
@@ -110,9 +113,8 @@ fun HTMLElement.intInput(value: Property<Int?>,
     val textValue = value.mapBidirectionally(
             transform = { if (it == null) "" else it.toString() },
             reverse = { if (!it.isEmpty()) parseInt(it) else null })
-    textInput(textValue, disabled, readonly, id) {
+    textInput(textValue, disabled, readonly, id, inputTypeClass = "number int") {
         type = "number"; step = "1"
-        addClass("number int")
         if (init != null) init()
     }
 }

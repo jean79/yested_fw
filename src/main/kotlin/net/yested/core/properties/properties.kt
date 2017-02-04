@@ -88,6 +88,34 @@ fun <IN, OUT> Property<IN>.mapBidirectionally(transform: (IN)->OUT, reverse: (OU
     return transformedProperty
 }
 
+/**
+ * Map a Property to two Properties and vice-versa.
+ * This is useful when either property can be modified and the other property should reflect the change,
+ * but it should not circle back to again update the property that was modified.
+ */
+fun <IN, OUT1, OUT2> Property<IN>.mapPartsBidirectionally(transform1: (IN)->OUT1, transform2: (IN)->OUT2, reverse: (OUT1, OUT2)->IN): Pair<Property<OUT1>, Property<OUT2>> {
+    var updating = false
+    val transformedProperty1 = Property(transform1(this.get()))
+    val transformedProperty2 = Property(transform2(this.get()))
+    this.onNext {
+        if (!updating) {
+            transformedProperty1.set(transform1(it))
+            transformedProperty2.set(transform2(it))
+        }
+    }
+    transformedProperty1.onNext {
+        updating = true
+        try { this.set(reverse(it, transformedProperty2.get())) }
+        finally { updating = false }
+    }
+    transformedProperty2.onNext {
+        updating = true
+        try { this.set(reverse(transformedProperty1.get(), it)) }
+        finally { updating = false }
+    }
+    return Pair(transformedProperty1, transformedProperty2)
+}
+
 fun ReadOnlyProperty<Boolean>.not() = this.map { !it }
 
 /** Zips two properties together into a Pair. */
