@@ -1,6 +1,8 @@
 package net.yested.core.utils
 
 import net.yested.core.properties.Property
+import java.util.*
+import kotlin.comparisons.compareBy
 import kotlin.comparisons.compareValues
 
 infix fun <T> T.with(doWith: T.()->Unit): T {
@@ -15,4 +17,9 @@ fun <T, V : Comparable<V>> compareByValue(get: (T) -> V?): (T, T) -> Int {
 /** Compare two Property values.  This is especially useful when using a grid of Iterable<Property<T>>. */
 fun <T, V : Comparable<V>> compareByPropertyValue(get: (T) -> V?): (Property<T>, Property<T>) -> Int {
     return compareByValue<Property<T>,V> { get(it.get()) }
+}
+
+/** Compare two Property values.  This is especially useful when using a grid of Iterable<Property<T>>. */
+fun <T> compareByProperty(get: (T) -> Comparable<*>?): Comparator<Property<T>> {
+    return compareBy { get(it.get()) }
 }

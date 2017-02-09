@@ -129,21 +129,12 @@ fun <T> HTMLElement.grid(responsive: Boolean = false, columns: Array<Column<T>>,
 
 private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyProperty<Iterable<T>?>,
                                       sortColumn: Property<Column<T>?>) {
-    data class ColumnSort<T>(val column: Column<T>, val ascending: Boolean)
-
-    val columnSort: Property<ColumnSort<T>?> = sortColumn.mapAsDefault { it?.let { ColumnSort(it, it.sortAscending!!) } }
-
-    fun sortData(toSort:Iterable<T>?, columnSort: ColumnSort<T>?):Iterable<T>? {
-        val sortFunction = columnSort?.column?.sortFunction
-        if (sortFunction == null || toSort == null) {
-            return toSort
-        }
-        val ascending = columnSort!!.ascending
-        //return toSort.sortedWith(comparator = Comparator { t, t ->  })
-        return toSort.sortedWith(comparator = Comparator { obj1: T, obj2: T ->  (sortFunction(obj1, obj2)) * (if (ascending) 1 else -1)})
+    data class ColumnSort<T>(val column: Column<T>, val ascending: Boolean) {
+        val comparator: Comparator<T>? = column.sortFunction?.let { Comparator { obj1: T, obj2: T -> (it(obj1, obj2)) * (if (ascending) 1 else -1) } }
     }
 
-    val sortedData: ReadOnlyProperty<Iterable<T>?> = data.zip<Iterable<T>?, ColumnSort<T>?>(columnSort).map { sortData(it.first, it.second) }
+    val columnSort: Property<ColumnSort<T>?> = sortColumn.mapAsDefault { it?.let { ColumnSort(it, it.sortAscending!!) } }
+    val sortedData = data.sortedWith(columnSort.map { it?.comparator })
 
     fun sortByColumn(column: Column<T>) {
         if (column == sortColumn.get()) {

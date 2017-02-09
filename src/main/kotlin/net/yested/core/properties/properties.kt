@@ -10,11 +10,13 @@ private interface PropertyChangeListener<in T> {
     fun onNext(value: T)
 }
 
+/** A Property that can be subscribed to.  The T value should be immutable or else its changes won't be detected. */
 interface ReadOnlyProperty<out T> {
     fun get():T
     fun onNext(handler: (T)->Unit):Disposable
 }
 
+/** A mutable Property that can be subscribed to.  The T value should be immutable or else its changes won't be detected. */
 class Property<T>(initialValue: T): ReadOnlyProperty<T> {
 
     private var value : T = initialValue
@@ -29,6 +31,16 @@ class Property<T>(initialValue: T): ReadOnlyProperty<T> {
             valueHashCode = newValueHashCode
             listeners.forEach { it.onNext(value) }
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (!(other is Property<*>)) return false
+        return value == other.value
+    }
+
+    override fun hashCode(): Int {
+        return value?.hashCode() ?: 0
     }
 
     override fun get() = value
@@ -47,7 +59,6 @@ class Property<T>(initialValue: T): ReadOnlyProperty<T> {
             }
         }
     }
-
 }
 
 fun <IN, OUT> ReadOnlyProperty<IN>.map(transform: (IN)->OUT): ReadOnlyProperty<OUT> {
@@ -221,3 +232,13 @@ fun <T> Property<List<T>>.modifyList(operation: (ArrayList<T>) -> Unit) {
 fun <T> Property<List<T>>.clear() { modifyList { it.clear() } }
 fun <T> Property<List<T>>.removeAt(index: Int) { modifyList { it.removeAt(index) } }
 fun <T> Property<List<T>>.add(item: T) { modifyList { it.add(item) } }
+
+fun <T> ReadOnlyProperty<Iterable<T>?>.sortedWith(comparator: ReadOnlyProperty<Comparator<T>?>): ReadOnlyProperty<Iterable<T>?> {
+    return mapWith(comparator) { toSort, comparator ->
+        if (comparator == null || toSort == null) {
+            toSort
+        } else {
+            toSort.sortedWith(comparator)
+        }
+    }
+}

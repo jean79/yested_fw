@@ -2,6 +2,7 @@ package net.yested.core.properties
 
 import org.junit.Test
 import spec.*
+import java.util.*
 
 /**
  * A test for [Property].
@@ -115,6 +116,89 @@ class PropertyTest {
 
         int3Property.set(555)
         textProperty.get().mustBe("999456555")
+    }
+
+    @Test
+    fun sortedWith() {
+        val listProperty = listOf(3, 1, 2).toProperty()
+        val comparatorProperty = Property<Comparator<Int>?>(null)
+        val sortedListProperty = listProperty.sortedWith(comparatorProperty)
+        sortedListProperty.get().mustBe(listOf(3, 1, 2))
+
+        comparatorProperty.set(Comparator<Int> { obj1, obj2 -> obj1 - obj2 })
+        sortedListProperty.get().mustBe(listOf(1, 2, 3))
+
+        comparatorProperty.set(Comparator<Int> { obj1, obj2 -> obj2 - obj1 })
+        sortedListProperty.get().mustBe(listOf(3, 2, 1))
+
+        comparatorProperty.set(null)
+        sortedListProperty.get().mustBe(listOf(3, 1, 2))
+    }
+
+    @Test
+    fun sortedWith_listOfProperties_replaceEntry() {
+        val one = 1.toProperty()
+        val two = 2.toProperty()
+        val three = 3.toProperty()
+        val listProperty = listOf(three, one, two).toProperty()
+        val comparatorProperty = Property(Comparator<Property<Int>> { obj1, obj2 -> obj1.get() - obj2.get() })
+        val sortedListProperty = listProperty.sortedWith(comparatorProperty)
+        sortedListProperty.get().mustBe(listOf(one, two, three))
+
+        val four = 4.toProperty()
+        listProperty.set(listOf(four, one, two))
+        sortedListProperty.get().mustBe(listOf(one, two, four))
+    }
+
+    fun <T> Property<T>.detectContentChange() {
+        set(get())
+    }
+
+    @Test
+    fun sortedWith_listOfProperties_modifyProperty() {
+        val one = 1.toProperty()
+        val x = 2.toProperty()
+        val three = 3.toProperty()
+        val listProperty = listOf(three, one, x).toProperty()
+        val comparatorProperty = Property<Comparator<Property<Int>>?>(null)
+        val sortedListProperty = listProperty.sortedWith(comparatorProperty)
+        sortedListProperty.get().mustBe(listOf(three, one, x))
+
+        comparatorProperty.set(Comparator<Property<Int>> { obj1, obj2 -> obj1.get() - obj2.get() })
+        sortedListProperty.get().mustBe(listOf(one, x, three))
+
+        var onNextCount = 0
+        sortedListProperty.onNext { onNextCount++ }
+
+        // unfortunately (but better for performance), this won't cause the list to be resorted.
+        x.set(0)
+        sortedListProperty.get().mustBe(listOf(one, x, three))
+        onNextCount.mustBe(1)
+
+        // this should cause the list to be resorted since its value hash has changed
+        listProperty.detectContentChange()
+        sortedListProperty.get().mustBe(listOf(x, one, three))
+        onNextCount.mustBe(2)
+    }
+
+    @Test
+    fun pairOfProperties_detectChange() {
+        val one = 1.toProperty()
+        val x = 2.toProperty()
+        val pairProperty = Pair(one, x).toProperty()
+
+        var onNextCount = 0
+        pairProperty.onNext { onNextCount++ }
+        onNextCount.mustBe(1)
+
+        // unfortunately (but better for performance), this won't cause the list to be resorted.
+        x.set(0)
+        pairProperty.get()
+        onNextCount.mustBe(1)
+
+        // pinging the property should cause it to be republished since its value hash has changed
+        pairProperty.set(pairProperty.get())
+        onNextCount.mustBe(2)
     }
 
     @Test
