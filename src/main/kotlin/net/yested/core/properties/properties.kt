@@ -67,6 +67,44 @@ fun <IN, OUT> ReadOnlyProperty<IN>.mapAsDefault(transform: (IN)->OUT): Property<
     return property
 }
 
+/** Maps two properties together to calculate a single result. */
+fun <T,T2,OUT> ReadOnlyProperty<T>.mapWith(property2: ReadOnlyProperty<T2>, transform: (T,T2)->OUT): ReadOnlyProperty<OUT> {
+    var value1 = this.get()
+    var value2 = property2.get()
+    val result = Property(transform(value1, value2))
+    this.onNext {
+        value1 = it
+        result.set(transform(value1, value2))
+    }
+    property2.onNext {
+        value2 = it
+        result.set(transform(value1, value2))
+    }
+    return result
+}
+
+/** Maps three properties together to calculate a single result. */
+fun <T,T2,T3,OUT> ReadOnlyProperty<T>.mapWith(property2: ReadOnlyProperty<T2>, property3: ReadOnlyProperty<T3>,
+                                              transform: (T,T2,T3)->OUT): ReadOnlyProperty<OUT> {
+    var value1 = this.get()
+    var value2 = property2.get()
+    var value3 = property3.get()
+    val result = Property(transform(value1, value2, value3))
+    this.onNext {
+        value1 = it
+        result.set(transform(value1, value2, value3))
+    }
+    property2.onNext {
+        value2 = it
+        result.set(transform(value1, value2, value3))
+    }
+    property3.onNext {
+        value3 = it
+        result.set(transform(value1, value2, value3))
+    }
+    return result
+}
+
 /**
  * Map a Property to another Property and vice-versa.
  * This is useful when either property can be modified and the other property should reflect the change,

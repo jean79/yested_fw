@@ -85,6 +85,39 @@ class PropertyTest {
     }
 
     @Test
+    fun mapWith() {
+        val int1Property = 123.toProperty()
+        val int2Property = 456.toProperty()
+        val textProperty = int1Property.mapWith(int2Property) { int1, int2 ->
+            "" + int1 + int2
+        }
+        textProperty.get().mustBe("123456")
+
+        int1Property.set(999)
+        textProperty.get().mustBe("999456")
+
+        int2Property.set(555)
+        textProperty.get().mustBe("999555")
+    }
+
+    @Test
+    fun mapWith_2() {
+        val int1Property = 123.toProperty()
+        val int2Property = 456.toProperty()
+        val int3Property = 789.toProperty()
+        val textProperty = int1Property.mapWith(int2Property, int3Property) { int1, int2, int3 ->
+            "" + int1 + int2 + int3
+        }
+        textProperty.get().mustBe("123456789")
+
+        int1Property.set(999)
+        textProperty.get().mustBe("999456789")
+
+        int3Property.set(555)
+        textProperty.get().mustBe("999456555")
+    }
+
+    @Test
     fun bind_shouldUpdateTheNewProperty() {
         val intProperty = 123.toProperty()
         val textProperty = intProperty.bind(
