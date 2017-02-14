@@ -1,6 +1,7 @@
 package net.yested.ext.bootstrap3
 
 import net.yested.core.html.bind
+import net.yested.core.html.bindMultiselect
 import net.yested.core.html.setDisabled
 import net.yested.core.html.setReadOnly
 import net.yested.core.properties.*
@@ -32,8 +33,7 @@ fun HTMLElement.textInput(
     val element = document.createElement("input") as HTMLInputElement
 
     id?.let { element.id = id }
-    element.className = "form-control"
-    element.addClass(inputTypeClass)
+    element.className = "form-control $inputTypeClass"
     element.type = "text"
     element.bind(value)
     element.setDisabled(disabled)
@@ -54,33 +54,8 @@ fun <T> HTMLElement.selectInput(
     val element = document.createElement("select") as HTMLSelectElement
     element.className = "form-control input-${size.code}"
     element.multiple = multiple
-    options.onNext {
-        element.removeAllChildElements()
-        it.forEachIndexed { index, item ->
-            val option: HTMLOptionElement = document.createElement("option").asDynamic()
-            option.value = "$index"
-            if (selected.get().filter { it == item}.isNotEmpty()) {
-                option.selected = true
-            }
-            option.render(item)
-            element.appendChild(option)
-        }
-    }
-
+    element.bindMultiselect(selected, options, render)
     element.setDisabled(disabled)
-
-    element.addEventListener("change", {
-
-        val selectOptions = element.options
-        val selectedValues = (1..selectOptions.length)
-                .map { selectOptions[it - 1] }
-                .filter { it.asDynamic().selected }
-                .map { it.asDynamic().value }
-                .map { options.get()[parseInt(it)] }
-
-        selected.set(selectedValues)
-
-    }, false)
     this.appendChild(element)
 }
 
@@ -90,15 +65,12 @@ fun <T> HTMLElement.singleSelectInput(
         disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
         render: HTMLElement.(T)->Unit) {
 
-    val multipleSelected = selected.bind({ if (it == null) emptyList() else listOf(it) }, { it.firstOrNull() as T })
-
-    selectInput(
-            selected = multipleSelected,
-            options = options,
-            multiple = false,
-            disabled = disabled,
-            render = render)
-
+    val element = document.createElement("select") as HTMLSelectElement
+    element.className = "form-control input-${Size.Default.code}"
+    element.multiple = false
+    element.bind(selected, options, render)
+    element.setDisabled(disabled)
+    this.appendChild(element)
 }
 
 fun HTMLElement.intInput(value: Property<Int?>,
