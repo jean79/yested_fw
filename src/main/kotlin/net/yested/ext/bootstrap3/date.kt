@@ -5,7 +5,7 @@ import jquery.jq
 import net.yested.core.html.div
 import net.yested.core.html.span
 import net.yested.core.properties.Property
-import net.yested.core.properties.mapBidirectionally
+import net.yested.core.properties.bind
 import net.yested.core.utils.whenAddedToDom
 import net.yested.ext.bootstrap3.utils.*
 import org.w3c.dom.HTMLElement
@@ -15,7 +15,7 @@ import org.w3c.dom.HTMLInputElement
 //TODO: support Locales: http://momentjs.com/docs/#/i18n/
 
 fun Property<Moment?>.asText(formatString: String): Property<String> {
-    return this.mapBidirectionally(
+    return this.bind(
                 transform = { if (it == null) "" else it.format(formatString) },
                 reverse = { if (it.isEmpty()) null else Moment.parse(it, formatString) })
 }

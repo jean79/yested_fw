@@ -1,5 +1,7 @@
 package net.yested.ext.bootstrap3
 
+import net.yested.core.html.setClassPresence
+import net.yested.core.html.setDisabled
 import net.yested.core.html.*
 import net.yested.core.properties.Property
 import net.yested.core.properties.ReadOnlyProperty
@@ -15,7 +17,7 @@ class NavbarMenuDropDown(val ul: HTMLUListElement) {
     fun item(active: Property<Boolean>? = null, init: HTMLLIElement.()->Unit) {
         ul with {
             li {
-                active?.onNext { if (it) addClass("active") else removeClass("active") }
+                active?.let { setClassPresence("active", it) }
                 this.init()
             }
         }
@@ -42,7 +44,7 @@ class NavbarMenu(val ul: HTMLUListElement) {
     fun item(active: Property<Boolean>? = null, init: HTMLLIElement.()->Unit) {
         ul with {
             li {
-                active?.onNext { if (it) addClass("active") else removeClass("active") }
+                active?.let { setClassPresence("active", it) }
                 this.init()
             }
         }
@@ -111,16 +113,8 @@ class NavbarContext(
                 active?.set(!active.get())
             }, false)
             init()
-            active?.onNext {
-                if (it) {
-                    addClass("active")
-                } else {
-                    removeClass("active")
-                }
-            }
-            disabled?.onNext {
-                this.disabled = it
-            }
+            active?.let { setClassPresence("active", it) }
+            disabled?.let { setDisabled(it) }
         }
     }
 
