@@ -12,6 +12,7 @@ interface ColumnDefinition {
 }
 
 sealed class Col {
+    /** Widths are in 1/12's so a width of 12 means width:100% and 3 means width:25%. */
     class Width {
         /** Using this size requires including <a href="https://www.npmjs.com/package/bootstrap-xxs">bootstrap-xxs.css</a>. */
         class Tn(width: Int) : ColumnDefinition {
@@ -39,6 +40,7 @@ sealed class Col {
             override val css: String =  "col-lg-$width"
         }
     }
+    /** Offsets are in 1/12's so a 3 means push it right 25%. */
     class Offset {
         /** Using this size requires including <a href="https://www.npmjs.com/package/bootstrap-xxs">bootstrap-xxs.css</a>. */
         class Tn(width: Int) : ColumnDefinition {
@@ -66,6 +68,7 @@ sealed class Col {
             override val css: String =  "col-lg-offset-$width"
         }
     }
+    /** Push widths are in 1/12's so a 3 means reorder it to the right by 25%. */
     class Push {
         /** Using this size requires including <a href="https://www.npmjs.com/package/bootstrap-xxs">bootstrap-xxs.css</a>. */
         class Tn(width: Int) : ColumnDefinition {
@@ -93,6 +96,7 @@ sealed class Col {
             override val css: String =  "col-lg-push-$width"
         }
     }
+    /** Pull widths are in 1/12's so a 3 means reorder it to the left by 25%. */
     class Pull {
         /** Using this size requires including <a href="https://www.npmjs.com/package/bootstrap-xxs">bootstrap-xxs.css</a>. */
         class Tn(width: Int) : ColumnDefinition {

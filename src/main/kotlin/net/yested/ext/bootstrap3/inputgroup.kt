@@ -11,6 +11,7 @@ import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.events.Event
 
+/** This controls the vertical size and font size of an input and its addons. */
 enum class InputGroupSize(val code: String) {
     Large("input-group-lg"),
     Default(""),
@@ -66,4 +67,3 @@ fun HTMLElement.inputGroup(size: InputGroupSize = InputGroupSize.Default, init: 
     val el = div { className = "input-group ${size.code}" }
     InputGroupContext(el).init()
 }
-

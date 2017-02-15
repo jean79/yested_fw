@@ -8,7 +8,9 @@ import org.w3c.dom.HTMLElement
 import kotlin.browser.document
 
 enum class ContainerWidth(val code: String) {
+    /** Makes each item take up the full width. */
     Fixed("container"),
+    /** Allows items to share rows. */
     Fluid("container-fluid")
 }
 
