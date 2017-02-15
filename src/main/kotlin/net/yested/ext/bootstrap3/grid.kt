@@ -27,15 +27,15 @@ sealed class Col {
             override val css: String =  "col-xs-$width"
         }
 
-        class Sm(val width: Int) : ColumnDefinition {
+        class Sm(width: Int) : ColumnDefinition {
             override val css: String =  "col-sm-$width"
         }
 
-        class Md(val width: Int) : ColumnDefinition {
+        class Md(width: Int) : ColumnDefinition {
             override val css: String =  "col-md-$width"
         }
 
-        class Lg(val width: Int) : ColumnDefinition {
+        class Lg(width: Int) : ColumnDefinition {
             override val css: String =  "col-lg-$width"
         }
     }
