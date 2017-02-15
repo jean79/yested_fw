@@ -22,6 +22,7 @@ enum class ButtonLook(val code: String) {
     Link("link")
 }
 
+/** This controls the vertical size and font size of a button. */
 enum class ButtonSize(val code: String) {
     Large("btn-lg"),
     Default("btn-default"),
