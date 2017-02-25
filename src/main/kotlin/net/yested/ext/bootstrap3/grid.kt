@@ -2,8 +2,9 @@ package net.yested.ext.bootstrap3
 
 import net.yested.core.html.*
 import net.yested.core.properties.*
-import net.yested.core.utils.removeChildByName
-import net.yested.core.utils.with
+import net.yested.core.utils.SortSpecification
+import net.yested.core.utils.sortControl
+import net.yested.core.utils.tbody
 import org.w3c.dom.*
 import java.util.*
 
@@ -98,18 +99,29 @@ fun HTMLElement.col(width: ColumnDefinition, init: HTMLDivElement.()->Unit): HTM
     }
 }
 
-data class Column<in T>(
+/** Note: Here for backward-compatibility. */
+fun <T> Column(label: HTMLElement.() -> Unit,
+               sortFunction: ((T, T) -> Int)? = null,
+               align: Align = Align.LEFT,
+               sortAscending: Boolean? = null,
+               render: HTMLElement.(T) -> Unit): Column<T> {
+    val comparator: Comparator<T>? = sortFunction?.let { Comparator { obj1: T, obj2: T -> (it(obj1, obj2)) * (if (sortAscending!!) 1 else -1) } }
+    return Column(label, comparator, align, sortAscending, render)
+}
+
+/** Note: This would be <in T> except that Comparator isn't labeled as having <in T>. */
+data class Column<T>(
         val label: HTMLElement.() -> Unit,
-        val sortFunction: ((T, T) -> Int)? = null,
+        val comparator: Comparator<T>? = null,
         val align: Align = Align.LEFT,
         val sortAscending: Boolean? = null,
         val render: HTMLElement.(T) -> Unit) {
     init {
-        if ((sortFunction == null) != (sortAscending == null)) {
-            if (sortFunction == null) {
-                throw IllegalArgumentException("sortFunction must be specified when sortAscending is specified")
+        if ((comparator == null) != (sortAscending == null)) {
+            if (comparator == null) {
+                throw IllegalArgumentException("comparator must be specified when sortAscending is specified")
             } else {
-                throw IllegalArgumentException("sortAscending must be specified when sortFunction is specified")
+                throw IllegalArgumentException("sortAscending must be specified when comparator is specified")
             }
         }
     }
@@ -129,77 +141,56 @@ fun <T> HTMLElement.grid(responsive: Boolean = false, columns: Array<Column<T>>,
 
 private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyProperty<Iterable<T>?>,
                                       sortColumn: Property<Column<T>?>) {
-    data class ColumnSort<T>(val column: Column<T>, val ascending: Boolean)
+    data class ColumnSort<T>(val column: Column<T>, val ascending: Boolean) {
+        val comparator: Comparator<T>? = column.comparator
+    }
 
     val columnSort: Property<ColumnSort<T>?> = sortColumn.mapAsDefault { it?.let { ColumnSort(it, it.sortAscending!!) } }
-
-    fun sortData(toSort:Iterable<T>?, columnSort: ColumnSort<T>?):Iterable<T>? {
-        val sortFunction = columnSort?.column?.sortFunction
-        if (sortFunction == null || toSort == null) {
-            return toSort
-        }
-        val ascending = columnSort!!.ascending
-        //return toSort.sortedWith(comparator = Comparator { t, t ->  })
-        return toSort.sortedWith(comparator = Comparator { obj1: T, obj2: T ->  (sortFunction(obj1, obj2)) * (if (ascending) 1 else -1)})
+    val sortSpecification: Property<SortSpecification<T>?> = columnSort.mapAsDefault {
+        if (it != null && it.comparator != null) SortSpecification(it.comparator, it.ascending) else null
     }
+    val sortedData = data.sortedWith(sortSpecification)
 
-    val sortedData: ReadOnlyProperty<Iterable<T>?> = data.zip<Iterable<T>?, ColumnSort<T>?>(columnSort).map { sortData(it.first, it.second) }
-
-    fun sortByColumn(column: Column<T>) {
-        if (column == sortColumn.get()) {
-            val currentColumnSort = columnSort.get()!!
-            columnSort.set(currentColumnSort.copy(ascending = !currentColumnSort.ascending))
-        } else {
-            sortColumn.set(column)
-        }
-    }
-
-    val tableElement = table() { className = "table table-striped table-hover table-condensed"
+    table { className = "table table-striped table-hover table-condensed"
         thead {
             tr {
                 columns.forEach { column ->
-                    th { className = "text-${column.align.code}"
-                        if (column.sortAscending == null) {
+                    th {
+                        className = "text-${column.align.code}"
+                        if (column.comparator == null) {
                             (column.label)()
                         } else {
-                            a {
-                                setAttribute("style", "cursor: pointer;")
-                                onclick = { sortByColumn(column) }
+                            sortControlWithArrow<T>(sortSpecification, column.comparator, column.sortAscending!!) {
                                 (column.label)()
                             }
-                            span {
-                                val element = this
-                                val icon = columnSort.map { currentColumnSort ->
-                                    element.hidden = currentColumnSort?.ascending == null
-                                    if (currentColumnSort?.column != column) null
-                                    else if (currentColumnSort!!.ascending) "arrow-up" else "arrow-down"
-                                }
-                                glyphicon(icon)
-                            }
                         }
                     }
                 }
             }
         }
+        tbody(sortedData) { item ->
+            tr {
+                columns.forEach { column ->
+                    td {
+                        className = "text-${column.align.code}"
+                        (column.render)(item)
+                    }
+                }
+            }
+        }
     }
+}
 
-    sortedData.onNext { values ->
-        tableElement.removeChildByName("tbody")
-        values?.let {
-            tableElement.with {
-                tbody {
-                    values.forEach { item ->
-                        tr {
-                            columns.forEach { column ->
-                                td {
-                                    className = "text-${column.align.code}"
-                                    (column.render)(item)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+fun <T> HTMLTableHeaderCellElement.sortControlWithArrow(currentSort: Property<SortSpecification<T>?>,
+                                                        comparator: Comparator<T>, sortAscending: Boolean = true,
+                                                        sortNow: Boolean = false, init: HTMLElement.() -> Unit): Property<Boolean?> {
+    val ascendingProperty = sortControl(currentSort, comparator, sortAscending, sortNow, init)
+    span {
+        val icon = ascendingProperty.map { ascending ->
+            hidden = ascending == null
+            if (ascending == null) null else if (ascending) "arrow-up" else "arrow-down"
         }
+        glyphicon(icon)
     }
+    return ascendingProperty
 }

@@ -1,10 +1,15 @@
 import net.yested.core.html.*
 import net.yested.core.properties.*
+import net.yested.core.utils.SortSpecification
+import net.yested.core.utils.tbody
 import net.yested.core.utils.with
 import net.yested.ext.bootstrap3.*
 import org.w3c.dom.HTMLElement
 import kotlin.browser.document
+import kotlin.comparisons.compareBy
+import kotlin.comparisons.naturalOrder
 import kotlin.dom.appendText
+import kotlin.dom.onClick
 
 enum class City { Prague, London }
 
@@ -230,7 +235,7 @@ fun main(args: Array<String>) {
             }
         }
 
-        /*textInput(value = p, validation = validation)
+        /*textInput(value = p, validation = validation)*/
         div {
             id = "id"
             className = "bla"
@@ -241,12 +246,8 @@ fun main(args: Array<String>) {
         table {
             thead {
                 tr {
-                    th {
-                        appendText("Col1")
-                    }
-                    th {
-                        appendText("Col2")
-                    }
+                    th { appendText("Col1") }
+                    th { appendText("Col2") }
                 }
             }
             tbody {
@@ -254,24 +255,34 @@ fun main(args: Array<String>) {
                     td {
                         a {
                             appendText("http://www.seznam.cz")
-                            onClick {
-                                js("alert('hh')")
-                            }
+                            onClick { js("alert('hh')") }
                         }
                     }
+                    td { text(p) }
                     td {
-                        text(p)
-                    }
-                    td {
-                        selectInput(selected = city, options = Property(City.values().toList()), render = { appendText(it.name) })
+                        singleSelectInput(selected = city, options = Property(City.values().toList()), render = { appendText(it.name) })
                         appendText("Selected city: ")
                         text(value = city.map { it.name })
                     }
                 }
             }
-        }*/
+        }
+        val currentSort = Property<SortSpecification<String>?>(null)
+        table {
+            thead {
+                tr {
+                    th { sortControlWithArrow(currentSort, naturalOrder<String>()) { appendText("URL") } }
+                    th { sortControlWithArrow(currentSort, compareBy<String> { parseInt(it) }) { appendText("URL Length") } }
+                }
+            }
+            tbody(listOf("http://www.seznam.cz", "http://www.google.com", "http://www.yahoo.com").toProperty().sortedWith(currentSort)) { index, value ->
+                tr { className = if (index % 2 == 0) "even" else "odd"
+                    td { appendText(value) }
+                    td { appendText(value.length.toString()) }
+                }
+            }
+        }
     }
-
 }
 
 fun openSampleDialog() {
