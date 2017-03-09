@@ -272,7 +272,7 @@ fun main(args: Array<String>) {
             thead {
                 tr {
                     th { sortControlWithArrow(currentSort, naturalOrder<String>()) { appendText("URL") } }
-                    th { sortControlWithArrow(currentSort, compareBy<String> { parseInt(it) }) { appendText("URL Length") } }
+                    th { sortControlWithArrow(currentSort, compareBy<String> { it.length }) { appendText("URL Length") } }
                 }
             }
             tbody(listOf("http://www.seznam.cz", "http://www.google.com", "http://www.yahoo.com").toProperty().sortedWith(currentSort)) { index, value ->
