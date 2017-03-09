@@ -36,7 +36,7 @@ fun HTMLElement.dateInput(data: Property<Moment?>, placeholder: String? = null, 
     whenAddedToDom {
         text.onNext { setAttribute("data-value", it) }
 
-        jq(this).pickadate(PickADateOptions(formatString.toLowerCase(), selectMonths = true, selectYears = true,
+        jq(element).pickadate(PickADateOptions(formatString.toLowerCase(), selectMonths = true, selectYears = true,
                 onSet = { context: DateContext ->
                     if (context.select != undefined)
                         data.set(context.select?.let { Moment.parseMillisecondsSinceUnixEpoch(it) })
