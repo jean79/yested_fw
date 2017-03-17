@@ -84,7 +84,7 @@ sealed class Col {
 }
 
 infix fun ColumnDefinition.and(other: ColumnDefinition) = object: ColumnDefinition {
-    override val css: String = this@and.css + other.css
+    override val css: String = this@and.css + " " + other.css
 }
         
 fun HTMLElement.row(init:HTMLDivElement.()->Unit) {
