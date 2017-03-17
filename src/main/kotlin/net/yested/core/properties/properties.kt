@@ -1,6 +1,9 @@
 package net.yested.core.properties
 
 import net.yested.core.utils.SortSpecification
+import net.yested.core.utils.Tuple4
+import net.yested.core.utils.Tuple5
+import net.yested.core.utils.Tuple6
 import java.util.*
 
 interface Disposable {
@@ -201,6 +204,99 @@ fun <T,T2,T3> ReadOnlyProperty<T>.zip(property2: ReadOnlyProperty<T2>, property3
     property3.onNext {
         value3 = it
         combined.set(Triple(value1, value2, value3))
+    }
+    return combined
+}
+
+/** Zips four properties together into a Tuple4. */
+fun <T,T2,T3,T4> ReadOnlyProperty<T>.zip(property2: ReadOnlyProperty<T2>, property3: ReadOnlyProperty<T3>, property4: ReadOnlyProperty<T4>): ReadOnlyProperty<Tuple4<T, T2, T3, T4>> {
+    var value1 = this.get()
+    var value2 = property2.get()
+    var value3 = property3.get()
+    var value4 = property4.get()
+    val combined = Property(Tuple4(value1, value2, value3, value4))
+    this.onNext {
+        value1 = it
+        combined.set(Tuple4(value1, value2, value3, value4))
+    }
+    property2.onNext {
+        value2 = it
+        combined.set(Tuple4(value1, value2, value3, value4))
+    }
+    property3.onNext {
+        value3 = it
+        combined.set(Tuple4(value1, value2, value3, value4))
+    }
+    property4.onNext {
+        value4 = it
+        combined.set(Tuple4(value1, value2, value3, value4))
+    }
+    return combined
+}
+
+/** Zips five properties together into a Tuple5. */
+fun <T,T2,T3,T4,T5> ReadOnlyProperty<T>.zip(property2: ReadOnlyProperty<T2>, property3: ReadOnlyProperty<T3>, property4: ReadOnlyProperty<T4>, property5: ReadOnlyProperty<T5>): ReadOnlyProperty<Tuple5<T, T2, T3, T4, T5>> {
+    var value1 = this.get()
+    var value2 = property2.get()
+    var value3 = property3.get()
+    var value4 = property4.get()
+    var value5 = property5.get()
+    val combined = Property(Tuple5(value1, value2, value3, value4, value5))
+    this.onNext {
+        value1 = it
+        combined.set(Tuple5(value1, value2, value3, value4, value5))
+    }
+    property2.onNext {
+        value2 = it
+        combined.set(Tuple5(value1, value2, value3, value4, value5))
+    }
+    property3.onNext {
+        value3 = it
+        combined.set(Tuple5(value1, value2, value3, value4, value5))
+    }
+    property4.onNext {
+        value4 = it
+        combined.set(Tuple5(value1, value2, value3, value4, value5))
+    }
+    property5.onNext {
+        value5 = it
+        combined.set(Tuple5(value1, value2, value3, value4, value5))
+    }
+    return combined
+}
+
+/** Zips six properties together into a Tuple6. */
+fun <T,T2,T3,T4,T5,T6> ReadOnlyProperty<T>.zip(property2: ReadOnlyProperty<T2>, property3: ReadOnlyProperty<T3>, property4: ReadOnlyProperty<T4>, property5: ReadOnlyProperty<T5>, property6: ReadOnlyProperty<T6>): ReadOnlyProperty<Tuple6<T, T2, T3, T4, T5, T6>> {
+    var value1 = this.get()
+    var value2 = property2.get()
+    var value3 = property3.get()
+    var value4 = property4.get()
+    var value5 = property5.get()
+    var value6 = property6.get()
+    val combined = Property(Tuple6(value1, value2, value3, value4, value5, value6))
+    this.onNext {
+        value1 = it
+        combined.set(Tuple6(value1, value2, value3, value4, value5, value6))
+    }
+    property2.onNext {
+        value2 = it
+        combined.set(Tuple6(value1, value2, value3, value4, value5, value6))
+    }
+    property3.onNext {
+        value3 = it
+        combined.set(Tuple6(value1, value2, value3, value4, value5, value6))
+    }
+    property4.onNext {
+        value4 = it
+        combined.set(Tuple6(value1, value2, value3, value4, value5, value6))
+    }
+    property5.onNext {
+        value5 = it
+        combined.set(Tuple6(value1, value2, value3, value4, value5, value6))
+    }
+    property6.onNext {
+        value6 = it
+        combined.set(Tuple6(value1, value2, value3, value4, value5, value6))
     }
     return combined
 }
