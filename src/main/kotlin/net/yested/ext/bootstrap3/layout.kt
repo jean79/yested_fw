@@ -15,7 +15,7 @@ enum class ContainerWidth(val code: String) {
 fun HTMLElement.container(
         width: ContainerWidth = ContainerWidth.Fixed,
         init: HTMLDivElement.()->Unit) {
-    div { className = "${width.code}"
+    div { className = width.code
         init()
     }
 }
@@ -26,11 +26,7 @@ fun HTMLElement.pageHeader(init: HTMLDivElement.() -> Unit) {
     }
 }
 
-class PageContext(val element: HTMLElement, val layout: ContainerWidth) {
-    fun header(init: HTMLDivElement.() -> Unit) {
-        element.pageHeader(init)
-    }
-
+class PageContext(val element: HTMLElement) {
     fun navbar(
             position: NavbarCompletePosition = NavbarCompletePosition.Top,
             inverted: Boolean = false,
@@ -38,29 +34,31 @@ class PageContext(val element: HTMLElement, val layout: ContainerWidth) {
         element.navbar(position, inverted, init)
     }
 
-    fun content(init: HTMLDivElement.() -> Unit) {
-        element.div {
-            className = layout.code
+    fun header(init: HTMLDivElement.() -> Unit) {
+        element.pageHeader(init)
+    }
+
+    fun content(layout: ContainerWidth = ContainerWidth.Fixed, init: HTMLDivElement.() -> Unit) {
+        element.container(layout) {
             init()
         }
    }
 
     fun footer(init: HTMLDivElement.() -> Unit) {
-        element.container(ContainerWidth.Fixed) {
+        element.div { className = ContainerWidth.Fixed.code
             hr()
             init()
         }
    }
 }
 
-fun HTMLElement.page(layout: ContainerWidth = ContainerWidth.Fixed, init: PageContext.() -> Unit) {
-    className = layout.code
-    PageContext(this, layout).init()
+fun HTMLElement.page(layout: ContainerWidth? = null, init: PageContext.() -> Unit) {
+    if (layout != null) className = layout.code
+    PageContext(this).init()
 }
 
-fun page(placeholderElementId:String, layout: ContainerWidth = ContainerWidth.Fixed, init: PageContext.() -> Unit) {
+fun page(placeholderElementId:String, layout: ContainerWidth? = null, init: PageContext.() -> Unit) {
     document.getElementById(placeholderElementId) as HTMLElement with {
-        className = layout.code
-        PageContext(this, layout).init()
+        page(layout, init)
     }
 }
