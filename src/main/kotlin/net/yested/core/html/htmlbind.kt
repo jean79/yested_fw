@@ -76,6 +76,10 @@ fun HTMLSelectElement.setDisabled(property: ReadOnlyProperty<Boolean>) {
     property.onNext { disabled = it }
 }
 
+fun HTMLFieldSetElement.setDisabled(property: ReadOnlyProperty<Boolean>) {
+    property.onNext { disabled = it }
+}
+
 fun HTMLInputElement.setReadOnly(property: ReadOnlyProperty<Boolean>) {
     property.onNext { readOnly = it }
 }
