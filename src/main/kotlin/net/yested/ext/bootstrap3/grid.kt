@@ -14,6 +14,16 @@ interface ColumnDefinition {
 
 sealed class Col {
     class Width {
+        /** Using this size requires including <a href="https://www.npmjs.com/package/bootstrap-xxs">bootstrap-xxs.css</a>. */
+        class Tn(width: Int) : ColumnDefinition {
+            override val css: String =  "col-tn-$width"
+        }
+
+        /** Using this size requires including <a href="https://www.npmjs.com/package/bootstrap-xxs">bootstrap-xxs.css</a>. */
+        class Xxs(width: Int) : ColumnDefinition {
+            override val css: String =  "col-xxs-$width"
+        }
+
         class Xs(width: Int) : ColumnDefinition {
             override val css: String =  "col-xs-$width"
         }
@@ -31,6 +41,16 @@ sealed class Col {
         }
     }
     class Offset {
+        /** Using this size requires including <a href="https://www.npmjs.com/package/bootstrap-xxs">bootstrap-xxs.css</a>. */
+        class Tn(width: Int) : ColumnDefinition {
+            override val css: String =  "col-tn-offset-$width"
+        }
+
+        /** Using this size requires including <a href="https://www.npmjs.com/package/bootstrap-xxs">bootstrap-xxs.css</a>. */
+        class Xss(width: Int) : ColumnDefinition {
+            override val css: String =  "col-xxs-offset-$width"
+        }
+
         class Xs(width: Int) : ColumnDefinition {
             override val css: String =  "col-xs-offset-$width"
         }
@@ -48,6 +68,16 @@ sealed class Col {
         }
     }
     class Push {
+        /** Using this size requires including <a href="https://www.npmjs.com/package/bootstrap-xxs">bootstrap-xxs.css</a>. */
+        class Tn(width: Int) : ColumnDefinition {
+            override val css: String =  "col-tn-push-$width"
+        }
+
+        /** Using this size requires including <a href="https://www.npmjs.com/package/bootstrap-xxs">bootstrap-xxs.css</a>. */
+        class Xxs(width: Int) : ColumnDefinition {
+            override val css: String =  "col-xxs-push-$width"
+        }
+
         class Xs(width: Int) : ColumnDefinition {
             override val css: String =  "col-xs-push-$width"
         }
@@ -65,6 +95,16 @@ sealed class Col {
         }
     }
     class Pull {
+        /** Using this size requires including <a href="https://www.npmjs.com/package/bootstrap-xxs">bootstrap-xxs.css</a>. */
+        class Tn(width: Int) : ColumnDefinition {
+            override val css: String =  "col-tn-pull-$width"
+        }
+
+        /** Using this size requires including <a href="https://www.npmjs.com/package/bootstrap-xxs">bootstrap-xxs.css</a>. */
+        class Xxs(width: Int) : ColumnDefinition {
+            override val css: String =  "col-xxs-pull-$width"
+        }
+
         class Xs(width: Int) : ColumnDefinition {
             override val css: String =  "col-xs-pull-$width"
         }
