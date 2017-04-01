@@ -78,7 +78,7 @@ First compile src/main in IntelliJ (e.g. right-click on the main module and clic
 This will generate some .js files in target/classes/lib, 
 and will probably fail to compile src/test, but that's ok and won't matter.
 
-On the command-line run "mvn install".
+On the command-line run "mvn test-compile".
 This will generate some .js files in target/test-js
 
 In IntelliJ, right-click on src/test/web/runner.html and "Open in Browser".
