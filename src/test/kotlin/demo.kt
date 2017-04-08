@@ -1,7 +1,6 @@
 import net.yested.core.html.*
 import net.yested.core.properties.*
 import net.yested.core.utils.SortSpecification
-import net.yested.core.utils.tbody
 import net.yested.core.utils.with
 import net.yested.ext.bootstrap3.*
 import org.w3c.dom.HTMLElement
