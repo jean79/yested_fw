@@ -28,27 +28,34 @@ fun HTMLInputElement.bind(property: Property<String>) {
 }
 
 fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: Property<List<T>>, render: HTMLElement.(T)->Unit) {
+    val selectElement = this
     options.onNext {
         removeAllChildElements()
         it.forEachIndexed { index, item ->
             val option: HTMLOptionElement = document.createElement("option").asDynamic()
             option.value = "$index"
-            if (selected.get().contains(item)) {
-                option.selected = true
-            }
             option.render(item)
             appendChild(option)
+        }
+    }
+    var updating = false
+    selected.onNext { selectedList ->
+        if (!updating) {
+            options.get().forEachIndexed { index, option ->
+                (selectElement.options.get(index) as HTMLOptionElement).selected = selectedList.contains(option)
+            }
         }
     }
     addEventListener("change", {
         val selectOptions = this.options
         val selectedValues = (1..selectOptions.length)
                 .map { selectOptions[it - 1] }
-                .filter { it.asDynamic().selected }
-                .map { it.asDynamic().value }
+                .filter { (it as HTMLOptionElement).selected }
+                .map { (it as HTMLOptionElement).value }
                 .map { options.get()[parseInt(it)] }
-
+        updating = true
         selected.set(selectedValues)
+        updating = false
     }, false)
 }
 
