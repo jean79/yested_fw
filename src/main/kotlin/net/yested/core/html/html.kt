@@ -32,10 +32,15 @@ fun HTMLElement.h4(init:(HTMLHeadingElement.()->Unit)? = null) = tag(this, tagNa
 fun HTMLElement.h5(init:(HTMLHeadingElement.()->Unit)? = null) = tag(this, tagName = "h5", init = init)
 fun HTMLElement.h6(init:(HTMLHeadingElement.()->Unit)? = null) = tag(this, tagName = "h6", init = init)
 fun HTMLElement.nbsp(count: Int = 1) = (1..count).forEach { appendText(Typography.nbsp.toString()) }
+fun HTMLElement.img(init:(HTMLImageElement.()->Unit)? = null) = tag(this, tagName = "img", init = init)
+fun HTMLElement.br() = tag<HTMLHRElement>(this, tagName = "br")
 fun HTMLElement.hr() = tag<HTMLHRElement>(this, tagName = "hr")
 fun HTMLElement.strong(init:(HTMLSpanElement.()->Unit)? = null) = tag(this, tagName = "strong", init = init)
+fun HTMLElement.em(init:(HTMLSpanElement.()->Unit)? = null) = tag(this, tagName = "em", init = init)
+fun HTMLElement.u(init:(HTMLSpanElement.()->Unit)? = null) = tag(this, tagName = "u", init = init)
 fun HTMLElement.button(init:(HTMLButtonElement.()->Unit)? = null) = tag(this, tagName = "button", init = init)
 fun HTMLElement.form(init:(HTMLFormElement.()->Unit)? = null) = tag(this, tagName = "form", init = init)
+fun HTMLElement.fieldset(init:(HTMLFieldSetElement.()->Unit)? = null) = tag(this, tagName = "fieldset", init = init)
 fun HTMLElement.label(init:(HTMLLabelElement.()->Unit)? = null) = tag(this, tagName = "label", init = init)
 
 enum class Align(val code:String) {

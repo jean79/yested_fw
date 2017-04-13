@@ -4,7 +4,6 @@ import net.yested.core.html.*
 import net.yested.core.properties.*
 import net.yested.core.utils.SortSpecification
 import net.yested.core.utils.sortControl
-import net.yested.core.utils.tbody
 import org.w3c.dom.*
 import java.util.*
 
@@ -84,7 +83,7 @@ sealed class Col {
 }
 
 infix fun ColumnDefinition.and(other: ColumnDefinition) = object: ColumnDefinition {
-    override val css: String = this@and.css + other.css
+    override val css: String = this@and.css + " " + other.css
 }
         
 fun HTMLElement.row(init:HTMLDivElement.()->Unit) {
