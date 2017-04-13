@@ -38,6 +38,16 @@ To add simple text, it will call appendText("some text").
 # Demo
 See https://github.com/jean79/yested_fw/blob/master/src/main/kotlin/demo.kt
 
+## To run demo:
+First compile src/main in IntelliJ (e.g. right-click on the main module and click "Compile").
+This will generate some .js files in target/classes/lib, 
+and will probably fail to compile src/test, but that's ok and won't matter.
+
+On the command-line run "mvn install".
+This will generate some .js files in target/test-js
+
+In IntelliJ, right-click on index.html and "Open in Browser".
+
 # Example of a Simple Component
 ```kotlin
 fun HTMLElement.jumbotron(init: HTMLElement.()->Unit) {

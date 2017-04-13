@@ -54,7 +54,7 @@ fun openDialog(size: DialogSize = DialogSize.Default, init:DialogContext.(dialog
                     className = "modal-header"
                     button {
                         type = "button"; className = "close"; setAttribute("data-dismiss", "modal")
-                        span { appendText("&times;") }
+                        span { appendText(Typography.times.toString()) }
                     }
                     h4 {
                         className = "modal-title"
