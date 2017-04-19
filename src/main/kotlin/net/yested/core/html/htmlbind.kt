@@ -108,13 +108,13 @@ fun HTMLInputElement.setReadOnly(property: ReadOnlyProperty<Boolean>) {
  *   }
  * </pre>
  */
-fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, tbodyItemInit: TableItemContext<T>.(Int, T)->Unit) {
+fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, tbodyItemInit: TableItemContext.(Int, T)->Unit) {
     orderedData.onNext { values ->
         removeChildByName("tbody")
         tbody {
             val tbody = this
             values?.forEachIndexed { index, item ->
-                TableItemContext(tbody, item).tbodyItemInit(index, item)
+                TableItemContext(tbody).tbodyItemInit(index, item)
             }
         }
     }
@@ -137,22 +137,20 @@ fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, tbod
  *   }
  * </pre>
  */
-fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, tbodyItemInit: TableItemContext<T>.(T)->Unit) {
+fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, tbodyItemInit: TableItemContext.(T)->Unit) {
     orderedData.onNext { values ->
         removeChildByName("tbody")
         tbody {
             val tbody = this
             values?.forEach { item ->
-                TableItemContext(tbody, item).tbodyItemInit(item)
+                TableItemContext(tbody).tbodyItemInit(item)
             }
         }
     }
 }
 
-class TableItemContext<T>(val tbody: HTMLTableSectionElement, val currentItem: T) {
+class TableItemContext(val tbody: HTMLTableSectionElement) {
     fun tr(init:(HTMLTableRowElement.()->Unit)? = null): HTMLTableRowElement {
-        val tr = tbody.tr(init)
-        tr.itemValue = currentItem
-        return tr
+        return tbody.tr(init)
     }
 }
