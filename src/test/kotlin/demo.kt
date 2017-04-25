@@ -291,7 +291,7 @@ fun openSampleDialog() {
             appendText("sample text")
         }}
         footer {
-            btsButton(look = ButtonLook.Primary, onclick = { dialog.closeDialog() }) {
+            btsButton(look = ButtonLook.Primary, onclick = { dialog.hideDialog() }) {
                 appendText("Submit")
             }
         }

@@ -11,8 +11,10 @@ import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLHeadingElement
 import kotlin.dom.appendText
 
-interface DialogInterface {
-    fun closeDialog()
+interface DialogControl {
+    fun showDialog()
+
+    fun hideDialog()
 }
 
 class DialogContext internal constructor(val header: HTMLHeadingElement, val body: HTMLDivElement, val footer: HTMLDivElement) {
@@ -31,7 +33,7 @@ class DialogContext internal constructor(val header: HTMLHeadingElement, val bod
 
 }
 
-@native fun JQuery.modal(command: String): Nothing = noImpl
+@native fun JQuery.modal(command: String) { noImpl }
 
 enum class DialogSize(val code: String) {
     Small("sm"),
@@ -39,8 +41,19 @@ enum class DialogSize(val code: String) {
     Large("lg")
 }
 
-fun openDialog(size: DialogSize = DialogSize.Default, init:DialogContext.(dialog: DialogInterface)->Unit) {
+fun openDialog(size: DialogSize = DialogSize.Default, init:DialogContext.(dialog: DialogControl)->Unit): DialogControl {
+    val dialog = prepareDialog(size, init)
+    dialog.showDialog()
+    return dialog
+}
 
+/**
+ * Prepares a dialog without showing it.
+ * This is useful as a lazy value so that it can be shown and hidden multiple times without wasting resources.
+ * Any callbacks should be tied to a button added to the dialog.
+ * @return DialogControl to enable showing and hiding it.
+ */
+fun prepareDialog(size: DialogSize = DialogSize.Default, init:DialogContext.(dialog: DialogControl)->Unit): DialogControl {
     var header: HTMLHeadingElement? = null
     var body: HTMLDivElement? = null
     var footer: HTMLDivElement? = null
@@ -74,14 +87,17 @@ fun openDialog(size: DialogSize = DialogSize.Default, init:DialogContext.(dialog
         }
     }
 
-    val dialog = object: DialogInterface {
-        override fun closeDialog() {
+    val dialogControl = object: DialogControl {
+        override fun showDialog() {
+            jq(dialogElement).modal("show")
+        }
+
+        override fun hideDialog() {
             jq(dialogElement).modal("hide")
         }
     }
 
-    DialogContext(header = header!!, body = body!!, footer = footer!!).init(dialog)
+    DialogContext(header = header!!, body = body!!, footer = footer!!).init(dialogControl)
 
-    jq(dialogElement).modal("show")
-
+    return dialogControl
 }
