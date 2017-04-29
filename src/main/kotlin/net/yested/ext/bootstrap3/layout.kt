@@ -32,8 +32,9 @@ class PageContext(val element: HTMLElement) {
     fun navbar(
             position: NavbarCompletePosition = NavbarCompletePosition.Top,
             inverted: Boolean = false,
+            containerWidth: ContainerWidth = ContainerWidth.Fixed,
             init: NavbarContext.()->Unit) {
-        element.navbar(position, inverted, init)
+        element.navbar(position, inverted, containerWidth, init)
     }
 
     fun header(init: HTMLDivElement.() -> Unit) {

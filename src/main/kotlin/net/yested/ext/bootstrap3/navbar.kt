@@ -155,6 +155,7 @@ enum class NavbarCompletePosition(val code: String) {
 fun HTMLElement.navbar(
         position: NavbarCompletePosition = NavbarCompletePosition.Top,
         inverted: Boolean = false,
+        containerWidth: ContainerWidth = ContainerWidth.Fixed,
         init: NavbarContext.()->Unit) {
 
     var navbar: HTMLDivElement? = null
@@ -163,7 +164,7 @@ fun HTMLElement.navbar(
 
     nav {  className = "navbar ${if (inverted) "navbar-inverse" else if (position == NavbarCompletePosition.Top) "" else "navbar-default"} ${position.code}"
         navbar = this
-        div { className = "container"
+        container(width = containerWidth) {
             div { className = "navbar-header"
                 navbarHeader = this
             }
