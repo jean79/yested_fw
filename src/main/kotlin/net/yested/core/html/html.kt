@@ -15,6 +15,7 @@ fun HTMLElement.div(init:(HTMLDivElement.()->Unit)? = null) = tag(this, tagName 
 fun HTMLElement.p(init:(HTMLParagraphElement.()->Unit)? = null) = tag(this, tagName = "p", init = init)
 fun HTMLElement.nav(init:(HTMLDivElement.()->Unit)? = null) = tag(this, tagName = "nav", init = init)
 fun HTMLElement.span(init:(HTMLSpanElement.()->Unit)? = null) = tag(this, tagName = "span", init = init)
+fun HTMLElement.footer(init:(HTMLDivElement.()->Unit)? = null) = tag(this, tagName = "footer", init = init)
 fun HTMLElement.table(init:(HTMLTableElement.()->Unit)? = null) = tag(this, tagName = "table", init = init)
 fun HTMLElement.tr(init:(HTMLTableRowElement.()->Unit)? = null) = tag(this, tagName = "tr", init = init)
 fun HTMLElement.td(init:(HTMLTableCellElement.()->Unit)? = null) = tag(this, tagName = "td", init = init)
