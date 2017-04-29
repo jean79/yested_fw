@@ -76,6 +76,7 @@ enum class NavbarPosition(val code: String) {
 
 class NavbarContext(
         val navbar: HTMLDivElement,
+        val navbarContainer: HTMLDivElement,
         val navbarHeader: HTMLElement,
         val contentElement: HTMLDivElement) {
     private var navbarToggle: HTMLElement? = null
@@ -159,6 +160,7 @@ fun HTMLElement.navbar(
         init: NavbarContext.()->Unit) {
 
     var navbar: HTMLDivElement? = null
+    var navbarContainer: HTMLDivElement? = null
     var navbarHeader: HTMLDivElement? = null
     var contentElement: HTMLDivElement? = null
 
@@ -172,9 +174,10 @@ fun HTMLElement.navbar(
                 setAttribute("aria-expanded", "false")
                 contentElement = this
             }
+            navbarContainer = this
         }
     }
 
-    NavbarContext(navbar = navbar!!, navbarHeader = navbarHeader!!,  contentElement = contentElement!!).init()
+    NavbarContext(navbar = navbar!!, navbarContainer = navbarContainer!!, navbarHeader = navbarHeader!!,  contentElement = contentElement!!).init()
 
 }
