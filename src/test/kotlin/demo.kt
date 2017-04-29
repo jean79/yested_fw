@@ -7,6 +7,7 @@ import org.w3c.dom.HTMLElement
 import kotlin.browser.document
 import kotlin.comparisons.compareBy
 import kotlin.comparisons.naturalOrder
+import kotlin.dom.addClass
 import kotlin.dom.appendText
 import kotlin.dom.onClick
 
@@ -34,6 +35,8 @@ fun main(args: Array<String>) {
 
     element?.with {
         navbar(inverted = true) {
+            navbar.addClass("my-custom-navbar")
+            toggle()
             brand {
                 appendText("Sample Application")
             }

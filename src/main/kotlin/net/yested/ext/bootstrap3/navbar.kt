@@ -75,12 +75,27 @@ enum class NavbarPosition(val code: String) {
 }
 
 class NavbarContext(
-        private val navbarToggle: HTMLElement,
-        private val navbarHeader: HTMLElement,
+        val navbar: HTMLDivElement,
+        val navbarHeader: HTMLElement,
         val contentElement: HTMLDivElement) {
+    private var navbarToggle: HTMLElement? = null
+
+    fun toggle(init: HTMLElement.()->Unit = { glyphicon("menu-hamburger") }) {
+        // pull-left will be removed if a brand is added.
+        button {
+            className = "navbar-toggle collapsed pull-left"; type = "button"
+            setAttribute("data-toggle", "collapse")
+            setAttribute("data-target", "#navbar")
+            setAttribute("aria-expanded", "false")
+            setAttribute("aria-controls", "navbar")
+            span { className = "sr-only"; appendText("Toggle Navigation") }
+            navbarToggle = this
+            init()
+        }
+    }
 
     fun brand(init:HTMLElement.()->Unit) {
-        navbarToggle.removeClass("pull-left")
+        navbarToggle?.removeClass("pull-left")
         navbarHeader.a { className = "navbar-brand"; href = "#"
             init ()
         }
@@ -142,24 +157,14 @@ fun HTMLElement.navbar(
         inverted: Boolean = false,
         init: NavbarContext.()->Unit) {
 
-    var navbarHeader: HTMLElement? = null
-    var navbarToggle: HTMLElement? = null
+    var navbar: HTMLDivElement? = null
+    var navbarHeader: HTMLDivElement? = null
     var contentElement: HTMLDivElement? = null
 
     nav {  className = "navbar ${if (inverted) "navbar-inverse " else ""}${position.code}"
+        navbar = this
         div { className = "container"
             div { className = "navbar-header"
-                // pull-left will be removed if a brand is added.
-                button {
-                    className = "navbar-toggle collapsed pull-left"; type = "button"
-                    setAttribute("data-toggle", "collapse")
-                    setAttribute("data-target", "#navbar")
-                    setAttribute("aria-expanded", "false")
-                    setAttribute("aria-controls", "navbar")
-                    span { className = "sr-only"; appendText("Toggle Navigation") }
-                    glyphicon("menu-hamburger")
-                    navbarToggle = this
-                }
                 navbarHeader = this
             }
             div { id = "navbar"; className = "navbar-collapse collapse"
@@ -169,6 +174,6 @@ fun HTMLElement.navbar(
         }
     }
 
-    NavbarContext(navbarToggle = navbarToggle!!, navbarHeader = navbarHeader!!,  contentElement = contentElement!!).init()
+    NavbarContext(navbar = navbar!!, navbarHeader = navbarHeader!!,  contentElement = contentElement!!).init()
 
 }
