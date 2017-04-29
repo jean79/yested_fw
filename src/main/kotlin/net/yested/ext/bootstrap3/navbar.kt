@@ -161,7 +161,7 @@ fun HTMLElement.navbar(
     var navbarHeader: HTMLDivElement? = null
     var contentElement: HTMLDivElement? = null
 
-    nav {  className = "navbar ${if (inverted) "navbar-inverse " else ""}${position.code}"
+    nav {  className = "navbar ${if (inverted) "navbar-inverse" else if (position == NavbarCompletePosition.Top) "" else "navbar-default"} ${position.code}"
         navbar = this
         div { className = "container"
             div { className = "navbar-header"
