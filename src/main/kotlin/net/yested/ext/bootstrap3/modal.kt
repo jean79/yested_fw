@@ -15,6 +15,8 @@ interface DialogControl {
     fun showDialog()
 
     fun hideDialog()
+
+    fun destroyDialog()
 }
 
 class DialogContext internal constructor(val header: HTMLHeadingElement, val body: HTMLDivElement, val footer: HTMLDivElement) {
@@ -94,6 +96,10 @@ fun prepareDialog(size: DialogSize = DialogSize.Default, init:DialogContext.(dia
 
         override fun hideDialog() {
             jq(dialogElement).modal("hide")
+        }
+
+        override fun destroyDialog() {
+            jq(dialogElement).modal("destroy")
         }
     }
 
