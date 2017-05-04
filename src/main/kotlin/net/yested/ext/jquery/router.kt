@@ -2,7 +2,9 @@ package net.yested.ext.jquery
 
 import net.yested.core.properties.Property
 import net.yested.core.properties.bind
+import org.w3c.dom.History
 import org.w3c.dom.Location
+import kotlin.browser.document
 import kotlin.browser.window
 
 @native
@@ -60,4 +62,43 @@ fun registerHashChangeListener(runNow:Boolean = true, listener:(Array<String>) -
             listener(window.location.splitHashProperty.get())
         }
     }
+}
+
+fun History.backToHash(hashUrl: String?) {
+    if (historyDestinationBack != hashUrl) {
+        console.info("Going back to $hashUrl")
+    }
+    historyDestinationBack = hashUrl
+    if (window.location.hash == "") {
+        console.info("got to the main entry-point page.  Assuming it's close enough to '$hashUrl'")
+        historyDestinationBack = null
+    } else if (hashUrl == null) {
+        back()
+    } else if (historyDestinationBack == windowLocationHash.get()) {
+        historyDestinationBack = null
+    } else if (this.length <= 1) {
+        historyDestinationBack = null
+        replaceState(null, document.title, hashUrl)
+        console.info("got to the beginning of browser history going to $hashUrl")
+        windowLocationHash.set(hashUrl)
+    } else {
+        //The onNext listener above will see if it needs to go back again
+        back()
+    }
+}
+
+/** A place to store the current destination going back, outside of the [backToHash] method. */
+private var historyDestinationBack: String? = makeDestinationBackBeActive()
+val History.destinationBack: String? get() = historyDestinationBack
+
+/** This onNext listener needs to be invoked before any custom listener to avoid drawing multiple pages as it goes back. */
+private fun makeDestinationBackBeActive(): String? {
+    windowLocationHash.onNext { hash ->
+        console.info("new window.location.hash=$hash")
+        val destinationBack = window.history.destinationBack
+        if (destinationBack != null) {
+            window.history.backToHash(destinationBack)
+        }
+    }
+    return null
 }
