@@ -33,7 +33,11 @@ class Property<T>(initialValue: T): ReadOnlyProperty<T> {
         if (newValue != value || newValueHashCode != valueHashCode) {
             value = newValue
             valueHashCode = newValueHashCode
-            listeners.forEach { it.onNext(value) }
+            listeners.forEach {
+                if ((value == newValue) && (valueHashCode == newValueHashCode)) {
+                    it.onNext(value)
+                } //else one of the listeners or another thread may have changed it again, which will have its own notification
+            }
         }
     }
 
