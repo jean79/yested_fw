@@ -86,6 +86,93 @@ class PropertyTest {
     }
 
     @Test
+    fun zip4() {
+        val int1Property = 123.toProperty()
+        val int2Property = 456.toProperty()
+        val stringProperty = "hello".toProperty()
+        val int4Property = 1234.toProperty()
+        val textProperty = int1Property.zip(int2Property, stringProperty, int4Property).map { tuple ->
+            val (int1, int2, string, int4) = tuple
+            "" + int1 + int2 + string + int4
+        }
+        textProperty.get().mustBe("123456hello1234")
+
+        int1Property.set(999)
+        textProperty.get().mustBe("999456hello1234")
+
+        int2Property.set(555)
+        textProperty.get().mustBe("999555hello1234")
+
+        stringProperty.set("bye")
+        textProperty.get().mustBe("999555bye1234")
+
+        int4Property.set(555)
+        textProperty.get().mustBe("999555bye555")
+    }
+
+    @Test
+    fun zip5() {
+        val int1Property = 123.toProperty()
+        val int2Property = 456.toProperty()
+        val stringProperty = "hello".toProperty()
+        val int4Property = 1234.toProperty()
+        val int5Property = 555.toProperty()
+        val textProperty = int1Property.zip(int2Property, stringProperty, int4Property, int5Property).map { tuple ->
+            val (int1, int2, string, int4, int5) = tuple
+            "" + int1 + int2 + string + int4 + int5
+        }
+        textProperty.get().mustBe("123456hello1234555")
+
+        int1Property.set(999)
+        textProperty.get().mustBe("999456hello1234555")
+
+        int2Property.set(555)
+        textProperty.get().mustBe("999555hello1234555")
+
+        stringProperty.set("bye")
+        textProperty.get().mustBe("999555bye1234555")
+
+        int4Property.set(444)
+        textProperty.get().mustBe("999555bye444555")
+
+        int5Property.set(5)
+        textProperty.get().mustBe("999555bye4445")
+    }
+
+    @Test
+    fun zip6() {
+        val int1Property = 123.toProperty()
+        val int2Property = 456.toProperty()
+        val stringProperty = "hello".toProperty()
+        val int4Property = 1234.toProperty()
+        val int5Property = 555.toProperty()
+        val int6Property = 666.toProperty()
+        val textProperty = int1Property.zip(int2Property, stringProperty, int4Property, int5Property, int6Property).map { tuple ->
+            val (int1, int2, string, int4, int5, int6) = tuple
+            "" + int1 + int2 + string + int4 + int5 + int6
+        }
+        textProperty.get().mustBe("123456hello1234555666")
+
+        int1Property.set(999)
+        textProperty.get().mustBe("999456hello1234555666")
+
+        int2Property.set(555)
+        textProperty.get().mustBe("999555hello1234555666")
+
+        stringProperty.set("bye")
+        textProperty.get().mustBe("999555bye1234555666")
+
+        int4Property.set(444)
+        textProperty.get().mustBe("999555bye444555666")
+
+        int5Property.set(5)
+        textProperty.get().mustBe("999555bye4445666")
+
+        int6Property.set(6)
+        textProperty.get().mustBe("999555bye44456")
+    }
+
+    @Test
     fun mapWith() {
         val int1Property = 123.toProperty()
         val int2Property = 456.toProperty()
