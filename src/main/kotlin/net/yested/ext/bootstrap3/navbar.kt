@@ -1,7 +1,6 @@
 package net.yested.ext.bootstrap3
 
 import net.yested.core.html.setClassPresence
-import net.yested.core.html.setDisabled
 import net.yested.core.html.*
 import net.yested.core.properties.Property
 import net.yested.core.properties.ReadOnlyProperty
@@ -125,14 +124,9 @@ class NavbarContext(
             active: Property<Boolean>? = null,
             disabled: ReadOnlyProperty<Boolean>? = null,
             init: HTMLButtonElement.()->Unit) {
-        contentElement.btsButton { className = "btn navbar-btn ${position.code} btn-${look.code}"; type = "submit"
-            addEventListener("click", {  event ->
-                onclick?.let { onclick(event) }
-                active?.set(!active.get())
-            }, false)
+        contentElement.btsButton(look = look, onclick = onclick, active = active, disabled = disabled) {
+            addClass("navbar-btn", position.code)
             init()
-            active?.let { setClassPresence("active", it) }
-            disabled?.let { setDisabled(it) }
         }
     }
 
