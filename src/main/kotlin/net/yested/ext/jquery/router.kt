@@ -69,6 +69,11 @@ fun History.backToHash(hashUrl: String?) {
         console.info("Going back to $hashUrl")
     }
     historyDestinationBack = hashUrl
+    backToDestination()
+}
+
+private fun History.backToDestination() {
+    val hashUrl = historyDestinationBack
     if (window.location.hash == "") {
         console.info("got to the main entry-point page.  Assuming it's close enough to '$hashUrl'")
         historyDestinationBack = null
@@ -82,23 +87,19 @@ fun History.backToHash(hashUrl: String?) {
         console.info("got to the beginning of browser history going to $hashUrl")
         windowLocationHash.set(hashUrl)
     } else {
-        //The onNext listener above will see if it needs to go back again
+        window.setTimeout({
+            val destinationBack = window.history.destinationBack
+            if (destinationBack != null) {
+                backToDestination()
+            }
+        }, 100)
         back()
     }
 }
 
-/** A place to store the current destination going back, outside of the [backToHash] method. */
-private var historyDestinationBack: String? = makeDestinationBackBeActive()
+/**
+ * A place to store the current destination going back, outside of the [backToHash] method.
+ * It is only public to be accessible from tests in other projects.
+ */
 val History.destinationBack: String? get() = historyDestinationBack
-
-/** This onNext listener needs to be invoked before any custom listener to avoid drawing multiple pages as it goes back. */
-private fun makeDestinationBackBeActive(): String? {
-    windowLocationHash.onNext { hash ->
-        console.info("new window.location.hash=$hash")
-        val destinationBack = window.history.destinationBack
-        if (destinationBack != null) {
-            window.history.backToHash(destinationBack)
-        }
-    }
-    return null
-}
+private var historyDestinationBack: String? = null
