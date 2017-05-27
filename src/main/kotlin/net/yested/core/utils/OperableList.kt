@@ -60,7 +60,7 @@ fun <T> OperableList<T>.reconcileTo(desiredList: List<T>) {
     }
 }
 
-class InMemoryOperableList<T>(val list: MutableList<T>) : OperableList<T> {
+open class InMemoryOperableList<T>(val list: MutableList<T>) : OperableList<T> {
     var modificationCount = 0
 
     override fun size(): Int = list.size
