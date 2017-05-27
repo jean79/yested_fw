@@ -39,4 +39,5 @@ interface Assert {
     fun ok(actual: Boolean): Unit
     fun notOk(actual: Boolean): Unit
     fun throws(f: () -> Any, expectedException: Throwable, message: String = "should have thrown exception")
+    fun async(): ()->Unit
 }
