@@ -14,16 +14,17 @@ import org.w3c.dom.HTMLElement
 @native fun JQuery.children(selector: String): JQuery = noImpl
 
 fun JQuery.slideUpTableRow(duration:Int = 400, callback:(()->Unit)? = null): JQuery {
-    val tdElements = children("td")
-    tdElements.children("*").slideUp(duration)
     var callbackDone = false
-    return tdElements.slideUp(duration) { if (!callbackDone) { callbackDone = true; callback?.invoke() } }
+    return children("td").slideUp(duration).children("*").slideUp(duration) {
+        if (!callbackDone) { callbackDone = true; callback?.invoke() }
+    }
 }
 
 fun JQuery.slideDownTableRow(duration:Int = 400, callback:(()->Unit)? = null): JQuery {
-    val tdElements = children("td")
-    tdElements.children("*").slideDown()
-    return tdElements.slideDown(duration, callback)
+    var callbackDone = false
+    return children("td").slideDown(duration).children("*").slideDown(duration) {
+        if (!callbackDone) { callbackDone = true; callback?.invoke() }
+    }
 }
 
 private val DURATION = 200
