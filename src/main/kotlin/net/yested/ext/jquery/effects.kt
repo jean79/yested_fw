@@ -4,6 +4,7 @@ import jquery.JQuery
 import jquery.jq
 import net.yested.core.utils.setChild
 import org.w3c.dom.HTMLElement
+import kotlin.browser.window
 
 @native fun JQuery.fadeOut(duration: Int, callback:()->Unit): JQuery = noImpl;
 @native fun JQuery.fadeIn(duration: Int, callback:()->Unit): JQuery = noImpl;
@@ -14,17 +15,23 @@ import org.w3c.dom.HTMLElement
 @native fun JQuery.children(selector: String): JQuery = noImpl
 
 fun JQuery.slideUpTableRow(duration:Int = 400, callback:(()->Unit)? = null): JQuery {
-    var callbackDone = false
-    return children("td").slideUp(duration).children("*").slideUp(duration) {
-        if (!callbackDone) { callbackDone = true; callback?.invoke() }
+    children("td").slideUp(duration).children("*").slideUp(duration)
+    if (callback != null) {
+        window.setTimeout({
+            callback()
+        }, duration)
     }
+    return this
 }
 
 fun JQuery.slideDownTableRow(duration:Int = 400, callback:(()->Unit)? = null): JQuery {
-    var callbackDone = false
-    return children("td").slideDown(duration).children("*").slideDown(duration) {
-        if (!callbackDone) { callbackDone = true; callback?.invoke() }
+    children("td").slideDown(duration).children("*").slideDown(duration)
+    if (callback != null) {
+        window.setTimeout({
+            callback()
+        }, duration)
     }
+    return this
 }
 
 private val DURATION = 200
