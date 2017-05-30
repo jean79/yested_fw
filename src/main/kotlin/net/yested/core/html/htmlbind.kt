@@ -179,17 +179,17 @@ class TBodyOperableList<T>(initialData: MutableList<T>, val tbodyElement: HTMLTa
     private val rowsWithoutDelays = tbodyElement.rows.toList().toMutableList()
 
     override fun add(index: Int, item: T) {
+        val nextRow = if (index < rowsWithoutDelays.size) rowsWithoutDelays.get(index) else null
         TableItemContext({ rowInit ->
-            val insertIndex = if (index >= tbodyElement.rows.length) -1 else index
-            val newRow = tbodyElement.insertRow(insertIndex) as HTMLTableRowElement
-            rowsWithoutDelays.add(index, newRow)
-            if (rowInit != null) newRow.rowInit()
+            val newRow = Tr(rowInit)
+            tbodyElement.insertBefore(newRow, nextRow)
             val jqNewRow = jq(newRow)
             // start it out hidden in a way that slideDown will show it.
-            jqNewRow.slideUpTableRow(duration = 1) {
+            jqNewRow.slideUpTableRow(duration = 0) {
                 // now animate showing it
                 jqNewRow.slideDownTableRow()
             }
+            rowsWithoutDelays.add(index, newRow)
             newRow
         }).tbodyItemInit(index, item)
         super.add(index, item)

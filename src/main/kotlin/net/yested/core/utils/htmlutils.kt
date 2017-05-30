@@ -2,6 +2,7 @@ package net.yested.core.utils
 
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLTableRowElement
 import org.w3c.dom.Node
 import kotlin.browser.document
 import kotlin.browser.window
@@ -55,6 +56,13 @@ fun repeatWithDelayUntil(check:()->Boolean, millisecondInterval:Int, run:()->Uni
 /** Creates a Div that is not attached to any parent HTMLElement yet. */
 fun Div(init:(HTMLDivElement.()->Unit)? = null): HTMLDivElement {
     val element: HTMLDivElement = document.createElement("div").asDynamic()
+    init?.let { element.init() }
+    return element
+}
+
+/** Creates a TR that is not attached to any parent HTMLElement yet. */
+fun Tr(init:(HTMLTableRowElement.()->Unit)? = null): HTMLTableRowElement {
+    val element: HTMLTableRowElement = document.createElement("tr").asDynamic()
     init?.let { element.init() }
     return element
 }
