@@ -48,6 +48,64 @@ class PropertyTest {
     }
 
     @Test
+    fun onNext_reentrantAvoidsInfiniteLoopForSameValue() {
+        val property = 123.toProperty()
+        property.onNext { property.set(300) }
+        property.get().mustBe(300)
+    }
+
+    @Test
+    fun onNext_reentrantSetNewValue() {
+        val property = 123.toProperty()
+        val values1 = mutableListOf<Int>()
+        val values2 = mutableListOf<Int>()
+        property.onNext { values1.add(it) }
+        property.onNext { if (property.get() == 200) property.set(300) }
+        property.onNext { values2.add(it) }
+
+        property.set(200)
+        values1.mustBe(mutableListOf(123, 200, 300))
+        values2.mustBe(mutableListOf(123, 300))
+    }
+
+    @Test
+    fun onNext_reentrantSetNewValueHash() {
+        val list = mutableListOf(1, 2, 3)
+        val property = list.toProperty()
+        val values1 = mutableListOf<MutableList<Int>>()
+        val values2 = mutableListOf<MutableList<Int>>()
+        property.onNext { values1.add(it) }
+        property.onNext { if (values1.size == 2) {
+            list.add(400)
+            property.set(list)
+        } }
+        property.onNext { values2.add(it) }
+
+        list.add(200)
+        property.set(list)
+        values1.mustBe(mutableListOf(list, list, list))
+        values2.mustBe(mutableListOf(list, list))
+    }
+
+    @Test
+    fun onNext_reentrantModifyValueHash() {
+        val list = mutableListOf(1, 2, 3)
+        val property = list.toProperty()
+        val values1 = mutableListOf<MutableList<Int>>()
+        val values2 = mutableListOf<MutableList<Int>>()
+        property.onNext { values1.add(it) }
+        property.onNext { if (values1.size == 2) {
+            list.add(400)
+        } }
+        property.onNext { values2.add(it) }
+
+        list.add(200)
+        property.set(list)
+        values1.mustBe(mutableListOf(list, list))
+        values2.mustBe(mutableListOf(list, list))
+    }
+
+    @Test
     fun zip() {
         val int1Property = 123.toProperty()
         val int2Property = 456.toProperty()
