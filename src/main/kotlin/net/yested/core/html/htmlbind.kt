@@ -111,24 +111,18 @@ fun HTMLInputElement.setReadOnly(property: ReadOnlyProperty<Boolean>) {
  * </pre>
  */
 fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, animate: Boolean = true, tbodyItemInit: TableItemContext.(Int, T)->Unit) {
-    if (animate) {
-        var tbodyOperableList : TBodyOperableList<T>? = null
+    var tbodyOperableList : TBodyOperableList<T>? = null
 
-        orderedData.onNext { values ->
-            val operableListSnapshot = tbodyOperableList
-            if (values == null) {
-                removeChildByName("tbody")
-                tbodyOperableList = null
-            } else if (operableListSnapshot == null) {
-                val tbody = setTBodyContentsImmediately(values, tbodyItemInit)
-                tbodyOperableList = TBodyOperableList(values.toMutableList(), tbody, tbodyItemInit)
-            } else {
-                operableListSnapshot.reconcileTo(values.toList())
-            }
-        }
-    } else {
-        orderedData.onNext { values ->
-            setTBodyContentsImmediately(values, tbodyItemInit)
+    orderedData.onNext { values ->
+        val operableListSnapshot = tbodyOperableList
+        if (values == null) {
+            removeChildByName("tbody")
+            tbodyOperableList = null
+        } else if (operableListSnapshot == null) {
+            val tbody = setTBodyContentsImmediately(values, tbodyItemInit)
+            tbodyOperableList = TBodyOperableList(values.toMutableList(), tbody, animate, tbodyItemInit)
+        } else {
+            operableListSnapshot.reconcileTo(values.toList())
         }
     }
 }
@@ -175,6 +169,7 @@ fun HTMLCollection.toList(): List<HTMLElement> {
 }
 
 class TBodyOperableList<T>(initialData: MutableList<T>, val tbodyElement: HTMLTableSectionElement,
+                           val animate: Boolean,
                            val tbodyItemInit: TableItemContext.(Int, T)->Unit) : InMemoryOperableList<T>(initialData) {
     private val rowsWithoutDelays = tbodyElement.rows.toList().toMutableList()
 
@@ -183,10 +178,12 @@ class TBodyOperableList<T>(initialData: MutableList<T>, val tbodyElement: HTMLTa
         TableItemContext({ rowInit ->
             val newRow = tbodyElement.tr(before = nextRow, init = rowInit)
             val jqNewRow = jq(newRow)
-            // start it out hidden in a way that slideDown will show it.
-            jqNewRow.slideUpTableRow(duration = 0) {
-                // now animate showing it
-                jqNewRow.slideDownTableRow()
+            if (animate) {
+                // start it out hidden in a way that slideDown will show it.
+                jqNewRow.slideUpTableRow(duration = 0) {
+                    // now animate showing it
+                    jqNewRow.slideDownTableRow()
+                }
             }
             rowsWithoutDelays.add(index, newRow)
             newRow
@@ -196,8 +193,12 @@ class TBodyOperableList<T>(initialData: MutableList<T>, val tbodyElement: HTMLTa
 
     override fun removeAt(index: Int): T {
         val row = rowsWithoutDelays.removeAt(index)
-        val jqRow = jq(row as HTMLTableRowElement)
-        jqRow.slideUpTableRow {
+        if (animate) {
+            val jqRow = jq(row as HTMLTableRowElement)
+            jqRow.slideUpTableRow {
+                tbodyElement.removeChild(row)
+            }
+        } else {
             tbodyElement.removeChild(row)
         }
         return super.removeAt(index)

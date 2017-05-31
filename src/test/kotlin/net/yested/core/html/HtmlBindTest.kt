@@ -4,7 +4,6 @@ import QUnit.Assert
 import net.yested.core.properties.*
 import net.yested.core.utils.Div
 import org.junit.Test
-import org.w3c.dom.HTMLCollection
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLTableElement
 import spec.*
@@ -22,6 +21,15 @@ class HtmlBindTest {
 
     @Test
     fun tableShouldReflectData(assert: Assert) {
+        tableShouldReflectData(assert, animate = false)
+    }
+
+    @Test
+    fun tableShouldReflectData_animated(assert: Assert) {
+        tableShouldReflectData(assert, animate = true)
+    }
+
+    private fun tableShouldReflectData(assert: Assert, animate: Boolean) {
         val done = assert.async()
         val data: Property<List<Int>?> = listOf(1, 2, 3).toProperty()
         var table: HTMLTableElement? = null
@@ -33,7 +41,7 @@ class HtmlBindTest {
                         appendText("Items")
                     }
                 }
-                tbody(data) { item ->
+                tbody(data, animate = animate) { item ->
                     tr { id = (nextId++).toString()
                         td { appendText(item.toString()) }
                     }
@@ -58,10 +66,10 @@ class HtmlBindTest {
                 ListAssert(listOf(12, 13, 14), "Items121314", "25,26,27"))
 
         val listAssertIterator = listAssertSequence.iterator()
-        validateListAsserts(listAssertIterator, table, data, done)
+        validateListAsserts(listAssertIterator, table, data, done, if (animate) 500 else 0)
     }
 
-    private fun validateListAsserts(listAssertIterator: Iterator<ListAssert>, table: HTMLTableElement?, data: Property<List<Int>?>, done: () -> Unit) {
+    private fun validateListAsserts(listAssertIterator: Iterator<ListAssert>, table: HTMLTableElement?, data: Property<List<Int>?>, done: () -> Unit, stepDelay: Int) {
         if (listAssertIterator.hasNext()) {
             val listAssert = listAssertIterator.next()
             // This callback will be called once tbody animation rendering is done
@@ -70,11 +78,11 @@ class HtmlBindTest {
                 window.setTimeout({
                     table!!.textContent.mustBe(listAssert.expectedText)
                     getRowIdsAsString(table).mustBe(listAssert.expectedIds)
-                    validateListAsserts(listAssertIterator, table, data, done)
-                }, 500)
+                    validateListAsserts(listAssertIterator, table, data, done, stepDelay)
+                }, stepDelay)
             } else {
                 console.info("skipping since equal")
-                validateListAsserts(listAssertIterator, table, data, done)
+                validateListAsserts(listAssertIterator, table, data, done, stepDelay)
             }
         } else {
             console.info("all validateListAsserts are done")
