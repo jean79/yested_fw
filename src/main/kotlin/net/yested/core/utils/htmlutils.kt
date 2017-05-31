@@ -59,10 +59,3 @@ fun Div(init:(HTMLDivElement.()->Unit)? = null): HTMLDivElement {
     init?.let { element.init() }
     return element
 }
-
-/** Creates a TR that is not attached to any parent HTMLElement yet. */
-fun Tr(init:(HTMLTableRowElement.()->Unit)? = null): HTMLTableRowElement {
-    val element: HTMLTableRowElement = document.createElement("tr").asDynamic()
-    init?.let { element.init() }
-    return element
-}

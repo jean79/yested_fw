@@ -138,7 +138,7 @@ private fun <T> HTMLTableElement.setTBodyContentsImmediately(values: Iterable<T>
     return tbody {
         val tbody = this
         values?.forEachIndexed { index, item ->
-            TableItemContext({ rowInit -> tbody.tr(rowInit) }).tbodyItemInit(index, item)
+            TableItemContext({ rowInit -> tbody.tr(init = rowInit) }).tbodyItemInit(index, item)
         }
     }
 }
@@ -181,8 +181,7 @@ class TBodyOperableList<T>(initialData: MutableList<T>, val tbodyElement: HTMLTa
     override fun add(index: Int, item: T) {
         val nextRow = if (index < rowsWithoutDelays.size) rowsWithoutDelays.get(index) else null
         TableItemContext({ rowInit ->
-            val newRow = Tr(rowInit)
-            tbodyElement.insertBefore(newRow, nextRow)
+            val newRow = tbodyElement.tr(before = nextRow, init = rowInit)
             val jqNewRow = jq(newRow)
             // start it out hidden in a way that slideDown will show it.
             jqNewRow.slideUpTableRow(duration = 0) {

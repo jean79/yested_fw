@@ -4,10 +4,12 @@ import org.w3c.dom.*
 import kotlin.browser.document
 import kotlin.dom.appendText
 
-fun <T : HTMLElement> tag(parent: Element, tagName: String, init:(T.()->Unit)? = null): T {
+fun <T : HTMLElement> tag(parent: Element, tagName: String,
+                          addFirst: Boolean = false, before: HTMLElement? = null, init:(T.()->Unit)? = null): T {
     val element:T = document.createElement(tagName).asDynamic()
-    parent.appendChild(element)
+    if (addFirst) parent.insertBefore(element, before)
     init?.let { element.init() }
+    if (!addFirst) parent.insertBefore(element, before)
     return element
 }
 
@@ -17,7 +19,8 @@ fun HTMLElement.nav(init:(HTMLDivElement.()->Unit)? = null) = tag(this, tagName 
 fun HTMLElement.span(init:(HTMLSpanElement.()->Unit)? = null) = tag(this, tagName = "span", init = init)
 fun HTMLElement.footer(init:(HTMLDivElement.()->Unit)? = null) = tag(this, tagName = "footer", init = init)
 fun HTMLElement.table(init:(HTMLTableElement.()->Unit)? = null) = tag(this, tagName = "table", init = init)
-fun HTMLElement.tr(init:(HTMLTableRowElement.()->Unit)? = null) = tag(this, tagName = "tr", init = init)
+fun HTMLElement.tr(addFirst: Boolean = false, before: HTMLElement? = null, init:(HTMLTableRowElement.()->Unit)? = null) =
+        tag(this, "tr", addFirst, before, init)
 fun HTMLElement.td(init:(HTMLTableCellElement.()->Unit)? = null) = tag(this, tagName = "td", init = init)
 fun HTMLElement.th(init:(HTMLTableHeaderCellElement.()->Unit)? = null) = tag(this, tagName = "th", init = init)
 fun HTMLElement.thead(init:(HTMLTableSectionElement.()->Unit)? = null) = tag(this, tagName = "thead", init = init)
