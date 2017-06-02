@@ -17,20 +17,18 @@ import kotlin.browser.window
 fun JQuery.slideUpTableRow(duration:Int = 400, callback:(()->Unit)? = null): JQuery {
     children("td").slideUp(duration).children("*").slideUp(duration)
     if (callback != null) {
-        window.setTimeout({
-            callback()
-        }, duration)
+        window.setTimeout(callback, duration)
     }
     return this
 }
 
 fun JQuery.slideDownTableRow(duration:Int = 400, callback:(()->Unit)? = null): JQuery {
-    children("td").slideDown(duration).children("*").slideDown(duration)
-    if (callback != null) {
-        window.setTimeout({
-            callback()
-        }, duration)
-    }
+    val jqTdElements = children("td")
+    jqTdElements.slideDown(duration).children("*").slideDown(duration)
+    window.setTimeout({
+        jqTdElements.attr("style", "").children("*").attr("style", "")
+        callback?.invoke()
+    }, duration)
     return this
 }
 
