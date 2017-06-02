@@ -2,6 +2,7 @@ package net.yested.core.utils
 
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLTableRowElement
 import org.w3c.dom.Node
 import kotlin.browser.document
 import kotlin.browser.window

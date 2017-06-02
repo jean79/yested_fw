@@ -87,6 +87,30 @@
             </plugin>
 
             <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <version>1.5.2</version>
+                <executions>
+                    <execution>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <file>target/test-js/Yested-tests.js</file>
+                        <replacements>
+                            <!-- add the QUnit assert parameter -->
+                            <replacement>
+                                <token>(HtmlBindTest.+\()(\)[ ;])</token>
+                                <value>$1assert$2</value>
+                            </replacement>
+                        </replacements>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
             </plugin>
 

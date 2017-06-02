@@ -4,13 +4,33 @@ import jquery.JQuery
 import jquery.jq
 import net.yested.core.utils.setChild
 import org.w3c.dom.HTMLElement
+import kotlin.browser.window
 
-@native fun JQuery.fadeOut(duration:Int, callback:()->Unit) :Unit = noImpl;
-@native fun JQuery.fadeIn(duration:Int, callback:()->Unit) :Unit = noImpl;
-@native fun JQuery.slideUp(duration:Int, callback:()->Unit) :Unit = noImpl
-@native fun JQuery.slideDown(duration:Int, callback:()->Unit) :Unit = noImpl
-@native fun JQuery.show(callback:()->Unit) :Unit = noImpl;
-@native fun JQuery.hide(callback:()->Unit) :Unit = noImpl;
+@native fun JQuery.fadeOut(duration: Int, callback:()->Unit): JQuery = noImpl;
+@native fun JQuery.fadeIn(duration: Int, callback:()->Unit): JQuery = noImpl;
+@native fun JQuery.slideUp(duration: Int = 400, callback:(()->Unit)? = null): JQuery = noImpl
+@native fun JQuery.slideDown(duration: Int = 400, callback:(()->Unit)? = null): JQuery = noImpl
+@native fun JQuery.show(callback:()->Unit): JQuery = noImpl;
+@native fun JQuery.hide(callback:()->Unit): JQuery = noImpl;
+@native fun JQuery.children(selector: String): JQuery = noImpl
+
+fun JQuery.slideUpTableRow(duration:Int = 400, callback:(()->Unit)? = null): JQuery {
+    children("td").slideUp(duration).children("*").slideUp(duration)
+    if (callback != null) {
+        window.setTimeout(callback, duration)
+    }
+    return this
+}
+
+fun JQuery.slideDownTableRow(duration:Int = 400, callback:(()->Unit)? = null): JQuery {
+    val jqTdElements = children("td")
+    jqTdElements.slideDown(duration).children("*").slideDown(duration)
+    window.setTimeout({
+        jqTdElements.attr("style", "").children("*").attr("style", "")
+        callback?.invoke()
+    }, duration)
+    return this
+}
 
 private val DURATION = 200
 private val SLIDE_DURATION = DURATION * 2

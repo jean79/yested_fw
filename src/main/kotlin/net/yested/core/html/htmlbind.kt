@@ -1,10 +1,12 @@
 package net.yested.core.html
 
+import jquery.jq
 import net.yested.core.properties.Property
 import net.yested.core.properties.ReadOnlyProperty
 import net.yested.core.properties.bind
-import net.yested.core.utils.removeAllChildElements
-import net.yested.core.utils.removeChildByName
+import net.yested.core.utils.*
+import net.yested.ext.jquery.slideDownTableRow
+import net.yested.ext.jquery.slideUpTableRow
 import org.w3c.dom.*
 import kotlin.browser.document
 import kotlin.dom.addClass
@@ -108,14 +110,29 @@ fun HTMLInputElement.setReadOnly(property: ReadOnlyProperty<Boolean>) {
  *   }
  * </pre>
  */
-fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, tbodyItemInit: TableItemContext.(Int, T)->Unit) {
+fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, animate: Boolean = true, tbodyItemInit: TableItemContext.(Int, T)->Unit) {
+    var tbodyOperableList : TBodyOperableList<T>? = null
+
     orderedData.onNext { values ->
-        removeChildByName("tbody")
-        tbody {
-            val tbody = this
-            values?.forEachIndexed { index, item ->
-                TableItemContext(tbody).tbodyItemInit(index, item)
-            }
+        val operableListSnapshot = tbodyOperableList
+        if (values == null) {
+            removeChildByName("tbody")
+            tbodyOperableList = null
+        } else if (operableListSnapshot == null) {
+            val tbody = setTBodyContentsImmediately(values, tbodyItemInit)
+            tbodyOperableList = TBodyOperableList(values.toMutableList(), tbody, animate, tbodyItemInit)
+        } else {
+            operableListSnapshot.reconcileTo(values.toList())
+        }
+    }
+}
+
+private fun <T> HTMLTableElement.setTBodyContentsImmediately(values: Iterable<T>?, tbodyItemInit: TableItemContext.(Int, T) -> Unit): HTMLTableSectionElement {
+    removeChildByName("tbody")
+    return tbody {
+        val tbody = this
+        values?.forEachIndexed { index, item ->
+            TableItemContext({ rowInit -> tbody.tr(init = rowInit) }).tbodyItemInit(index, item)
         }
     }
 }
@@ -137,20 +154,60 @@ fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, tbod
  *   }
  * </pre>
  */
-fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, tbodyItemInit: TableItemContext.(T)->Unit) {
-    orderedData.onNext { values ->
-        removeChildByName("tbody")
-        tbody {
-            val tbody = this
-            values?.forEach { item ->
-                TableItemContext(tbody).tbodyItemInit(item)
-            }
-        }
+fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, animate: Boolean = true, tbodyItemInit: TableItemContext.(T)->Unit) {
+    return tbody(orderedData, animate) { index, item -> tbodyItemInit(item) }
+}
+
+class TableItemContext(private val rowFactory: ((HTMLTableRowElement.()->Unit)?)->HTMLTableRowElement) {
+    fun tr(init:(HTMLTableRowElement.()->Unit)? = null): HTMLTableRowElement {
+        return rowFactory.invoke(init)
     }
 }
 
-class TableItemContext(val tbody: HTMLTableSectionElement) {
-    fun tr(init:(HTMLTableRowElement.()->Unit)? = null): HTMLTableRowElement {
-        return tbody.tr(init)
+fun HTMLCollection.toList(): List<HTMLElement> {
+    return (0..(this.length - 1)).map { item(it)!! as HTMLElement }
+}
+
+class TBodyOperableList<T>(initialData: MutableList<T>, val tbodyElement: HTMLTableSectionElement,
+                           val animate: Boolean,
+                           val tbodyItemInit: TableItemContext.(Int, T)->Unit) : InMemoryOperableList<T>(initialData) {
+    private val rowsWithoutDelays = tbodyElement.rows.toList().toMutableList()
+
+    override fun add(index: Int, item: T) {
+        val nextRow = if (index < rowsWithoutDelays.size) rowsWithoutDelays.get(index) else null
+        TableItemContext({ rowInit ->
+            val newRow = tbodyElement.tr(before = nextRow, init = rowInit)
+            val jqNewRow = jq(newRow)
+            if (animate) {
+                // start it out hidden in a way that slideDown will show it.
+                jqNewRow.slideUpTableRow(duration = 0) {
+                    // now animate showing it
+                    jqNewRow.slideDownTableRow()
+                }
+            }
+            rowsWithoutDelays.add(index, newRow)
+            newRow
+        }).tbodyItemInit(index, item)
+        super.add(index, item)
+    }
+
+    override fun removeAt(index: Int): T {
+        val row = rowsWithoutDelays.removeAt(index)
+        if (animate) {
+            val jqRow = jq(row as HTMLTableRowElement)
+            jqRow.slideUpTableRow {
+                tbodyElement.removeChild(row)
+            }
+        } else {
+            tbodyElement.removeChild(row)
+        }
+        return super.removeAt(index)
+    }
+
+    override fun move(fromIndex: Int, toIndex: Int) {
+        val item = removeAt(fromIndex)
+        add(toIndex, item)
+//        super.move(fromIndex, toIndex)
+//        (tbodyElement.parentElement as HTMLTableElement?)?.setTBodyContentsImmediately(toList(), tbodyItemInit)
     }
 }
