@@ -86,6 +86,25 @@ fun <IN, OUT> ReadOnlyProperty<IN>.mapAsDefault(transform: (IN)->OUT): Property<
     return property
 }
 
+/**
+ * Collects values for this property into a collected result.
+ * The resulting Property's onNext is called each time another value is collected.
+ * The collector function has access to the collected result so far and the next value.
+ * The collected result is null the first time the collector function is run.
+ * This can be useful when reducing or accumulating data or conditionally reusing what was previously mapped.
+ */
+fun <OUT, IN> ReadOnlyProperty<IN>.collect(collector: (OUT?, IN)->OUT): ReadOnlyProperty<OUT> {
+    return collectAsDefault(collector)
+}
+
+/** Same as [collect] but return a modifiable Property like [mapAsDefault]. */
+fun <OUT, IN> ReadOnlyProperty<IN>.collectAsDefault(collector: (OUT?, IN)->OUT): Property<OUT> {
+    val collected = Property(collector(null, this.get()))
+    var firstTime = true
+    this.onNext { if (firstTime) { firstTime = false } else collected.set(collector(collected.get(), it)) }
+    return collected
+}
+
 /** Maps two properties together to calculate a single result. */
 fun <T,T2,OUT> ReadOnlyProperty<T>.mapWith(property2: ReadOnlyProperty<T2>, transform: (T,T2)->OUT): ReadOnlyProperty<OUT> {
     var value1 = this.get()
