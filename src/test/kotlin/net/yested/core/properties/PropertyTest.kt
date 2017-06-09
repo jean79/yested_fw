@@ -231,6 +231,40 @@ class PropertyTest {
     }
 
     @Test
+    fun collect() {
+        val property = 123.toProperty()
+        val sumAccumulator = property.collect<Int,Int> { collected, value -> (collected ?: 0) + value }
+        sumAccumulator.get().mustBe(123)
+
+        property.set(3)
+        sumAccumulator.get().mustBe(126)
+
+        property.set(4)
+        sumAccumulator.get().mustBe(130)
+    }
+
+    @Test
+    fun collect_nullable() {
+        val property = 123.toProperty()
+        val maxEven = property.collect<Int?,Int> { collected, value ->
+            if (value % 2 != 0) collected else if (collected == null) value else Math.max(value, collected)
+        }
+        maxEven.get().mustBe(null)
+
+        property.set(3)
+        maxEven.get().mustBe(null)
+
+        property.set(4)
+        maxEven.get().mustBe(4)
+
+        property.set(2)
+        maxEven.get().mustBe(4)
+
+        property.set(10)
+        maxEven.get().mustBe(10)
+    }
+
+    @Test
     fun mapWith() {
         val int1Property = 123.toProperty()
         val int2Property = 456.toProperty()
