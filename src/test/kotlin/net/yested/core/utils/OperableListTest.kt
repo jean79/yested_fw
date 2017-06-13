@@ -19,6 +19,20 @@ class OperableListTest {
     }
 
     @Test
+    fun shouldAddToEndOfShortList() {
+        val originalList = InMemoryOperableList(mutableListOf(1))
+        originalList.reconcileToAndVerify(listOf(1, 2))
+        originalList.modificationCount.mustBe(1)
+    }
+
+    @Test
+    fun shouldAddToEndOfShortList2() {
+        val originalList = InMemoryOperableList(mutableListOf(1, 2))
+        originalList.reconcileToAndVerify(listOf(1, 2, 3))
+        originalList.modificationCount.mustBe(1)
+    }
+
+    @Test
     fun shouldMoveSingleItemToEnd() {
         val originalList = InMemoryOperableList(mutableListOf(1, 6, 2, 3, 4, 5))
         originalList.reconcileToAndVerify(listOf(1, 2, 3, 4, 5, 6))
