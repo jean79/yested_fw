@@ -31,7 +31,7 @@ class HtmlBindTest {
 
     private fun tableShouldReflectData(assert: Assert, animate: Boolean) {
         val done = assert.async()
-        val data: Property<List<Int>?> = listOf(1, 2, 3).toProperty()
+        val data: Property<List<Int>?> = listOf(1).toProperty()
         var table: HTMLTableElement? = null
         var nextId = 1
         Div {
@@ -48,9 +48,10 @@ class HtmlBindTest {
                 }
             }
         }
-        table!!.textContent.mustBe("Items123")
+        table!!.textContent.mustBe("Items1")
 
         val listAssertSequence = listOf(
+                ListAssert(listOf(1, 2), "Items12", "1,2"),
                 ListAssert(listOf(1, 2, 3), "Items123", "1,2,3"),
                 ListAssert(listOf(2, 3, 1), "Items231", "2,3,4"),
                 ListAssert(listOf(1, 2, 3), "Items123", "5,2,3"),
@@ -78,6 +79,7 @@ class HtmlBindTest {
                 window.setTimeout({
                     table!!.textContent.mustBe(listAssert.expectedText)
                     getRowIdsAsString(table).mustBe(listAssert.expectedIds)
+                    table.styleContent.mustBe("")
                     validateListAsserts(listAssertIterator, table, data, done, stepDelay)
                 }, stepDelay)
             } else {
@@ -89,6 +91,9 @@ class HtmlBindTest {
             done()
         }
     }
+
+    private val HTMLElement.styleContent: String
+        get() = (getAttribute("style") ?: "") + children.toList().map { it.styleContent }.joinToString("")
 
     private fun getRowIdsAsString(table: HTMLTableElement?): String {
         return (table!!.lastChild!! as HTMLElement).children.toList().map { it.getAttribute("id")}.joinToString(",")
