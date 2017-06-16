@@ -2,6 +2,9 @@ package net.yested.ext.jquery
 
 import jquery.JQuery
 import jquery.jq
+import net.yested.core.utils.BiDirectionEffect
+import net.yested.core.utils.Effect
+import net.yested.core.utils.SimpleBiDirectionEffect
 import net.yested.core.utils.setChild
 import org.w3c.dom.HTMLElement
 import kotlin.browser.window
@@ -14,95 +17,78 @@ import kotlin.browser.window
 @native fun JQuery.hide(callback:()->Unit): JQuery = noImpl;
 @native fun JQuery.children(selector: String): JQuery = noImpl
 
-fun JQuery.slideUpTableRow(duration:Int = 400, callback:(()->Unit)? = null): JQuery {
-    children("td").slideUp(duration).children("*").slideUp(duration)
-    if (callback != null) {
-        window.setTimeout(callback, duration)
-    }
-    return this
-}
-
-fun JQuery.slideDownTableRow(duration:Int = 400, callback:(()->Unit)? = null): JQuery {
-    val jqTdElements = children("td")
-    jqTdElements.slideDown(duration).children("*").slideDown(duration)
-    window.setTimeout({
-        jqTdElements.attr("style", "").children("*").attr("style", "")
-        callback?.invoke()
-    }, duration)
-    return this
-}
-
 private val DURATION = 200
 private val SLIDE_DURATION = DURATION * 2
 
-interface Effect {
-    fun apply(htmlElement: HTMLElement, callback: Function0<Unit>? = null)
-}
-
-interface BiDirectionEffect {
-    fun applyIn(htmlElement: HTMLElement, callback: Function0<Unit>? = null)
-    fun applyOut(htmlElement: HTMLElement, callback: Function0<Unit>? = null)
-}
-
-private fun call(function: Function0<Unit>?) {
-    function?.let { function() }
-}
-
- class Show() : Effect {
+class Show() : Effect {
     override fun apply(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        jq(htmlElement).show { call(callback) }
+        jq(htmlElement).show { callback?.invoke() }
     }
 }
 
- class Hide() : Effect {
+class Hide() : Effect {
     override fun apply(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        jq(htmlElement).hide { call(callback) }
+        jq(htmlElement).hide { callback?.invoke() }
     }
 }
 
- class SlideUp() : Effect {
+class SlideUp(private val duration: Int = SLIDE_DURATION) : Effect {
     override fun apply(htmlElement: HTMLElement, callback: Function0<Unit>?) {
-        jq(htmlElement).slideUp(SLIDE_DURATION) { call(callback) }
+        jq(htmlElement).slideUp(duration) { callback?.invoke() }
     }
 }
 
- class SlideDown : Effect {
+class SlideDown(private val duration: Int = SLIDE_DURATION) : Effect {
     override fun apply(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        jq(htmlElement).slideDown(SLIDE_DURATION) { call(callback) }
+        jq(htmlElement).slideDown(duration) { callback?.invoke() }
     }
 }
 
- class FadeOut : Effect {
+class FadeOut(private val duration: Int = DURATION) : Effect {
     override fun apply(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        jq(htmlElement).fadeOut(DURATION) { call(callback) }
+        jq(htmlElement).fadeOut(duration) { callback?.invoke() }
     }
 }
 
- class FadeIn : Effect {
+class FadeIn(private val duration: Int = DURATION) : Effect {
     override fun apply(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        jq(htmlElement).fadeIn(DURATION) { call(callback) }
+        jq(htmlElement).fadeIn(duration) { callback?.invoke() }
     }
 }
 
- class Fade : BiDirectionEffect {
-    override fun applyIn(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        FadeIn().apply(htmlElement, callback)
-    }
+class Fade(duration: Int = DURATION) : SimpleBiDirectionEffect(FadeIn(duration), FadeOut(duration))
 
-    override fun applyOut(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        FadeOut().apply(htmlElement, callback)
+class Slide(duration: Int = SLIDE_DURATION) : SimpleBiDirectionEffect(SlideDown(duration), SlideUp(duration))
+
+class SlideDownTableRow(private val duration: Int = SLIDE_DURATION) : Effect {
+    private val startingPointEffect = SlideUpTableRow(duration = 0)
+
+    override fun apply(htmlElement: HTMLElement, callback: (() -> Unit)?) {
+        // start it out hidden in a way that slideDown will show it.
+        startingPointEffect.apply(htmlElement) {
+            // now animate showing it
+            val jq = jq(htmlElement)
+            val jqTdElements = jq.children("td")
+            jqTdElements.slideDown(duration).children("*").slideDown(duration)
+            window.setTimeout({
+                jqTdElements.attr("style", "").children("*").attr("style", "")
+                callback?.invoke()
+            }, duration)
+        }
     }
 }
 
- class Slide : BiDirectionEffect {
-    override fun applyIn(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        SlideDown().apply(htmlElement, callback)
-    }
-
-    override fun applyOut(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        SlideUp().apply(htmlElement, callback)
+class SlideUpTableRow(private val duration: Int = SLIDE_DURATION) : Effect {
+    override fun apply(htmlElement: HTMLElement, callback: (() -> Unit)?) {
+        jq(htmlElement).children("td").slideUp(duration).children("*").slideUp(duration)
+        if (callback != null) {
+            window.setTimeout(callback, duration)
+        }
     }
 }
+
+class SlideTableRow(duration: Int = SLIDE_DURATION) : SimpleBiDirectionEffect(
+        SlideDownTableRow(duration), SlideUpTableRow(duration))
 
 fun HTMLElement.setChild(child: HTMLElement, effect: BiDirectionEffect, callback: Function0<Unit>? = null) {
     effect.applyOut(this) {

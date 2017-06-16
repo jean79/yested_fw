@@ -1,12 +1,9 @@
 package net.yested.core.html
 
-import jquery.jq
 import net.yested.core.properties.Property
 import net.yested.core.properties.ReadOnlyProperty
 import net.yested.core.properties.bind
 import net.yested.core.utils.*
-import net.yested.ext.jquery.slideDownTableRow
-import net.yested.ext.jquery.slideUpTableRow
 import org.w3c.dom.*
 import kotlin.browser.document
 import kotlin.dom.addClass
@@ -110,7 +107,8 @@ fun HTMLInputElement.setReadOnly(property: ReadOnlyProperty<Boolean>) {
  *   }
  * </pre>
  */
-fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, animate: Boolean = true, tbodyItemInit: TableItemContext.(Int, T)->Unit) {
+fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect = NoEffect,
+                               tbodyItemInit: TableItemContext.(Int, T) -> Unit) {
     var tbodyOperableList : TBodyOperableList<T>? = null
 
     orderedData.onNext { values ->
@@ -120,7 +118,7 @@ fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, anim
             tbodyOperableList = null
         } else if (operableListSnapshot == null) {
             val tbody = setTBodyContentsImmediately(values, tbodyItemInit)
-            tbodyOperableList = TBodyOperableList(values.toMutableList(), tbody, animate, tbodyItemInit)
+            tbodyOperableList = TBodyOperableList(values.toMutableList(), tbody, effect, tbodyItemInit)
         } else {
             operableListSnapshot.reconcileTo(values.toList())
         }
@@ -154,8 +152,9 @@ private fun <T> HTMLTableElement.setTBodyContentsImmediately(values: Iterable<T>
  *   }
  * </pre>
  */
-fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, animate: Boolean = true, tbodyItemInit: TableItemContext.(T)->Unit) {
-    return tbody(orderedData, animate) { index, item -> tbodyItemInit(item) }
+fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect = NoEffect,
+                               tbodyItemInit: TableItemContext.(T) -> Unit) {
+    return tbody(orderedData, effect, { index, item -> tbodyItemInit(item) })
 }
 
 class TableItemContext(private val rowFactory: ((HTMLTableRowElement.()->Unit)?)->HTMLTableRowElement) {
@@ -169,7 +168,7 @@ fun HTMLCollection.toList(): List<HTMLElement> {
 }
 
 class TBodyOperableList<T>(initialData: MutableList<T>, val tbodyElement: HTMLTableSectionElement,
-                           val animate: Boolean,
+                           val effect: BiDirectionEffect,
                            val tbodyItemInit: TableItemContext.(Int, T)->Unit) : InMemoryOperableList<T>(initialData) {
     private val rowsWithoutDelays = tbodyElement.rows.toList().toMutableList()
 
@@ -177,14 +176,7 @@ class TBodyOperableList<T>(initialData: MutableList<T>, val tbodyElement: HTMLTa
         val nextRow = if (index < rowsWithoutDelays.size) rowsWithoutDelays.get(index) else null
         TableItemContext({ rowInit ->
             val newRow = tbodyElement.tr(before = nextRow, init = rowInit)
-            val jqNewRow = jq(newRow)
-            if (animate) {
-                // start it out hidden in a way that slideDown will show it.
-                jqNewRow.slideUpTableRow(duration = 0) {
-                    // now animate showing it
-                    jqNewRow.slideDownTableRow()
-                }
-            }
+            effect.applyIn(newRow)
             rowsWithoutDelays.add(index, newRow)
             newRow
         }).tbodyItemInit(index, item)
@@ -193,12 +185,7 @@ class TBodyOperableList<T>(initialData: MutableList<T>, val tbodyElement: HTMLTa
 
     override fun removeAt(index: Int): T {
         val row = rowsWithoutDelays.removeAt(index)
-        if (animate) {
-            val jqRow = jq(row as HTMLTableRowElement)
-            jqRow.slideUpTableRow {
-                tbodyElement.removeChild(row)
-            }
-        } else {
+        effect.applyOut(row) {
             tbodyElement.removeChild(row)
         }
         return super.removeAt(index)
