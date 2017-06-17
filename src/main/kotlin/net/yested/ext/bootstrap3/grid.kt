@@ -4,7 +4,6 @@ import net.yested.core.html.*
 import net.yested.core.properties.*
 import net.yested.core.utils.SortSpecification
 import net.yested.core.utils.sortControl
-import net.yested.ext.jquery.SlideTableRow
 import org.w3c.dom.*
 import java.util.*
 
@@ -212,7 +211,7 @@ private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyP
                 }
             }
         }
-        tbody(sortedData, SlideTableRow()) { item ->
+        tbody(sortedData, Collapse()) { item ->
             tr {
                 columns.forEach { column ->
                     td {

@@ -98,7 +98,7 @@ fun HTMLInputElement.setReadOnly(property: ReadOnlyProperty<Boolean>) {
  *           th { appendText("Name") }
  *           th { appendText("Value") }
  *       }
- *       tbody(myData) { index, item ->
+ *       tbody(myData, effect = Collapse()) { index, item ->
  *           tr { className = if (index % 2 == 0) "even" else "odd"
  *               td { appendText(item.name) }
  *               td { appendText(item.value) }
@@ -143,7 +143,7 @@ private fun <T> HTMLTableElement.setTBodyContentsImmediately(values: Iterable<T>
  *           th { appendText("Name") }
  *           th { appendText("Value") }
  *       }
- *       tbody(myData) { item ->
+ *       tbody(myData, effect = Collapse()) { item ->
  *           tr { className = if (index % 2 == 0) "even" else "odd"
  *               td { appendText(item.name) }
  *               td { appendText(item.value) }

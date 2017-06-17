@@ -4,7 +4,7 @@ import QUnit.Assert
 import net.yested.core.properties.*
 import net.yested.core.utils.Div
 import net.yested.core.utils.NoEffect
-import net.yested.ext.jquery.SlideTableRow
+import net.yested.ext.bootstrap3.Collapse
 import org.junit.Test
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLTableElement
@@ -43,7 +43,7 @@ class HtmlBindTest {
                         appendText("Items")
                     }
                 }
-                tbody(data, if (animate) SlideTableRow() else NoEffect) { item ->
+                tbody(data, if (animate) Collapse() else NoEffect) { item ->
                     tr { id = (nextId++).toString()
                         td { appendText(item.toString()) }
                     }
