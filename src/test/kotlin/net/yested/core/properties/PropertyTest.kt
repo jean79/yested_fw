@@ -106,6 +106,27 @@ class PropertyTest {
     }
 
     @Test
+    fun onChange() {
+        val property = 100.toProperty()
+        val changes = mutableListOf<Pair<Int,Int>>()
+        val disposable = property.onChange { old, value -> changes.add(Pair(old, value)) }
+        changes.mustBe(emptyList<Pair<Int,Int>>())
+
+        property.set(100)
+        changes.mustBe(emptyList<Pair<Int,Int>>())
+
+        property.set(200)
+        changes.mustBe(listOf(Pair(100, 200)))
+
+        property.set(300)
+        changes.mustBe(listOf(Pair(100, 200), Pair(200, 300)))
+
+        disposable.dispose()
+        property.set(400)
+        changes.mustBe(listOf(Pair(100, 200), Pair(200, 300)))
+    }
+
+    @Test
     fun zip() {
         val int1Property = 123.toProperty()
         val int2Property = 456.toProperty()
@@ -262,6 +283,33 @@ class PropertyTest {
 
         property.set(10)
         maxEven.get().mustBe(10)
+    }
+
+    @Test
+    fun flatMap() {
+        val propertyByKey = mapOf(1 to Property("Julie"), 2 to Property("Sam"))
+        val intProperty = Property(1)
+        val nameProperty = intProperty.flatMap { propertyByKey.get(it)!! }
+        nameProperty.get().mustBe("Julie")
+
+        intProperty.set(2)
+        nameProperty.get().mustBe("Sam")
+        propertyByKey.get(1)!!.listenerCount.mustBe(0)
+
+        propertyByKey.get(2)!!.set("George")
+        nameProperty.get().mustBe("George")
+
+        propertyByKey.get(1)!!.set("Athena")
+        nameProperty.get().mustBe("George")
+
+        intProperty.set(1)
+        nameProperty.get().mustBe("Athena")
+        propertyByKey.get(2)!!.listenerCount.mustBe(0)
+
+        intProperty.listenerCount.mustBe(1)
+        propertyByKey.get(1)!!.listenerCount.mustBe(1)
+        propertyByKey.get(1)!!.listenerCount.mustBe(1)
+        propertyByKey.get(2)!!.listenerCount.mustBe(0)
     }
 
     @Test

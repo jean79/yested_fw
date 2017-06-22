@@ -67,6 +67,9 @@ class Property<T>(initialValue: T): ReadOnlyProperty<T> {
             }
         }
     }
+
+    /** Useful for ensuring that listeners are disposed correctly. */
+    val listenerCount: Int get() = listeners.size
 }
 
 fun <IN, OUT> ReadOnlyProperty<IN>.map(transform: (IN)->OUT): ReadOnlyProperty<OUT> {
@@ -84,6 +87,35 @@ fun <IN, OUT> ReadOnlyProperty<IN>.mapAsDefault(transform: (IN)->OUT): Property<
         property.set(transform(it))
     }
     return property
+}
+
+fun <IN, OUT> ReadOnlyProperty<IN>.flatMap(transform: (IN)->ReadOnlyProperty<OUT>): ReadOnlyProperty<OUT> {
+    val initialProperty = transform(this.get())
+    val result = Property(initialProperty.get())
+    var disposable = initialProperty.onChange { old, value -> result.set(value) }
+    this.onChange { old, value ->
+        disposable.dispose()
+        disposable = transform(value).onNext { result.set(it) }
+    }
+    return result
+}
+
+/**
+ * Executes an operation each time the property value changes.  The operation is not called immediately.
+ * @param operation an operation that takes the old and the new values, in that order.
+ */
+fun <T> ReadOnlyProperty<T>.onChange(operation: (T, T)->Unit): Disposable {
+    var firstTime = true
+    var oldValue = get()
+    return onNext { newValue ->
+        if (firstTime) {
+            firstTime = false
+        } else {
+            val oldValueToUse = oldValue
+            oldValue = newValue
+            operation(oldValueToUse, newValue)
+        }
+    }
 }
 
 /**
