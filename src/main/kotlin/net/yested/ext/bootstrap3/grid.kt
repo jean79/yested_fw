@@ -211,7 +211,7 @@ private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyP
                 }
             }
         }
-        tbody(sortedData) { item ->
+        tbody(sortedData, Collapse()) { item ->
             tr {
                 columns.forEach { column ->
                     td {
