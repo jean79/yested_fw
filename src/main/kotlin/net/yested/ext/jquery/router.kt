@@ -7,13 +7,7 @@ import org.w3c.dom.Location
 import kotlin.browser.document
 import kotlin.browser.window
 
-@native
-private interface JQRouter {
-    fun on(eventName:String, listener:() -> Unit):Unit = noImpl
-    fun trigger(eventName:String):Unit = noImpl
-}
-
-@native("$(window)") private var routerJQuery: JQRouter = null!!
+internal val jQueryWindow: JQueryWindow = yestedJQuery(window)
 
 /** A Property for window.location.hash.  It is bound to [splitHashProperty]. */
 val Location.hashProperty: Property<String> get() = windowLocationHash
@@ -26,7 +20,7 @@ private val splitWindowLocationHash: Property<Array<String>> = windowLocationHas
 private fun Location.bindToHash(): Property<String> {
     val property: Property<String> = Property(hash)
     var updating = true // avoid triggering an onNext yet
-    routerJQuery.on("hashchange") {
+    jQueryWindow.on("hashchange") {
         if (!updating) {
             updating = true
             try {
@@ -40,7 +34,7 @@ private fun Location.bindToHash(): Property<String> {
         if (!updating) {
             updating = true
             try {
-                routerJQuery.trigger("hashchange")
+                jQueryWindow.trigger("hashchange")
             } finally {
                 updating = false
             }
@@ -58,7 +52,7 @@ fun registerHashChangeListener(runNow:Boolean = true, listener:(Array<String>) -
     if (runNow) {
         window.location.splitHashProperty.onNext { listener(it) }
     } else {
-        routerJQuery.on("hashchange") {
+        jQueryWindow.on("hashchange") {
             listener(window.location.splitHashProperty.get())
         }
     }

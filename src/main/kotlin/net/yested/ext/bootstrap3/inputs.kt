@@ -5,14 +5,11 @@ import net.yested.core.html.bindMultiselect
 import net.yested.core.html.setDisabled
 import net.yested.core.html.setReadOnly
 import net.yested.core.properties.*
-import net.yested.core.utils.removeAllChildElements
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
-import org.w3c.dom.HTMLOptionElement
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.HTMLSpanElement
 import kotlin.browser.document
-import kotlin.dom.addClass
 
 fun HTMLElement.text(value: ReadOnlyProperty<String>) {
     val element = document.createElement("span") as HTMLSpanElement
@@ -80,7 +77,7 @@ fun HTMLElement.intInput(value: Property<Int?>,
         init: (HTMLInputElement.() -> Unit)? = null) {
     val textValue = value.bind(
             transform = { if (it == null) "" else it.toString() },
-            reverse = { if (!it.isEmpty()) parseInt(it) else null })
+            reverse = { if (!it.isEmpty()) it.toInt() else null })
     textInput(textValue, disabled, readonly, id, inputTypeClass = "number int") {
         type = "number"; step = "1"
         if (init != null) init()

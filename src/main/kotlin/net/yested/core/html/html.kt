@@ -22,7 +22,7 @@ fun HTMLElement.table(init:(HTMLTableElement.()->Unit)? = null) = tag(this, tagN
 fun HTMLElement.tr(addFirst: Boolean = false, before: HTMLElement? = null, init:(HTMLTableRowElement.()->Unit)? = null) =
         tag(this, "tr", addFirst, before, init)
 fun HTMLElement.td(init:(HTMLTableCellElement.()->Unit)? = null) = tag(this, tagName = "td", init = init)
-fun HTMLElement.th(init:(HTMLTableHeaderCellElement.()->Unit)? = null) = tag(this, tagName = "th", init = init)
+fun HTMLElement.th(init:(HTMLTableCellElement.()->Unit)? = null) = tag(this, tagName = "th", init = init)
 fun HTMLElement.thead(init:(HTMLTableSectionElement.()->Unit)? = null) = tag(this, tagName = "thead", init = init)
 fun HTMLElement.tbody(init:(HTMLTableSectionElement.()->Unit)? = null) = tag(this, tagName = "tbody", init = init)
 fun HTMLElement.a(init:(HTMLAnchorElement.()->Unit)? = null) = tag(this, tagName = "a", init = init)

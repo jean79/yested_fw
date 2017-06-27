@@ -9,7 +9,6 @@ import kotlin.comparisons.compareBy
 import kotlin.comparisons.naturalOrder
 import kotlin.dom.addClass
 import kotlin.dom.appendText
-import kotlin.dom.onClick
 
 enum class City { Prague, London }
 
@@ -257,7 +256,7 @@ fun main(args: Array<String>) {
                     td {
                         a {
                             appendText("http://www.seznam.cz")
-                            onClick { js("alert('hh')") }
+                            onclick = { js("alert('hh')") }
                         }
                     }
                     td { text(p) }

@@ -2,10 +2,8 @@ package net.yested.core.utils
 
 import net.yested.core.html.*
 import net.yested.core.properties.Property
-import net.yested.core.properties.ReadOnlyProperty
 import net.yested.core.properties.mapAsDefault
 import org.w3c.dom.*
-import java.util.*
 import kotlin.comparisons.*
 
 /**
@@ -30,7 +28,7 @@ import kotlin.comparisons.*
  * Date: 2/3/17
  * Time: 4:51 PM
  */
-fun <T> HTMLTableHeaderCellElement.sortControl(currentSort: Property<SortSpecification<T>?>,
+fun <T> HTMLTableCellElement.sortControl(currentSort: Property<SortSpecification<T>?>,
                                                comparator: Comparator<T>, sortAscending: Boolean = true,
                                                sortNow: Boolean = false, init: HTMLElement.() -> Unit): Property<Boolean?> {
     val sortSpecification = SortSpecification(comparator, sortAscending)

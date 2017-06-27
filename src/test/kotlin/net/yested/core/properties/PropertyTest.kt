@@ -2,7 +2,7 @@ package net.yested.core.properties
 
 import org.junit.Test
 import spec.*
-import java.util.*
+import kotlin.js.Math
 
 /**
  * A test for [Property].
@@ -432,7 +432,7 @@ class PropertyTest {
     fun bind_shouldUpdateTheNewProperty() {
         val intProperty = 123.toProperty()
         val textProperty = intProperty.bind(
-                transform = { it.toString() }, reverse = { parseInt(it) })
+                transform = { it.toString() }, reverse = { it.toInt() })
         intProperty.set(456)
         textProperty.get().mustBe("456")
     }
@@ -441,7 +441,7 @@ class PropertyTest {
     fun bind_shouldUpdateTheOriginalProperty() {
         val intProperty = 123.toProperty()
         val textProperty = intProperty.bind(
-                transform = { it.toString() }, reverse = { parseInt(it) })
+                transform = { it.toString() }, reverse = { it.toInt() })
         textProperty.set("456")
         intProperty.get().mustBe(456)
     }
@@ -450,7 +450,7 @@ class PropertyTest {
     fun bind_shouldNotUpdateThePropertyBeingChanged() {
         val intProperty = 123.toProperty()
         val textProperty = intProperty.bind(
-                transform = { it.toString() }, reverse = { parseInt(it) })
+                transform = { it.toString() }, reverse = { it.toInt() })
         textProperty.set("00456")
         intProperty.get().mustBe(456)
         textProperty.get().mustBe("00456")

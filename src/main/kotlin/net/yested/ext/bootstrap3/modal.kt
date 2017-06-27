@@ -1,12 +1,11 @@
 package net.yested.ext.bootstrap3
 
-import jquery.JQuery
-import jquery.jq
 import net.yested.core.html.button
 import net.yested.core.html.div
 import net.yested.core.html.h4
 import net.yested.core.html.span
 import net.yested.core.utils.Div
+import net.yested.ext.jquery.yestedJQuery
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLHeadingElement
 import kotlin.dom.appendText
@@ -34,8 +33,6 @@ class DialogContext internal constructor(val header: HTMLHeadingElement, val bod
     }
 
 }
-
-@native fun JQuery.modal(command: String) { noImpl }
 
 enum class DialogSize(val code: String) {
     Small("sm"),
@@ -91,15 +88,15 @@ fun prepareDialog(size: DialogSize = DialogSize.Default, init:DialogContext.(dia
 
     val dialogControl = object: DialogControl {
         override fun showDialog() {
-            jq(dialogElement).modal("show")
+            yestedJQuery(dialogElement).modal("show")
         }
 
         override fun hideDialog() {
-            jq(dialogElement).modal("hide")
+            yestedJQuery(dialogElement).modal("hide")
         }
 
         override fun destroyDialog() {
-            jq(dialogElement).modal("destroy")
+            yestedJQuery(dialogElement).modal("destroy")
         }
     }
 

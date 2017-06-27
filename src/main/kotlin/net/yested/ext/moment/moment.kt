@@ -3,35 +3,35 @@ package net.yested.ext.moment
 import net.yested.core.properties.Property
 import net.yested.core.properties.bind
 
-@native("moment") private fun moment_js(): MomentJs = noImpl
-@native("moment") private fun moment_js(millisecondsSinceUnixEpoch: Long): MomentJs = noImpl
-@native("moment") private fun moment_js(input: String, format: String): MomentJs = noImpl
+@JsName("moment") external private fun moment_js(): MomentJs = definedExternally
+@JsName("moment") external private fun moment_js(millisecondsSinceUnixEpoch: Long): MomentJs = definedExternally
+@JsName("moment") external private fun moment_js(input: String, format: String): MomentJs = definedExternally
 
-@native("Moment")
+external
 class MomentJs {
-    fun format(formatString: String? = null): String = noImpl
+    fun format(formatString: String? = definedExternally): String = definedExternally
     // This would be Long except that Kotlin's Long is a Javascript Object.
-    fun valueOf(): Number = noImpl
-    fun millisecond(value: Int? = null): Int = noImpl
-    fun second(value: Int? = null): Int = noImpl
-    fun minute(value: Int? = null): Int = noImpl
-    fun hour(value: Int? = null): Int = noImpl
-    fun date(value: Int? = null): Int = noImpl
-    fun day(value: Int? = null): Int = noImpl
-    fun weekday(value: Int? = null): Int = noImpl
-    fun isoWeekday(value: Int? = null): Int = noImpl
-    fun dayOfYear(value: Int? = null): Int = noImpl
-    fun week(value: Int? = null): Int = noImpl
-    fun isoWeek(value: Int? = null): Int = noImpl
-    fun month(value: Int? = null): Int = noImpl
-    fun quarter(value: Int? = null): Int = noImpl
-    fun year(value: Int? = null): Int = noImpl
-    fun weekYear(value: Int? = null): Int = noImpl
-    fun isoWeekYear(value: Int? = null): Int = noImpl
-    fun weeksInYear(): Int = noImpl
-    fun locale(localeName: String): Unit = noImpl
-    fun unix():Int = noImpl
-    fun unix(t:Int): Unit = noImpl
+    fun valueOf(): Number = definedExternally
+    fun millisecond(value: Int? = definedExternally): Int = definedExternally
+    fun second(value: Int? = definedExternally): Int = definedExternally
+    fun minute(value: Int? = definedExternally): Int = definedExternally
+    fun hour(value: Int? = definedExternally): Int = definedExternally
+    fun date(value: Int? = definedExternally): Int = definedExternally
+    fun day(value: Int? = definedExternally): Int = definedExternally
+    fun weekday(value: Int? = definedExternally): Int = definedExternally
+    fun isoWeekday(value: Int? = definedExternally): Int = definedExternally
+    fun dayOfYear(value: Int? = definedExternally): Int = definedExternally
+    fun week(value: Int? = definedExternally): Int = definedExternally
+    fun isoWeek(value: Int? = definedExternally): Int = definedExternally
+    fun month(value: Int? = definedExternally): Int = definedExternally
+    fun quarter(value: Int? = definedExternally): Int = definedExternally
+    fun year(value: Int? = definedExternally): Int = definedExternally
+    fun weekYear(value: Int? = definedExternally): Int = definedExternally
+    fun isoWeekYear(value: Int? = definedExternally): Int = definedExternally
+    fun weeksInYear(): Int = definedExternally
+    fun locale(localeName: String): Unit = definedExternally
+    fun unix():Int = definedExternally
+    fun unix(t:Int): Unit = definedExternally
 }
 
 class Moment(private val moment: MomentJs) {

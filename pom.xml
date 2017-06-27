@@ -8,7 +8,7 @@
     <artifactId>Yested</artifactId>
     <version>SNAPSHOT-1</version>
     <properties>
-        <kotlin.version>1.0.5</kotlin.version>
+        <kotlin.version>1.1.3</kotlin.version>
         <build.number>0.1.0.0</build.number>
     </properties>
     <packaging>jar</packaging>
@@ -42,9 +42,15 @@
     <dependencies>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-js-library</artifactId>
+            <artifactId>kotlin-stdlib-js</artifactId>
             <version>${kotlin.version}</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test-js</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
