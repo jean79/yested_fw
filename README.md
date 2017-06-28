@@ -39,12 +39,9 @@ To add simple text, it will call appendText("some text").
 See https://github.com/jean79/yested_fw/blob/master/src/main/kotlin/demo.kt
 
 ## To run demo:
-First compile src/main in IntelliJ (e.g. right-click on the main module and click "Compile").
-This will generate some .js files in target/classes/lib, 
-and will probably fail to compile src/test, but that's ok and won't matter.
 
 On the command-line run "mvn install".
-This will generate some .js files in target/test-js
+This will generate some .js files in target/test-js and put some .js files in target/classes/lib. 
 
 In IntelliJ, right-click on index.html and "Open in Browser".
 
@@ -74,11 +71,7 @@ formGroup(state = validation) {
 
 # How to Run tests from IntelliJ
 
-First compile src/main in IntelliJ (e.g. right-click on the main module and click "Compile").
-This will generate some .js files in target/classes/lib, 
-and will probably fail to compile src/test, but that's ok and won't matter.
-
 On the command-line run "mvn install".
-This will generate some .js files in target/test-js
+This will generate some .js files in target/test-js and put some .js files in target/classes/lib.
 
 In IntelliJ, right-click on src/test/web/runner.html and "Open in Browser".
