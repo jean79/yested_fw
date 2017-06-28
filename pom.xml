@@ -125,13 +125,13 @@
                 </executions>
                 <configuration>
                     <file>target/test-js/Yested-tests.js</file>
-                        <replacements>
-                            <!-- add the QUnit assert parameter -->
-                            <replacement>
-                                <token>(HtmlBindTest.+\()(\)[ ;])</token>
-                                <value>$1assert$2</value>
-                            </replacement>
-                        </replacements>
+                    <replacements>
+                        <!-- add the QUnit assert parameter -->
+                        <replacement>
+                            <token>(HtmlBindTest.+\()(\)[ ;])</token>
+                            <value>$1assert$2</value>
+                        </replacement>
+                    </replacements>
                 </configuration>
             </plugin>
 
