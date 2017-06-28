@@ -1,6 +1,6 @@
 package net.yested.ext.pickadate
 
-import jquery.JQuery
+import net.yested.ext.jquery.YestedJQuery
 
 /**
  * uses library: http://amsul.ca/pickadate.js/
@@ -15,7 +15,7 @@ class DateContext {
 class PickADateOptions(var format: String, var selectMonths: Boolean = false, var selectYears: Boolean = false,
                        var onSet: (DateContext) -> Unit)
 
-fun JQuery.pickadate(options: PickADateOptions) {
+fun YestedJQuery.pickadate(options: PickADateOptions) {
     val param: dynamic = object {}
     param.format = options.format
     param.selectMonths = options.selectMonths
@@ -24,5 +24,3 @@ fun JQuery.pickadate(options: PickADateOptions) {
     pickadate(param as Any)
 }
 
-@native
-private fun JQuery.pickadate(param: Any): Unit = noImpl

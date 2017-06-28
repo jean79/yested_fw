@@ -55,7 +55,7 @@ class NavbarMenu(val ul: HTMLUListElement) {
                 a {
                     href = "#"; className = "dropdown-toggle"
                     setAttribute("data-toggle", "dropdown")
-                    plus(label)
+                    appendText(label)
                     span { className = "caret" }
                 }
                 el = ul {

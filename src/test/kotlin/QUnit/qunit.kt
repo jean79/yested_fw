@@ -1,8 +1,5 @@
 package QUnit
 
-import java.util.*
-import kotlin.properties.Delegates
-
 /**
  * The QUnit API.
  * @author Eric Pabst (epabst@gmail.com)
@@ -21,16 +18,20 @@ fun module(name: String, nested: () -> Unit) {
     qUnitModule(moduleStack.joinToString(" "))
 }
 
-@native("QUnit.module")
-private fun qUnitModule(name: String) { noImpl }
+external
+private fun qUnitModule(name: String) { definedExternally }
 
-@native("QUnit.test")
-fun test(name: String, nested: () -> Unit) { noImpl }
+external
+fun test(name: String, nested: () -> Unit) { definedExternally }
 
-@native("QUnit.assert")
-val assert: Assert by Delegates.notNull()
+@JsName("QUnit") external val qunit2: QUnit2
 
-@native
+external interface QUnit2 {
+    val assert: Assert
+}
+val assert: Assert = qunit2.assert
+
+external
 interface Assert {
     fun <T> equal(actual: T, expected: T): Unit
     fun <T> notEqual(actual: T, unexpected: T): Unit
@@ -38,6 +39,6 @@ interface Assert {
     fun <T> notPropEqual(actual: T, unexpected: T): Unit
     fun ok(actual: Boolean): Unit
     fun notOk(actual: Boolean): Unit
-    fun throws(f: () -> Any, expectedException: Throwable, message: String = "should have thrown exception")
+    fun throws(f: () -> Any, expectedException: Throwable, message: String = definedExternally)
     fun async(): ()->Unit
 }

@@ -8,9 +8,7 @@ import net.yested.core.properties.ReadOnlyProperty
 import net.yested.core.utils.with
 import org.w3c.dom.*
 import org.w3c.dom.events.Event
-import kotlin.dom.addClass
-import kotlin.dom.plus
-import kotlin.dom.removeClass
+import kotlin.dom.appendText
 
 enum class ButtonLook(val code: String) {
     Default("default"),
@@ -78,8 +76,8 @@ fun HTMLDivElement.generateDropdownInto(label: String, init: DropDownContext.() 
     button {
         className = "btn btn-default dropdown-toggle"; type = "button"
         setAttribute("data-toggle", "dropdown")
-        plus(label)
-        plus(" ")
+        appendText(label)
+        appendText(" ")
         span { className = "caret" }
     }
     val el = ul { className = "dropdown-menu" }

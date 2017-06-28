@@ -1,9 +1,9 @@
 package net.yested.ext.pickadate
 
-import jquery.jq
 import net.yested.core.html.bind
 import net.yested.core.properties.Property
 import net.yested.core.utils.whenAddedToDom
+import net.yested.ext.jquery.yestedJQuery
 import net.yested.ext.moment.FormatString
 import net.yested.ext.moment.FormatStringBuilder
 import net.yested.ext.moment.Moment
@@ -36,7 +36,7 @@ fun HTMLElement.dateInput(data: Property<Moment?>, placeholder: String? = null, 
     whenAddedToDom {
         text.onNext { setAttribute("data-value", it) }
 
-        jq(element).pickadate(PickADateOptions(formatString.toLowerCase(), selectMonths = true, selectYears = true,
+        yestedJQuery(element).pickadate(PickADateOptions(formatString.toLowerCase(), selectMonths = true, selectYears = true,
                 onSet = { context: DateContext ->
                     if (context.select != undefined)
                         data.set(context.select?.let { Moment.parseMillisecondsSinceUnixEpoch(it) })

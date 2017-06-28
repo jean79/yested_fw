@@ -51,7 +51,7 @@ fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: 
                 .map { selectOptions[it - 1] }
                 .filter { (it as HTMLOptionElement).selected }
                 .map { (it as HTMLOptionElement).value }
-                .map { options.get()[parseInt(it)] }
+                .map { options.get()[it.toInt()] }
         updating = true
         selected.set(selectedValues)
         updating = false

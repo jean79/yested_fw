@@ -2,7 +2,6 @@ package net.yested.core.utils
 
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLTableRowElement
 import org.w3c.dom.Node
 import kotlin.browser.document
 import kotlin.browser.window
@@ -17,7 +16,7 @@ fun Node.removeAllChildElements() {
 fun HTMLElement.removeChildByName(childElementName:String) {
    val elements = this.getElementsByTagName(childElementName)
    (0..elements.length-1).forEach {
-       this.removeChild(elements.get(it)!!)
+       this.removeChild(elements.item(it)!!)
    }
 }
 

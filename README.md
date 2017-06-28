@@ -41,7 +41,8 @@ See https://github.com/jean79/yested_fw/blob/master/src/main/kotlin/demo.kt
 ## To run demo:
 
 On the command-line run "mvn install".
-This will generate some .js files in target/test-js and put some .js files in target/classes/lib. 
+This will produce target/classes/lib/kotlin.js, target/classes/Yested.js (also in target/js), and target/test-js/Yested-tests.js.
+Note: Building the module in IntelliJ produces target/test-js/Yested_test.js instead of Yested-tests.js.
 
 In IntelliJ, right-click on index.html and "Open in Browser".
 
@@ -72,6 +73,7 @@ formGroup(state = validation) {
 # How to Run tests from IntelliJ
 
 On the command-line run "mvn install".
-This will generate some .js files in target/test-js and put some .js files in target/classes/lib.
+This will produce target/classes/lib/kotlin.js, target/classes/Yested.js (also in target/js), and target/test-js/Yested-tests.js.
+Note: Building the module in IntelliJ produces target/test-js/Yested_test.js instead of Yested-tests.js, and doesn't add the QUnit 'assert' parameter.
 
 In IntelliJ, right-click on src/test/web/runner.html and "Open in Browser".

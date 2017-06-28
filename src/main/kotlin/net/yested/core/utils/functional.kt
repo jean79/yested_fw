@@ -1,8 +1,6 @@
 package net.yested.core.utils
 
 import net.yested.core.properties.Property
-import java.io.Serializable
-import java.util.*
 import kotlin.comparisons.compareBy
 import kotlin.comparisons.compareValues
 
@@ -45,7 +43,7 @@ public data class Tuple4<out A, out B, out C, out D>(
         public val second: B,
         public val third: C,
         public val fourth: D
-                                             ) : Serializable {
+                                             )  {
 
     /**
      * Returns string representation of the [Tuple4] including its [first], [second], [third] and [fourth] values.
@@ -81,7 +79,7 @@ public data class Tuple5<out A, out B, out C, out D, out E>(
         public val third: C,
         public val fourth: D,
         public val fifth: E
-                                             ) : Serializable {
+                                             ) {
 
     /**
      * Returns string representation of the [Tuple5] including its [first], [second], [third], [fourth] and [fifth] values.
@@ -120,7 +118,7 @@ public data class Tuple6<out A, out B, out C, out D, out E, out F>(
         public val fourth: D,
         public val fifth: E,
         public val sixth: F
-                                             ) : Serializable {
+                                             ) {
 
     /**
      * Returns string representation of the [Tuple5] including its [first], [second], [third], [fourth], [fifth], and [sixth] values.

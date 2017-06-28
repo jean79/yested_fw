@@ -5,7 +5,6 @@ import net.yested.core.properties.*
 import net.yested.core.utils.SortSpecification
 import net.yested.core.utils.sortControl
 import org.w3c.dom.*
-import java.util.*
 
 interface ColumnDefinition {
     val css: String
@@ -224,7 +223,7 @@ private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyP
     }
 }
 
-fun <T> HTMLTableHeaderCellElement.sortControlWithArrow(currentSort: Property<SortSpecification<T>?>,
+fun <T> HTMLTableCellElement.sortControlWithArrow(currentSort: Property<SortSpecification<T>?>,
                                                         comparator: Comparator<T>, sortAscending: Boolean = true,
                                                         sortNow: Boolean = false, init: HTMLElement.() -> Unit): Property<Boolean?> {
     val ascendingProperty = sortControl(currentSort, comparator, sortAscending, sortNow, init)
