@@ -81,8 +81,21 @@
                             <goal>unpack-dependencies</goal>
                         </goals>
                         <configuration>
+                            <includeScope>runtime</includeScope>
                             <includes>*.js</includes>
                             <outputDirectory>${project.build.outputDirectory}/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-test-dependencies</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>test</includeScope>
+                            <includes>*.js</includes>
+                            <outputDirectory>${project.build.testOutputDirectory}/lib</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
