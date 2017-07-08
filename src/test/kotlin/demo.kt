@@ -234,52 +234,53 @@ fun main(args: Array<String>) {
                     }
                 }
             }
-        }
 
-        /*textInput(value = p, validation = validation)*/
-        div {
-            id = "id"
-            className = "bla"
-            span {
-                className = "spanClass"
-            }
-        }
-        table {
-            thead {
-                tr {
-                    th { appendText("Col1") }
-                    th { appendText("Col2") }
+            /*textInput(value = p, validation = validation)*/
+            div {
+                id = "id"
+                className = "bla"
+                span {
+                    className = "spanClass"
                 }
             }
-            tbody {
-                tr {
-                    td {
-                        a {
-                            appendText("http://www.seznam.cz")
-                            onclick = { js("alert('hh')") }
+            table {
+                thead {
+                    tr {
+                        th { appendText("Col1") }
+                        th { appendText("Col2") }
+                    }
+                }
+                tbody {
+                    tr {
+                        td {
+                            a {
+                                appendText("http://www.seznam.cz")
+                                onclick = { js("alert('hh')") }
+                            }
+                        }
+                        td { text(p) }
+                        td {
+                            singleSelectInput(selected = city, options = Property(City.values().toList()), render = { appendText(it.name) })
+                            appendText("Selected city: ")
+                            text(value = city.map { it.name })
                         }
                     }
-                    td { text(p) }
-                    td {
-                        singleSelectInput(selected = city, options = Property(City.values().toList()), render = { appendText(it.name) })
-                        appendText("Selected city: ")
-                        text(value = city.map { it.name })
+                }
+            }
+            val currentSort = Property<SortSpecification<String>?>(null)
+            table {
+                className = "table table-striped table-hover table-condensed"
+                thead {
+                    tr {
+                        th { sortControlWithArrow(currentSort, naturalOrder<String>()) { appendText("URL") } }
+                        th { sortControlWithArrow(currentSort, compareBy<String> { it.length }) { appendText("URL Length") } }
                     }
                 }
-            }
-        }
-        val currentSort = Property<SortSpecification<String>?>(null)
-        table {
-            thead {
-                tr {
-                    th { sortControlWithArrow(currentSort, naturalOrder<String>()) { appendText("URL") } }
-                    th { sortControlWithArrow(currentSort, compareBy<String> { it.length }) { appendText("URL Length") } }
-                }
-            }
-            tbody(listOf("http://www.seznam.cz", "http://www.google.com", "http://www.yahoo.com").toProperty().sortedWith(currentSort)) { index, value ->
-                tr { className = if (index % 2 == 0) "even" else "odd"
-                    td { appendText(value) }
-                    td { appendText(value.length.toString()) }
+                tbody(listOf("http://www.seznam.cz", "http://www.google.com", "http://www.yahoo.com").toProperty().sortedWith(currentSort)) { index, value ->
+                    tr { className = if (index % 2 == 0) "even" else "odd"
+                        td { appendText(value) }
+                        td { appendText(value.length.toString()) }
+                    }
                 }
             }
         }
