@@ -6,7 +6,9 @@
 
     <groupId>net.yested</groupId>
     <artifactId>Yested</artifactId>
-    <version>1.0-alpha-SNAPSHOT</version>
+    <version>1.0-alpha-2</version>
+    <name>Yested Framework</name>
+
     <properties>
         <kotlin.version>1.1.3</kotlin.version>
         <build.number>0.1.0.0</build.number>
@@ -20,8 +22,11 @@
         <developer>
             <name>Jan Kovar</name>
             <email>jan.kovar79@gmail.com</email>
-            <organization>Sonatype</organization>
             <organizationUrl>https://github.com/jean79</organizationUrl>
+        </developer>
+        <developer>
+            <name>Eric Pabst</name>
+            <organizationUrl>https://github.com/epabst</organizationUrl>
         </developer>
     </developers>
 
@@ -56,14 +61,15 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>yested_nexus</id>
-            <url>http://31.31.73.220:8081/nexus/content/repositories/snapshots</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
-            <id>yested_nexus</id>
-            <url>http://31.31.73.220:8081/nexus/content/repositories/releases/</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+
 
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
@@ -185,7 +191,7 @@
                     <archive>
                         <forced/>
                         <manifestEntries>
-                            <Implementation-Version>${build.number}</Implementation-Version>
+                            <Implementation-Version>${project.version}</Implementation-Version>
                             <Kotlin-JS-Module-Name>${project.artifactId}</Kotlin-JS-Module-Name>
                         </manifestEntries>
                     </archive>
@@ -237,6 +243,47 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.8</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                        <configuration>
+                            <keyname>${gpg.keyname}</keyname>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.8</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
             </plugin>
 
         </plugins>
