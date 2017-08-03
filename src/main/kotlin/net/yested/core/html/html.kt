@@ -28,7 +28,8 @@ fun HTMLElement.tbody(init:(HTMLTableSectionElement.()->Unit)? = null) = tag(thi
 fun HTMLElement.a(init:(HTMLAnchorElement.()->Unit)? = null) = tag(this, tagName = "a", init = init)
 fun HTMLElement.select(init:(HTMLSelectElement.()->Unit)? = null) = tag(this, tagName = "select", init = init)
 fun HTMLElement.ul(init:(HTMLUListElement.()->Unit)? = null) = tag(this, tagName = "ul", init = init)
-fun HTMLElement.li(init:(HTMLLIElement.()->Unit)? = null) = tag(this, tagName = "li", init = init)
+fun HTMLElement.li(before: HTMLElement? = null, init:(HTMLLIElement.()->Unit)? = null) =
+        tag(this, tagName = "li", before = before, init = init)
 fun HTMLElement.h1(init:(HTMLHeadingElement.()->Unit)? = null) = tag(this, tagName = "h1", init = init)
 fun HTMLElement.h2(init:(HTMLHeadingElement.()->Unit)? = null) = tag(this, tagName = "h2", init = init)
 fun HTMLElement.h3(init:(HTMLHeadingElement.()->Unit)? = null) = tag(this, tagName = "h3", init = init)
