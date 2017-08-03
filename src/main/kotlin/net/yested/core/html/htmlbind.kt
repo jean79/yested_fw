@@ -90,6 +90,69 @@ fun HTMLInputElement.setReadOnly(property: ReadOnlyProperty<Boolean>) {
     property.onNext { readOnly = it }
 }
 
+fun HTMLCollection.toList(): List<HTMLElement> {
+    return (0..(this.length - 1)).map { item(it)!! as HTMLElement }
+}
+
+internal abstract class DynamicHTMLCollection<C : HTMLElement,I : HTMLElement,T>(
+        val orderedData: ReadOnlyProperty<Iterable<T>?>, val effect: BiDirectionEffect) {
+    abstract fun addItemViaContext(container: C, index: Int, item: T)
+    abstract fun addItemToDom(container: C, before: HTMLElement?, init: (I.() -> Unit)?): I
+    abstract fun addItemViaContextWithAnimation(container: C, index: Int, item: T, itemsWithoutDelays: MutableList<HTMLElement>)
+
+    fun invoke(containerElement: C) {
+        var operableList : OperableList<T>? = null
+
+        orderedData.onNext { values ->
+            val operableListSnapshot = operableList
+            if (values == null) {
+                containerElement.removeAllChildElements()
+                operableList = null
+            } else if (operableListSnapshot == null) {
+                containerElement.removeAllChildElements()
+                values.forEachIndexed { index, item ->
+                    addItemViaContext(containerElement, index, item)
+                }
+                operableList = DomOperableList<C,I,T>(this, values.toMutableList(), containerElement, effect)
+            } else {
+                operableListSnapshot.reconcileTo(values.toList())
+            }
+        }
+    }
+
+    fun addItemWithAnimation(container: C, index: Int, itemsWithoutDelays: MutableList<HTMLElement>, init: (I.() -> Unit)?): I {
+        val nextRow = if (index < itemsWithoutDelays.size) itemsWithoutDelays.get(index) else null
+        val newRow = addItemToDom(container, nextRow, init)
+        effect.applyIn(newRow)
+        itemsWithoutDelays.add(index, newRow)
+        return newRow
+    }
+}
+
+internal class DomOperableList<C : HTMLElement,I : HTMLElement,T>(
+        val dynamicHTMLCollection: DynamicHTMLCollection<C,I,T>,
+        initialData: MutableList<T>, val container: C, val effect: BiDirectionEffect) : InMemoryOperableList<T>(initialData) {
+    private val itemsWithoutDelays: MutableList<HTMLElement> = container.children.toList().toMutableList()
+
+    override fun add(index: Int, item: T) {
+        dynamicHTMLCollection.addItemViaContextWithAnimation(container, index, item, itemsWithoutDelays)
+        super.add(index, item)
+    }
+
+    override fun removeAt(index: Int): T {
+        val row = itemsWithoutDelays.removeAt(index)
+        effect.applyOut(row) {
+            container.removeChild(row)
+        }
+        return super.removeAt(index)
+    }
+
+    override fun move(fromIndex: Int, toIndex: Int) {
+        val item = removeAt(fromIndex)
+        add(toIndex, item)
+    }
+}
+
 /**
  * Bind table content to a Property<Iterable<T>>.  The index and value are provided to tbodyItemInit.
  * Example:<pre>
@@ -108,31 +171,8 @@ fun HTMLInputElement.setReadOnly(property: ReadOnlyProperty<Boolean>) {
  * </pre>
  */
 fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect = NoEffect,
-                               tbodyItemInit: TableItemContext.(Int, T) -> Unit) {
-    var tbodyOperableList : TBodyOperableList<T>? = null
-
-    orderedData.onNext { values ->
-        val operableListSnapshot = tbodyOperableList
-        if (values == null) {
-            removeChildByName("tbody")
-            tbodyOperableList = null
-        } else if (operableListSnapshot == null) {
-            val tbody = setTBodyContentsImmediately(values, tbodyItemInit)
-            tbodyOperableList = TBodyOperableList(values.toMutableList(), tbody, effect, tbodyItemInit)
-        } else {
-            operableListSnapshot.reconcileTo(values.toList())
-        }
-    }
-}
-
-private fun <T> HTMLTableElement.setTBodyContentsImmediately(values: Iterable<T>?, tbodyItemInit: TableItemContext.(Int, T) -> Unit): HTMLTableSectionElement {
-    removeChildByName("tbody")
-    return tbody {
-        val tbody = this
-        values?.forEachIndexed { index, item ->
-            TableItemContext({ rowInit -> tbody.tr(init = rowInit) }).tbodyItemInit(index, item)
-        }
-    }
+                               itemInit: TableItemContext.(Int, T) -> Unit) {
+    tbody { DynamicTBody(orderedData, effect, itemInit).invoke(this) }
 }
 
 /**
@@ -153,48 +193,74 @@ private fun <T> HTMLTableElement.setTBodyContentsImmediately(values: Iterable<T>
  * </pre>
  */
 fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect = NoEffect,
-                               tbodyItemInit: TableItemContext.(T) -> Unit) {
-    return tbody(orderedData, effect, { index, item -> tbodyItemInit(item) })
+                               itemInit: TableItemContext.(T) -> Unit) {
+    return tbody(orderedData, effect, { index, item -> itemInit(item) })
 }
 
-class TableItemContext(private val rowFactory: ((HTMLTableRowElement.()->Unit)?)->HTMLTableRowElement) {
-    fun tr(init:(HTMLTableRowElement.()->Unit)? = null): HTMLTableRowElement {
-        return rowFactory.invoke(init)
+class TableItemContext(private val addItemToDom: ((HTMLTableRowElement.() -> Unit)?)->HTMLTableRowElement) {
+    fun tr(init:(HTMLTableRowElement.()->Unit)? = null): HTMLTableRowElement = addItemToDom(init)
+}
+
+internal class DynamicTBody<T>(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect, val itemInit: TableItemContext.(Int, T) -> Unit)
+    : DynamicHTMLCollection<HTMLTableSectionElement,HTMLTableRowElement,T>(orderedData, effect) {
+
+    override fun addItemViaContext(container: HTMLTableSectionElement, index: Int, item: T) {
+        TableItemContext({ init -> addItemToDom(container, null, init) }).itemInit(index, item)
+    }
+
+    override fun addItemToDom(container: HTMLTableSectionElement, before: HTMLElement?, init: (HTMLTableRowElement.() -> Unit)?): HTMLTableRowElement {
+        return container.tr(before = before, init = init)
+    }
+
+    override fun addItemViaContextWithAnimation(container: HTMLTableSectionElement, index: Int, item: T, itemsWithoutDelays: MutableList<HTMLElement>) {
+        TableItemContext({ init -> addItemWithAnimation(container, index, itemsWithoutDelays, init) }).itemInit(index, item)
     }
 }
 
-fun HTMLCollection.toList(): List<HTMLElement> {
-    return (0..(this.length - 1)).map { item(it)!! as HTMLElement }
+/**
+ * Bind ul to a Property<Iterable<T>>.  The index and value are provided to itemInit.
+ * Example:<pre>
+ *   ul(myData, effect = Collapse()) { index, item ->
+ *       li { className = if (index % 2 == 0) "even" else "odd"
+ *           appendText(item.name)
+ *       }
+ *   }
+ * </pre>
+ */
+fun <T> HTMLDivElement.ul(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect = NoEffect,
+                          itemInit: ListItemContext.(Int, T) -> Unit) {
+    ul { DynamicUList(orderedData, effect, itemInit).invoke(this) }
 }
 
-class TBodyOperableList<T>(initialData: MutableList<T>, val tbodyElement: HTMLTableSectionElement,
-                           val effect: BiDirectionEffect,
-                           val tbodyItemInit: TableItemContext.(Int, T)->Unit) : InMemoryOperableList<T>(initialData) {
-    private val rowsWithoutDelays = tbodyElement.rows.toList().toMutableList()
+/**
+ * Bind ul to a Property<Iterable<T>>.  The index and value are provided to itemInit.
+ * Example:<pre>
+ *   ul(myData, effect = Collapse()) { item ->
+ *       li { appendText(item.name) }
+ *   }
+ * </pre>
+ */
+fun <T> HTMLDivElement.ul(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect = NoEffect,
+                          itemInit: ListItemContext.(T) -> Unit) {
+    return ul(orderedData, effect, { _, item -> itemInit(item) })
+}
 
-    override fun add(index: Int, item: T) {
-        val nextRow = if (index < rowsWithoutDelays.size) rowsWithoutDelays.get(index) else null
-        TableItemContext({ rowInit ->
-            val newRow = tbodyElement.tr(before = nextRow, init = rowInit)
-            effect.applyIn(newRow)
-            rowsWithoutDelays.add(index, newRow)
-            newRow
-        }).tbodyItemInit(index, item)
-        super.add(index, item)
+class ListItemContext(private val addItemToDom: ((HTMLLIElement.() -> Unit)?)->HTMLLIElement) {
+    fun li(init:(HTMLLIElement.()->Unit)? = null): HTMLLIElement = addItemToDom(init)
+}
+
+internal class DynamicUList<T>(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect, val itemInit: ListItemContext.(Int, T) -> Unit)
+    : DynamicHTMLCollection<HTMLUListElement,HTMLLIElement,T>(orderedData, effect) {
+
+    override fun addItemViaContext(container: HTMLUListElement, index: Int, item: T) {
+        ListItemContext({ init -> addItemToDom(container, null, init) }).itemInit(index, item)
     }
 
-    override fun removeAt(index: Int): T {
-        val row = rowsWithoutDelays.removeAt(index)
-        effect.applyOut(row) {
-            tbodyElement.removeChild(row)
-        }
-        return super.removeAt(index)
+    override fun addItemToDom(container: HTMLUListElement, before: HTMLElement?, init: (HTMLLIElement.() -> Unit)?): HTMLLIElement {
+        return container.li(before, init)
     }
 
-    override fun move(fromIndex: Int, toIndex: Int) {
-        val item = removeAt(fromIndex)
-        add(toIndex, item)
-//        super.move(fromIndex, toIndex)
-//        (tbodyElement.parentElement as HTMLTableElement?)?.setTBodyContentsImmediately(toList(), tbodyItemInit)
+    override fun addItemViaContextWithAnimation(container: HTMLUListElement, index: Int, item: T, itemsWithoutDelays: MutableList<HTMLElement>) {
+        ListItemContext({ init -> addItemWithAnimation(container, index, itemsWithoutDelays, init) }).itemInit(index, item)
     }
 }
