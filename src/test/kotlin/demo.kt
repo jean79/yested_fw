@@ -3,6 +3,8 @@ import net.yested.core.properties.*
 import net.yested.core.utils.SortSpecification
 import net.yested.core.utils.with
 import net.yested.ext.bootstrap3.*
+import net.yested.ext.jquery.Slide
+import net.yested.ext.jquery.SlideTableRow
 import org.w3c.dom.HTMLElement
 import kotlin.browser.document
 import kotlin.comparisons.compareBy
@@ -268,6 +270,7 @@ fun main(args: Array<String>) {
                 }
             }
             val currentSort = Property<SortSpecification<String>?>(null)
+            val urlList = listOf("http://www.seznam.cz", "http://www.google.com", "http://www.yahoo.com").toProperty().sortedWith(currentSort)
             table {
                 className = "table table-striped table-hover table-condensed"
                 thead {
@@ -276,13 +279,22 @@ fun main(args: Array<String>) {
                         th { sortControlWithArrow(currentSort, compareBy<String> { it.length }) { appendText("URL Length") } }
                     }
                 }
-                tbody(listOf("http://www.seznam.cz", "http://www.google.com", "http://www.yahoo.com").toProperty().sortedWith(currentSort)) { index, value ->
+                tbody(urlList, effect = SlideTableRow()) { index, value ->
                     tr { className = if (index % 2 == 0) "even" else "odd"
                         td { appendText(value) }
                         td { appendText(value.length.toString()) }
                     }
                 }
             }
+            ul {
+                repeatLive(urlList, effect = Slide()) { value -> li { appendText(value) } }
+                li { appendText("None of the above") }
+            }
+            br()
+            br()
+            br()
+            br()
+            br()
         }
     }
 }
