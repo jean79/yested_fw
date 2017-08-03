@@ -114,6 +114,11 @@ fun HTMLCollection.toList(): List<HTMLElement> {
 fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect = NoEffect,
                                itemInit: TableItemContext.(Int, T) -> Unit) {
     var containerElement: HTMLTableSectionElement? = null
+    val itemFactory = object : ItemFactory {
+        override fun invoke(parent: HTMLTableSectionElement, before: HTMLElement?, init: (HTMLTableRowElement.() -> Unit)?): HTMLTableRowElement {
+            return parent.tr(before = before, init = init)
+        }
+    }
     var operableList : TBodyOperableList<T>? = null
 
     orderedData.onNext { values ->
@@ -127,10 +132,10 @@ fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, effe
             val element = tbody {
                 val tbody = this
                 values.forEachIndexed { index, item ->
-                    TableItemContext({ init -> tbody.tr(init = init) }).itemInit(index, item)
+                    TableItemContext(tbody, itemFactory).itemInit(index, item)
                 }
             }
-            operableList = TBodyOperableList(values.toMutableList(), element, effect, itemInit)
+            operableList = TBodyOperableList(values.toMutableList(), element, effect, itemFactory, itemInit)
         } else {
             operableListSnapshot.reconcileTo(values.toList())
         }
@@ -159,25 +164,34 @@ fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, effe
     return tbody(orderedData, effect, { index, item -> itemInit(item) })
 }
 
-class TableItemContext(private val itemFactory: ((HTMLTableRowElement.()->Unit)?)->HTMLTableRowElement) {
+class TableItemContext(private val tbody: HTMLTableSectionElement,
+                       private val itemFactory: ItemFactory) {
     fun tr(init:(HTMLTableRowElement.()->Unit)? = null): HTMLTableRowElement {
-        return itemFactory.invoke(init)
+        return itemFactory.invoke(tbody, null, init)
     }
+}
+
+interface ItemFactory {
+    fun invoke(parent: HTMLTableSectionElement, before: HTMLElement?, init: (HTMLTableRowElement.() -> Unit)? = null): HTMLTableRowElement
 }
 
 class TBodyOperableList<T>(initialData: MutableList<T>, val tbodyElement: HTMLTableSectionElement,
                            val effect: BiDirectionEffect,
+                           val itemFactory: ItemFactory,
                            val itemInit: TableItemContext.(Int, T)->Unit) : InMemoryOperableList<T>(initialData) {
     private val itemsWithoutDelays = tbodyElement.rows.toList().toMutableList()
 
     override fun add(index: Int, item: T) {
         val nextRow = if (index < itemsWithoutDelays.size) itemsWithoutDelays.get(index) else null
-        TableItemContext({ init ->
-            val newRow = tbodyElement.tr(before = nextRow, init = init)
-            effect.applyIn(newRow)
-            itemsWithoutDelays.add(index, newRow)
-            newRow
-        }).itemInit(index, item)
+        val animatedItemFactory = object : ItemFactory {
+            override fun invoke(parent: HTMLTableSectionElement, before: HTMLElement?, init: (HTMLTableRowElement.() -> Unit)?): HTMLTableRowElement {
+                val newRow = itemFactory.invoke(parent, before = nextRow, init = init)
+                effect.applyIn(newRow)
+                itemsWithoutDelays.add(index, newRow)
+                return newRow
+            }
+        }
+        TableItemContext(tbodyElement, animatedItemFactory).itemInit(index, item)
         super.add(index, item)
     }
 
