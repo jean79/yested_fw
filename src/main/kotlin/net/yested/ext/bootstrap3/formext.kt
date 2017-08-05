@@ -2,6 +2,7 @@ package net.yested.ext.bootstrap3
 
 import net.yested.core.html.p
 import net.yested.core.properties.ReadOnlyProperty
+import net.yested.core.properties.toProperty
 import org.w3c.dom.*
 import kotlin.dom.appendText
 
@@ -26,7 +27,7 @@ class BtsFormContext(
 
     fun btsFormItem(
             labelId: String = "${++labelIdSequence}",
-            state: ReadOnlyProperty<State>,
+            state: ReadOnlyProperty<State> = State.Default.toProperty(),
             init: BtsFormItemContext.() -> Unit) {
 
         element.formGroup(state = state) {
@@ -43,7 +44,7 @@ class BtsFormContext(
 
     fun btsFormItemSimple(
             labelId: String = "${++labelIdSequence}",
-            state: ReadOnlyProperty<State>,
+            state: ReadOnlyProperty<State> = State.Default.toProperty(),
             label: String = "",
             init: HTMLDivElement.(labelId: String) -> Unit) {
 
