@@ -383,6 +383,7 @@ fun <T> Property<List<T>>.modifyList(operation: (ArrayList<T>) -> Unit) {
 fun <T> Property<List<T>>.clear() { modifyList { it.clear() } }
 fun <T> Property<List<T>>.removeAt(index: Int) { modifyList { it.removeAt(index) } }
 fun <T> Property<List<T>>.add(item: T) { modifyList { it.add(item) } }
+fun <T> Property<List<T>>.remove(item: T) { modifyList { it.remove(item) } }
 
 fun <T> ReadOnlyProperty<Iterable<T>?>.sortedWith(sortSpecification: ReadOnlyProperty<SortSpecification<T>?>): ReadOnlyProperty<Iterable<T>?> {
     return sortedWith(sortSpecification.map { it?.fullComparator })
