@@ -26,6 +26,17 @@ fun HTMLInputElement.bind(property: Property<String>) {
     addEventListener("keyup", { updating = true; property.set(value); updating = false }, false)
 }
 
+fun HTMLInputElement.bindChecked(checked: Property<Boolean>) {
+    val element = this
+    var updating = false
+    checked.onNext {
+        if (!updating) {
+            element.checked = it
+        }
+    }
+    addEventListener("change", { updating = true; checked.set(element.checked); updating = false }, false)
+}
+
 fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: Property<List<T>>, render: HTMLElement.(T)->Unit) {
     val selectElement = this
     options.onNext {

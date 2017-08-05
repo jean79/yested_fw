@@ -94,11 +94,16 @@ fun main(args: Array<String>) {
             p {
                 btsForm(format = FormFormat.Horizontal) {
                     formGroup(state = validation) {
-                        btsLabel(htmlFor = "ii", width = Col.Width.Lg(4)) {
+                        btsLabel(htmlFor = "ii", width = Col.Width.Sm(6)) {
                             appendText("Label")
-                        }
-                        col(Col.Width.Lg(4)) {
                             textInput(id = "ii", value = p)
+                        }
+                        val checked = false.toProperty()
+                        btsLabel(width = Col.Width.Sm(6)) {
+                            div { className = "checkbox"
+                                checkbox(checked, name = "vehicle", value = "bicycle")
+                                span { checked.onNext { textContent = if (it) "Checked" else "Unchecked" } }
+                            }
                         }
                     }
                     btsButton { appendText("Submit") }
