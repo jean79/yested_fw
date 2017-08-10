@@ -187,7 +187,7 @@ private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyP
         val comparator: Comparator<T>? = column.comparator
     }
 
-    val columnSort: Property<ColumnSort<T>?> = sortColumn.mapAsDefault { it?.let { ColumnSort(it, it.sortAscending!!) } }
+    val columnSort: ReadOnlyProperty<ColumnSort<T>?> = sortColumn.mapIfNotNull { ColumnSort(it, it.sortAscending!!) }
     val sortSpecification: Property<SortSpecification<T>?> = columnSort.mapAsDefault {
         if (it != null && it.comparator != null) SortSpecification(it.comparator, it.ascending) else null
     }
