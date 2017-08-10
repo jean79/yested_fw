@@ -74,10 +74,13 @@ fun <T> HTMLSelectElement.bind(selected: Property<T>, options: Property<List<T>>
     bindMultiselect(multipleSelected, options, render)
 }
 
-
 fun HTMLElement.setClassPresence(className: String, present: ReadOnlyProperty<Boolean>) {
-    present.onNext {
-        if (it) addClass(className) else removeClass(className)
+    setClassPresence(className, present, true)
+}
+
+fun <T> HTMLElement.setClassPresence(className: String, property: ReadOnlyProperty<T>, presentValue: T) {
+    property.onNext {
+        if (it == presentValue) addClass(className) else removeClass(className)
     }
 }
 
