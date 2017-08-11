@@ -202,7 +202,7 @@ private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyP
                         if (column.comparator == null) {
                             (column.label)()
                         } else {
-                            sortControlWithArrow<T>(sortSpecification, column.comparator, column.sortAscending!!) {
+                            sortControlWithArrow(sortSpecification, column.comparator, column.sortAscending!!) {
                                 (column.label)()
                             }
                         }
@@ -224,8 +224,10 @@ private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyP
 }
 
 fun <T> HTMLTableCellElement.sortControlWithArrow(currentSort: Property<SortSpecification<T>?>,
-                                                        comparator: Comparator<T>, sortAscending: Boolean = true,
-                                                        sortNow: Boolean = false, init: HTMLElement.() -> Unit): Property<Boolean?> {
+                                                  comparator: Comparator<T>,
+                                                  sortAscending: Boolean = true,
+                                                  sortNow: Boolean = false,
+                                                  init: HTMLElement.() -> Unit): Property<Boolean?> {
     val ascendingProperty = sortControl(currentSort, comparator, sortAscending, sortNow, init)
     span {
         val icon = ascendingProperty.map { ascending ->

@@ -76,7 +76,7 @@ class SortControlTest {
     fun shouldSortPropertyListAsExpected() {
         var nameSort : Property<Boolean?>? = null
         var ageSort : Property<Boolean?>? = null
-        val currentSort = Property<SortSpecification<Property<Person>>?>(null)
+        val currentSort = Property<SortSpecification<ReadOnlyProperty<Person>>?>(null)
         val data = listOf(Person("George", 40), Person("Ancient Billy", 90), Person("Buddy", 7)).map { it.toProperty() }.toProperty()
         val sortedData = data.sortedWith(currentSort)
         Div {

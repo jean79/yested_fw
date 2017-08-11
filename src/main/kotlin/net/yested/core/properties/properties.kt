@@ -416,7 +416,7 @@ fun <T> ReadOnlyProperty<Iterable<T>?>.sortedWith(sortSpecification: ReadOnlyPro
     return sortedWith(sortSpecification.map { it?.fullComparator })
 }
 
-fun <T> ReadOnlyProperty<Iterable<T>?>.sortedWith(comparator: ReadOnlyProperty<Comparator<T>?>): ReadOnlyProperty<Iterable<T>?> {
+fun <T> ReadOnlyProperty<Iterable<T>?>.sortedWith(comparator: ReadOnlyProperty<Comparator<in T>?>): ReadOnlyProperty<Iterable<T>?> {
     return mapWith(comparator) { toSort, comparator ->
         if (comparator == null || toSort == null) {
             toSort
