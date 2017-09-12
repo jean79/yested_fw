@@ -15,7 +15,8 @@ private val windowLocationHash: Property<String> = window.location.bindToHash()
 
 /** A Property for window.location.hash as a split array.  It is bound to [hashProperty]. */
 val Location.splitHashProperty: Property<Array<String>> get() = splitWindowLocationHash
-private val splitWindowLocationHash: Property<Array<String>> = windowLocationHash.bind({ it.split("_").toTypedArray() }, { it.joinToString("_") })
+// The "_" is deprecated in favor of "/".
+private val splitWindowLocationHash: Property<Array<String>> = windowLocationHash.bind({ it.split("/", "_").toTypedArray() }, { it.joinToString("/") })
 
 private fun Location.bindToHash(): Property<String> {
     val property: Property<String> = Property(hash)
