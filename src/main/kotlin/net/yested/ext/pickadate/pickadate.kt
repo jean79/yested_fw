@@ -12,15 +12,12 @@ class DateContext {
     var select: Long? = null
 }
 
-class PickADateOptions(var format: String, var selectMonths: Boolean = false, var selectYears: Boolean = false,
+class PickADateOptions(var format: String,
+                       var selectMonths: Boolean = false,
+                       var selectYears: Boolean = false,
+                       var clear: String = "Clear",
                        var onSet: (DateContext) -> Unit)
 
 fun YestedJQuery.pickadate(options: PickADateOptions) {
-    val param: dynamic = object {}
-    param.format = options.format
-    param.selectMonths = options.selectMonths
-    param.selectYears = options.selectYears
-    param.onSet = options.onSet
-    pickadate(param as Any)
+    this.asDynamic().pickadate(options)
 }
-

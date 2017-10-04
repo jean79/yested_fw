@@ -19,8 +19,16 @@ import kotlin.browser.document
  * Time: 6:44 AM
  */
 
-/** A dateInput. */
-fun HTMLElement.dateInput(data: Property<Moment?>, placeholder: String? = null, formatter: FormatStringBuilder.()-> FormatString) {
+/**
+ * A dateInput.
+ * @param clearLabel the label to put on the "Clear" button on the pick-a-date dialog.
+ */
+fun HTMLElement.dateInput(data: Property<Moment?>,
+                          placeholder: String? = null,
+                          clearLabel: String = "Clear",
+                          formatter: FormatStringBuilder.()-> FormatString,
+                          init: (HTMLInputElement.() -> Unit)? = null) {
+
     val formatString = FormatStringBuilder().formatter().toString()
 
     val text = data.asText(formatString)
@@ -32,15 +40,20 @@ fun HTMLElement.dateInput(data: Property<Moment?>, placeholder: String? = null, 
     element.type = "text"
     if (placeholder != null) { element.placeholder = placeholder }
     element.bind(text)
+    if (init != null) element.init()
     this.appendChild(element)
+
+    val options = PickADateOptions(
+            format= formatString.toLowerCase(),
+            selectMonths = true,
+            selectYears = true,
+            clear = clearLabel,
+            onSet = { context -> data.set(context.select?.let { Moment.parseMillisecondsSinceUnixEpoch(it) }) }
+    )
+
     whenAddedToDom {
         text.onNext { setAttribute("data-value", it) }
 
-        yestedJQuery(element).pickadate(PickADateOptions(formatString.toLowerCase(), selectMonths = true, selectYears = true,
-                onSet = { context: DateContext ->
-                    if (context.select != undefined)
-                        data.set(context.select?.let { Moment.parseMillisecondsSinceUnixEpoch(it) })
-                })
-        )
+        yestedJQuery(element).pickadate(options)
     }
 }
