@@ -3,6 +3,7 @@ package net.yested.core.html
 import net.yested.core.properties.Property
 import net.yested.core.properties.ReadOnlyProperty
 import net.yested.core.properties.bind
+import net.yested.core.properties.zip
 import net.yested.core.utils.*
 import org.w3c.dom.*
 import kotlin.browser.document
@@ -49,10 +50,12 @@ fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: 
         }
     }
     var updating = false
-    selected.onNext { selectedList ->
+    selected.zip(options).onNext { (selectedList, options) ->
         if (!updating) {
-            options.get().forEachIndexed { index, option ->
-                (selectElement.options.get(index) as HTMLOptionElement).selected = selectedList.contains(option)
+            options.forEachIndexed { index, option ->
+                if (index < selectElement.options.length) {
+                    (selectElement.options.get(index) as HTMLOptionElement).selected = selectedList.contains(option)
+                }
             }
         }
     }
