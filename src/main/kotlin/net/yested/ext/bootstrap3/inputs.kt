@@ -46,7 +46,7 @@ fun <T> HTMLElement.selectInput(
         disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
         multiple: Boolean,
         size: Size = Size.Default,
-        render: HTMLElement.(T)->Unit) {
+        render: HTMLElement.(T)->Unit): HTMLSelectElement {
 
     val element = document.createElement("select") as HTMLSelectElement
     element.className = "form-control input-${size.code}"
@@ -54,13 +54,14 @@ fun <T> HTMLElement.selectInput(
     element.bindMultiselect(selected, options, render)
     element.setDisabled(disabled)
     this.appendChild(element)
+    return element
 }
 
 fun <T> HTMLElement.singleSelectInput(
         selected: Property<T>,
-        options: Property<List<T>>,
+        options: ReadOnlyProperty<List<T>>,
         disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
-        render: HTMLElement.(T)->Unit) {
+        render: HTMLElement.(T)->Unit): HTMLSelectElement {
 
     val element = document.createElement("select") as HTMLSelectElement
     element.className = "form-control input-${Size.Default.code}"
@@ -68,6 +69,7 @@ fun <T> HTMLElement.singleSelectInput(
     element.bind(selected, options, render)
     element.setDisabled(disabled)
     this.appendChild(element)
+    return element
 }
 
 fun HTMLElement.intInput(value: Property<Int?>,

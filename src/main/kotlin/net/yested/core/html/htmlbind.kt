@@ -37,7 +37,7 @@ fun HTMLInputElement.bindChecked(checked: Property<Boolean>) {
     addEventListener("change", { updating = true; checked.set(element.checked); updating = false }, false)
 }
 
-fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: Property<List<T>>, render: HTMLElement.(T)->Unit) {
+fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: ReadOnlyProperty<List<T>>, render: HTMLElement.(T)->Unit) {
     val selectElement = this
     options.onNext {
         removeAllChildElements()
@@ -69,7 +69,7 @@ fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: 
     }, false)
 }
 
-fun <T> HTMLSelectElement.bind(selected: Property<T>, options: Property<List<T>>, render: HTMLElement.(T)->Unit) {
+fun <T> HTMLSelectElement.bind(selected: Property<T>, options: ReadOnlyProperty<List<T>>, render: HTMLElement.(T)->Unit) {
     val multipleSelected = selected.bind({ if (it == null) emptyList() else listOf(it) }, { it.firstOrNull() as T })
     bindMultiselect(multipleSelected, options, render)
 }
