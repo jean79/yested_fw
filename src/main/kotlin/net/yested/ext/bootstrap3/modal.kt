@@ -8,7 +8,9 @@ import net.yested.core.utils.Div
 import net.yested.ext.jquery.yestedJQuery
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLHeadingElement
+import kotlin.dom.addClass
 import kotlin.dom.appendText
+import kotlin.dom.removeClass
 
 interface DialogControl {
     fun showDialog()
@@ -25,10 +27,12 @@ class DialogContext internal constructor(val header: HTMLHeadingElement, val bod
     }
 
     fun body(init:HTMLDivElement.()->Unit) {
+        body.removeClass("hidden")
         body.init()
     }
 
     fun footer(init:HTMLDivElement.()->Unit) {
+        footer.removeClass("hidden")
         footer.init()
     }
 
@@ -75,11 +79,11 @@ fun prepareDialog(size: DialogSize = DialogSize.Default, init:DialogContext.(dia
 
                 }
                 div {
-                    className = "modal-body"
+                    addClass("modal-body hidden") // DialogContext.body will unhide this
                     body = this
                 }
                 div {
-                    className = "modal-footer"
+                    addClass("modal-footer hidden") // DialogContext.footer will unhide this
                     footer = this
                 }
             }

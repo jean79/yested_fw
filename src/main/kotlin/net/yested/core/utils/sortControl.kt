@@ -29,8 +29,10 @@ import kotlin.comparisons.*
  * Time: 4:51 PM
  */
 fun <T> HTMLTableCellElement.sortControl(currentSort: Property<SortSpecification<T>?>,
-                                               comparator: Comparator<T>, sortAscending: Boolean = true,
-                                               sortNow: Boolean = false, init: HTMLElement.() -> Unit): Property<Boolean?> {
+                                         comparator: Comparator<T>,
+                                         sortAscending: Boolean = true,
+                                         sortNow: Boolean = false,
+                                         init: HTMLElement.() -> Unit): Property<Boolean?> {
     val sortSpecification = SortSpecification(comparator, sortAscending)
     val sortControlProperty = currentSort.mapAsDefault {
         if (it == null || it.sortableId != sortSpecification.sortableId) null else it.ascending
@@ -51,10 +53,10 @@ fun <T> HTMLTableCellElement.sortControl(currentSort: Property<SortSpecification
     return sortControlProperty
 }
 
-class SortSpecification<T> private constructor (val comparator: Comparator<T>, val ascending: Boolean, val sortableId: Int) {
+class SortSpecification<in T> private constructor (val comparator: Comparator<in T>, val ascending: Boolean, val sortableId: Int) {
     constructor(comparator: Comparator<T>, ascending: Boolean = true) : this(comparator, ascending, nextSortableId++)
 
-    val fullComparator: Comparator<T>? = if (ascending) comparator else comparator.reversed()
+    val fullComparator: Comparator<in T>? = if (ascending) comparator else comparator.reversed()
     val reverse: SortSpecification<T> by lazy { SortSpecification(comparator, !ascending, sortableId) }
 
     private companion object {

@@ -313,6 +313,23 @@ class PropertyTest {
     }
 
     @Test
+    fun flatMapOrNull() {
+        val propertyByKey = mapOf("A" to Property("Julie"), "B" to Property("Sam"))
+        val listProperty = Property(listOf("A"))
+        val flatMapProperty = listProperty.flatMapOrNull { it.firstOrNull()?.let { propertyByKey[it] } }
+        flatMapProperty.get().mustBe("Julie")
+
+        listProperty.set(emptyList())
+        flatMapProperty.get().mustBe(null)
+
+        listProperty.set(listOf("A"))
+        flatMapProperty.get().mustBe("Julie")
+
+        propertyByKey.get("A")!!.set("Athena")
+        flatMapProperty.get().mustBe("Athena")
+    }
+
+    @Test
     fun mapWith() {
         val int1Property = 123.toProperty()
         val int2Property = 456.toProperty()

@@ -31,8 +31,6 @@ external interface YestedJQuery {
     //fun post(url:String, data:Any?, handler:()->Unit, type:String = "json") : Unit = definedExternally
     //fun ajax(url:String, type:String, contentType:String, dataType:String, data:Any, success:()->Unit) : Unit = definedExternally
     fun <RESULT> ajax(request: AjaxRequest<RESULT>) : Unit
-    /** Requires pickadate.js */
-    fun pickadate(param: Any): Unit
 }
 
 external interface JQueryWindow {

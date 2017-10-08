@@ -8,8 +8,6 @@ import net.yested.core.properties.toProperty
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLLIElement
 import org.w3c.dom.HTMLUListElement
-import kotlin.dom.addClass
-import kotlin.dom.removeClass
 
 class NavContext(val el: HTMLUListElement) {
 

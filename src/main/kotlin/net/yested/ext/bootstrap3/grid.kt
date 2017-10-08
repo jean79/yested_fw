@@ -187,7 +187,7 @@ private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyP
         val comparator: Comparator<T>? = column.comparator
     }
 
-    val columnSort: Property<ColumnSort<T>?> = sortColumn.mapAsDefault { it?.let { ColumnSort(it, it.sortAscending!!) } }
+    val columnSort: ReadOnlyProperty<ColumnSort<T>?> = sortColumn.mapIfNotNull { ColumnSort(it, it.sortAscending!!) }
     val sortSpecification: Property<SortSpecification<T>?> = columnSort.mapAsDefault {
         if (it != null && it.comparator != null) SortSpecification(it.comparator, it.ascending) else null
     }
@@ -202,7 +202,7 @@ private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyP
                         if (column.comparator == null) {
                             (column.label)()
                         } else {
-                            sortControlWithArrow<T>(sortSpecification, column.comparator, column.sortAscending!!) {
+                            sortControlWithArrow(sortSpecification, column.comparator, column.sortAscending!!) {
                                 (column.label)()
                             }
                         }
@@ -224,8 +224,10 @@ private fun <T> HTMLElement.gridTable(columns: Array<Column<T>>, data: ReadOnlyP
 }
 
 fun <T> HTMLTableCellElement.sortControlWithArrow(currentSort: Property<SortSpecification<T>?>,
-                                                        comparator: Comparator<T>, sortAscending: Boolean = true,
-                                                        sortNow: Boolean = false, init: HTMLElement.() -> Unit): Property<Boolean?> {
+                                                  comparator: Comparator<T>,
+                                                  sortAscending: Boolean = true,
+                                                  sortNow: Boolean = false,
+                                                  init: HTMLElement.() -> Unit): Property<Boolean?> {
     val ascendingProperty = sortControl(currentSort, comparator, sortAscending, sortNow, init)
     span {
         val icon = ascendingProperty.map { ascending ->

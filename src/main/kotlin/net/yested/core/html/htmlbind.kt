@@ -3,6 +3,7 @@ package net.yested.core.html
 import net.yested.core.properties.Property
 import net.yested.core.properties.ReadOnlyProperty
 import net.yested.core.properties.bind
+import net.yested.core.properties.zip
 import net.yested.core.utils.*
 import org.w3c.dom.*
 import kotlin.browser.document
@@ -26,7 +27,18 @@ fun HTMLInputElement.bind(property: Property<String>) {
     addEventListener("keyup", { updating = true; property.set(value); updating = false }, false)
 }
 
-fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: Property<List<T>>, render: HTMLElement.(T)->Unit) {
+fun HTMLInputElement.bindChecked(checked: Property<Boolean>) {
+    val element = this
+    var updating = false
+    checked.onNext {
+        if (!updating) {
+            element.checked = it
+        }
+    }
+    addEventListener("change", { updating = true; checked.set(element.checked); updating = false }, false)
+}
+
+fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: ReadOnlyProperty<List<T>>, render: HTMLElement.(T)->Unit) {
     val selectElement = this
     options.onNext {
         removeAllChildElements()
@@ -38,10 +50,12 @@ fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: 
         }
     }
     var updating = false
-    selected.onNext { selectedList ->
+    selected.zip(options).onNext { (selectedList, options) ->
         if (!updating) {
-            options.get().forEachIndexed { index, option ->
-                (selectElement.options.get(index) as HTMLOptionElement).selected = selectedList.contains(option)
+            options.forEachIndexed { index, option ->
+                if (index < selectElement.options.length) {
+                    (selectElement.options.get(index) as HTMLOptionElement).selected = selectedList.contains(option)
+                }
             }
         }
     }
@@ -58,15 +72,18 @@ fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: 
     }, false)
 }
 
-fun <T> HTMLSelectElement.bind(selected: Property<T>, options: Property<List<T>>, render: HTMLElement.(T)->Unit) {
+fun <T> HTMLSelectElement.bind(selected: Property<T>, options: ReadOnlyProperty<List<T>>, render: HTMLElement.(T)->Unit) {
     val multipleSelected = selected.bind({ if (it == null) emptyList() else listOf(it) }, { it.firstOrNull() as T })
     bindMultiselect(multipleSelected, options, render)
 }
 
-
 fun HTMLElement.setClassPresence(className: String, present: ReadOnlyProperty<Boolean>) {
-    present.onNext {
-        if (it) addClass(className) else removeClass(className)
+    setClassPresence(className, present, true)
+}
+
+fun <T> HTMLElement.setClassPresence(className: String, property: ReadOnlyProperty<T>, presentValue: T) {
+    property.onNext {
+        if (it == presentValue) addClass(className) else removeClass(className)
     }
 }
 
@@ -90,8 +107,89 @@ fun HTMLInputElement.setReadOnly(property: ReadOnlyProperty<Boolean>) {
     property.onNext { readOnly = it }
 }
 
+fun HTMLCollection.toList(): List<HTMLElement> {
+    return (0..(this.length - 1)).map { item(it)!! as HTMLElement }
+}
+
+fun <C: HTMLElement,T> C.repeatLive(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect = NoEffect, itemInit: C.(T) -> Unit) {
+    return repeatLive(orderedData, effect, { index, item -> itemInit(item) })
+}
+
+fun <C: HTMLElement,T> C.repeatLive(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect = NoEffect, itemInit: C.(Int, T) -> Unit) {
+    val containerElement = this
+    val itemsWithoutDelays = mutableListOf<List<HTMLElement>>()
+    var operableList : DomOperableList<C,T>? = null
+    var elementAfter: HTMLElement? = null
+
+    orderedData.onNext { values ->
+        val operableListSnapshot = operableList
+        if (values == null) {
+            itemsWithoutDelays.flatten().forEach {
+                containerElement.removeChild(it)
+            }
+            itemsWithoutDelays.clear()
+            operableList = null
+        } else if (operableListSnapshot == null) {
+            itemsWithoutDelays.flatten().forEach {
+                containerElement.removeChild(it)
+            }
+            itemsWithoutDelays.clear()
+            val domOperableList = DomOperableList(values.toMutableList(), itemsWithoutDelays, containerElement, effect, elementAfter, itemInit)
+            values.forEachIndexed { index, item ->
+                domOperableList.addItemToContainer(containerElement, index, item, itemsWithoutDelays, elementAfter)
+            }
+            operableList = domOperableList
+        } else {
+            operableListSnapshot.reconcileTo(values.toList())
+        }
+    }
+    elementAfter = span() // create a <span/> to clearly indicate where to insert new elements.
+    operableList?.elementAfter = elementAfter
+}
+
+internal class DomOperableList<C : HTMLElement,T>(
+        initialData: MutableList<T>,
+        val itemsWithoutDelays: MutableList<List<HTMLElement>>,
+        val container: C,
+        val effect: BiDirectionEffect,
+        var elementAfter: HTMLElement? = null,
+        val itemInit: C.(Int, T) -> Unit) : InMemoryOperableList<T>(initialData) {
+    override fun add(index: Int, item: T) {
+        addItemToContainer(container, index, item, itemsWithoutDelays, elementAfter).forEach { effect.applyIn(it) }
+        super.add(index, item)
+    }
+
+    override fun removeAt(index: Int): T {
+        val elementsForIndex = itemsWithoutDelays.removeAt(index)
+        elementsForIndex.forEach {
+            effect.applyOut(it) {
+                container.removeChild(it)
+            }
+        }
+        return super.removeAt(index)
+    }
+
+    override fun move(fromIndex: Int, toIndex: Int) {
+        val item = removeAt(fromIndex)
+        add(toIndex, item)
+    }
+
+    fun addItemToContainer(container: C, index: Int, item: T, itemsWithoutDelays: MutableList<List<HTMLElement>>, elementAfter: HTMLElement?): List<HTMLElement> {
+        val nextElement = if (index < itemsWithoutDelays.size) itemsWithoutDelays.get(index).firstOrNull() else elementAfter
+        val childrenBefore = container.children.toList()
+        container.itemInit(index, item)
+        val childrenLater = container.children.toList()
+        val newChildren = childrenLater.filterNot { childrenBefore.contains(it) }
+        if (nextElement != null) {
+            newChildren.forEach { container.insertBefore(it, nextElement) }
+        }
+        itemsWithoutDelays.add(index, newChildren)
+        return newChildren
+    }
+}
+
 /**
- * Bind table content to a Property<Iterable<T>>.  The index and value are provided to tbodyItemInit.
+ * Bind table content to a Property<Iterable<T>>.  The index and value are provided to itemInit.
  * Example:<pre>
  *   table {
  *       thead {
@@ -108,35 +206,12 @@ fun HTMLInputElement.setReadOnly(property: ReadOnlyProperty<Boolean>) {
  * </pre>
  */
 fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect = NoEffect,
-                               tbodyItemInit: TableItemContext.(Int, T) -> Unit) {
-    var tbodyOperableList : TBodyOperableList<T>? = null
-
-    orderedData.onNext { values ->
-        val operableListSnapshot = tbodyOperableList
-        if (values == null) {
-            removeChildByName("tbody")
-            tbodyOperableList = null
-        } else if (operableListSnapshot == null) {
-            val tbody = setTBodyContentsImmediately(values, tbodyItemInit)
-            tbodyOperableList = TBodyOperableList(values.toMutableList(), tbody, effect, tbodyItemInit)
-        } else {
-            operableListSnapshot.reconcileTo(values.toList())
-        }
-    }
-}
-
-private fun <T> HTMLTableElement.setTBodyContentsImmediately(values: Iterable<T>?, tbodyItemInit: TableItemContext.(Int, T) -> Unit): HTMLTableSectionElement {
-    removeChildByName("tbody")
-    return tbody {
-        val tbody = this
-        values?.forEachIndexed { index, item ->
-            TableItemContext({ rowInit -> tbody.tr(init = rowInit) }).tbodyItemInit(index, item)
-        }
-    }
+                               itemInit: HTMLTableSectionElement.(Int, T) -> Unit) {
+    tbody { repeatLive(orderedData, effect, itemInit) }
 }
 
 /**
- * Bind table content to a Property<Iterable<T>>.  The value is provided to tbodyItemInit.
+ * Bind table content to a Property<Iterable<T>>.  The value is provided to itemInit.
  * Example:<pre>
  *   table {
  *       thead {
@@ -153,48 +228,6 @@ private fun <T> HTMLTableElement.setTBodyContentsImmediately(values: Iterable<T>
  * </pre>
  */
 fun <T> HTMLTableElement.tbody(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect = NoEffect,
-                               tbodyItemInit: TableItemContext.(T) -> Unit) {
-    return tbody(orderedData, effect, { index, item -> tbodyItemInit(item) })
-}
-
-class TableItemContext(private val rowFactory: ((HTMLTableRowElement.()->Unit)?)->HTMLTableRowElement) {
-    fun tr(init:(HTMLTableRowElement.()->Unit)? = null): HTMLTableRowElement {
-        return rowFactory.invoke(init)
-    }
-}
-
-fun HTMLCollection.toList(): List<HTMLElement> {
-    return (0..(this.length - 1)).map { item(it)!! as HTMLElement }
-}
-
-class TBodyOperableList<T>(initialData: MutableList<T>, val tbodyElement: HTMLTableSectionElement,
-                           val effect: BiDirectionEffect,
-                           val tbodyItemInit: TableItemContext.(Int, T)->Unit) : InMemoryOperableList<T>(initialData) {
-    private val rowsWithoutDelays = tbodyElement.rows.toList().toMutableList()
-
-    override fun add(index: Int, item: T) {
-        val nextRow = if (index < rowsWithoutDelays.size) rowsWithoutDelays.get(index) else null
-        TableItemContext({ rowInit ->
-            val newRow = tbodyElement.tr(before = nextRow, init = rowInit)
-            effect.applyIn(newRow)
-            rowsWithoutDelays.add(index, newRow)
-            newRow
-        }).tbodyItemInit(index, item)
-        super.add(index, item)
-    }
-
-    override fun removeAt(index: Int): T {
-        val row = rowsWithoutDelays.removeAt(index)
-        effect.applyOut(row) {
-            tbodyElement.removeChild(row)
-        }
-        return super.removeAt(index)
-    }
-
-    override fun move(fromIndex: Int, toIndex: Int) {
-        val item = removeAt(fromIndex)
-        add(toIndex, item)
-//        super.move(fromIndex, toIndex)
-//        (tbodyElement.parentElement as HTMLTableElement?)?.setTBodyContentsImmediately(toList(), tbodyItemInit)
-    }
+                               itemInit: HTMLTableSectionElement.(T) -> Unit): HTMLTableSectionElement {
+    return tbody { repeatLive(orderedData, effect, itemInit) }
 }

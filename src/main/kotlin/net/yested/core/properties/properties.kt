@@ -19,6 +19,21 @@ interface ReadOnlyProperty<out T> {
     fun onNext(handler: (T)->Unit):Disposable
 }
 
+private val nullProperty: ReadOnlyProperty<Any?> = object : ReadOnlyProperty<Any?> {
+    val emptyDisposable: Disposable = object : Disposable {
+        override fun dispose() {}
+    }
+
+    override fun get(): Any? = null
+
+    override fun onNext(handler: (Any?) -> Unit): Disposable {
+        handler(null)
+        return emptyDisposable
+    }
+}
+@Suppress("UNCHECKED_CAST")
+fun <T> nullProperty(): ReadOnlyProperty<T?> = nullProperty as ReadOnlyProperty<T>
+
 /** A mutable Property that can be subscribed to.  The T value should be immutable or else its changes won't be detected. */
 class Property<T>(initialValue: T): ReadOnlyProperty<T> {
 
@@ -97,6 +112,18 @@ fun <IN, OUT> ReadOnlyProperty<IN>.flatMap(transform: (IN)->ReadOnlyProperty<OUT
         disposable = transform(value).onNext { result.set(it) }
     }
     return result
+}
+
+fun <IN, OUT> ReadOnlyProperty<IN>.flatMapOrNull(transform: (IN)->ReadOnlyProperty<OUT?>?): ReadOnlyProperty<OUT?> {
+    return flatMap<IN,OUT?> { transform(it) ?: nullProperty() }
+}
+
+fun <IN, OUT> ReadOnlyProperty<IN?>.flatMapIfNotNull(transform: (IN)->ReadOnlyProperty<OUT?>?): ReadOnlyProperty<OUT?> {
+    return flatMapOrNull<IN?,OUT?> { it?.let(transform) }
+}
+
+fun <IN, OUT> ReadOnlyProperty<IN?>.mapIfNotNull(default: OUT? = null, transform: (IN)->OUT?): ReadOnlyProperty<OUT?> {
+    return map { it?.let { transform(it) } ?: default }
 }
 
 /**
@@ -383,12 +410,13 @@ fun <T> Property<List<T>>.modifyList(operation: (ArrayList<T>) -> Unit) {
 fun <T> Property<List<T>>.clear() { modifyList { it.clear() } }
 fun <T> Property<List<T>>.removeAt(index: Int) { modifyList { it.removeAt(index) } }
 fun <T> Property<List<T>>.add(item: T) { modifyList { it.add(item) } }
+fun <T> Property<List<T>>.remove(item: T) { modifyList { it.remove(item) } }
 
 fun <T> ReadOnlyProperty<Iterable<T>?>.sortedWith(sortSpecification: ReadOnlyProperty<SortSpecification<T>?>): ReadOnlyProperty<Iterable<T>?> {
     return sortedWith(sortSpecification.map { it?.fullComparator })
 }
 
-fun <T> ReadOnlyProperty<Iterable<T>?>.sortedWith(comparator: ReadOnlyProperty<Comparator<T>?>): ReadOnlyProperty<Iterable<T>?> {
+fun <T> ReadOnlyProperty<Iterable<T>?>.sortedWith(comparator: ReadOnlyProperty<Comparator<in T>?>): ReadOnlyProperty<Iterable<T>?> {
     return mapWith(comparator) { toSort, comparator ->
         if (comparator == null || toSort == null) {
             toSort
