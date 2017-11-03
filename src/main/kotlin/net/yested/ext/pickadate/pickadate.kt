@@ -12,12 +12,23 @@ class DateContext {
     var select: Long? = null
 }
 
+@JsModule("pickadate/lib/picker.date") @JsNonModule @JsName("$") external val requirePickadate: Any = definedExternally
+
 class PickADateOptions(var format: String,
                        var selectMonths: Boolean = false,
                        var selectYears: Boolean = false,
                        var clear: String = "Clear",
-                       var onSet: (DateContext) -> Unit)
+                       var onSet: (DateContext) -> Unit) {
+    companion object {
+        init { console.info(requirePickadate) }
+    }
+}
+
+@JsModule("pickadate/lib/picker.date") @JsNonModule external interface PickADateJQuery {
+    fun pickadate(options: PickADateOptions): YestedJQuery
+}
 
 fun YestedJQuery.pickadate(options: PickADateOptions) {
-    this.asDynamic().pickadate(options)
+    @Suppress("UNCHECKED_CAST_TO_NATIVE_INTERFACE")
+    (this as PickADateJQuery).pickadate(options)
 }

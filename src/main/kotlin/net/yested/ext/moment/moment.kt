@@ -3,9 +3,9 @@ package net.yested.ext.moment
 import net.yested.core.properties.Property
 import net.yested.core.properties.bind
 
-@JsName("moment") external private fun moment_js(): MomentJs = definedExternally
-@JsName("moment") external private fun moment_js(millisecondsSinceUnixEpoch: Long): MomentJs = definedExternally
-@JsName("moment") external private fun moment_js(input: String, format: String): MomentJs = definedExternally
+@JsModule("moment") @JsNonModule @JsName("moment") external private fun moment_js(): MomentJs = definedExternally
+@JsModule("moment") @JsNonModule @JsName("moment") external private fun moment_js(millisecondsSinceUnixEpoch: Long): MomentJs = definedExternally
+@JsModule("moment") @JsNonModule @JsName("moment") external private fun moment_js(input: String, format: String): MomentJs = definedExternally
 
 external
 class MomentJs {
