@@ -36,7 +36,7 @@ The method generally adds content to the object it is invoked on.
 To add simple text, it will call appendText("some text").
 
 # Demo
-See https://github.com/jean79/yested_fw/blob/master/src/main/kotlin/demo.kt
+See https://github.com/jean79/yested_fw/blob/master/src/test/kotlin/demo.kt
 
 ## To run demo:
 
