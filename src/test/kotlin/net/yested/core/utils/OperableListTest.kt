@@ -1,6 +1,6 @@
 package net.yested.core.utils
 
-import org.junit.Test
+import kotlin.test.Test
 import spec.mustBe
 
 /**

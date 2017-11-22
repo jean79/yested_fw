@@ -26,7 +26,7 @@ fun ReadOnlyProperty<ValidationStatus>.message() =
 fun main(args: Array<String>) {
 
     val p = Property("hello")
-    val validation = p.validate(errorMessage = "Name is required") { it.size > 0 }.message()
+    val validation = p.validate(errorMessage = "Name is required") { it.length > 0 }.message()
     val city = Property(City.Prague)
     val active = Property(false)
 

@@ -31,7 +31,7 @@ private fun Location.bindToHash(): Property<String> {
             }
         }
     }
-    property.onNext { newValue ->
+    property.onNext { _ ->
         if (!updating) {
             updating = true
             try {
