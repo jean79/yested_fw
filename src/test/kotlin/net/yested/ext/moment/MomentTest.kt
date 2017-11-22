@@ -2,7 +2,7 @@ package net.yested.ext.moment
 
 import net.yested.core.properties.Property
 import net.yested.core.properties.toProperty
-import org.junit.Test
+import kotlin.test.Test
 import spec.*
 
 /**

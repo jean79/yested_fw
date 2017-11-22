@@ -5,13 +5,13 @@ import net.yested.core.properties.*
 import net.yested.core.utils.Div
 import net.yested.core.utils.NoEffect
 import net.yested.ext.bootstrap3.Collapse
-import org.junit.Test
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLTableSectionElement
 import org.w3c.dom.HTMLUListElement
 import spec.*
 import kotlin.browser.window
 import kotlin.dom.appendText
+import kotlin.test.Test
 
 /**
  * A test for [tbody] and [repeatLive].

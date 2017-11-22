@@ -106,8 +106,8 @@ fun <IN, OUT> ReadOnlyProperty<IN>.mapAsDefault(transform: (IN)->OUT): Property<
 fun <IN, OUT> ReadOnlyProperty<IN>.flatMap(transform: (IN)->ReadOnlyProperty<OUT>): ReadOnlyProperty<OUT> {
     val initialProperty = transform(this.get())
     val result = Property(initialProperty.get())
-    var disposable = initialProperty.onChange { old, value -> result.set(value) }
-    this.onChange { old, value ->
+    var disposable = initialProperty.onChange { _, value -> result.set(value) }
+    this.onChange { _, value ->
         disposable.dispose()
         disposable = transform(value).onNext { result.set(it) }
     }
@@ -417,11 +417,11 @@ fun <T> ReadOnlyProperty<Iterable<T>?>.sortedWith(sortSpecification: ReadOnlyPro
 }
 
 fun <T> ReadOnlyProperty<Iterable<T>?>.sortedWith(comparator: ReadOnlyProperty<Comparator<in T>?>): ReadOnlyProperty<Iterable<T>?> {
-    return mapWith(comparator) { toSort, comparator ->
-        if (comparator == null || toSort == null) {
+    return mapWith(comparator) { toSort, _comparator ->
+        if (_comparator == null || toSort == null) {
             toSort
         } else {
-            toSort.sortedWith(comparator)
+            toSort.sortedWith(_comparator)
         }
     }
 }

@@ -1,6 +1,6 @@
 package net.yested.core.properties
 
-import org.junit.Test
+import kotlin.test.Test
 import spec.*
 import kotlin.js.Math
 

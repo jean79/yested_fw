@@ -73,6 +73,7 @@ fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: 
 }
 
 fun <T> HTMLSelectElement.bind(selected: Property<T>, options: ReadOnlyProperty<List<T>>, render: HTMLElement.(T)->Unit) {
+    @Suppress("UNCHECKED_CAST") // T is allowed to be nullable or not-nullable.
     val multipleSelected = selected.bind({ if (it == null) emptyList() else listOf(it) }, { it.firstOrNull() as T })
     bindMultiselect(multipleSelected, options, render)
 }
@@ -112,7 +113,7 @@ fun HTMLCollection.toList(): List<HTMLElement> {
 }
 
 fun <C: HTMLElement,T> C.repeatLive(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect = NoEffect, itemInit: C.(T) -> Unit) {
-    return repeatLive(orderedData, effect, { index, item -> itemInit(item) })
+    return repeatLive(orderedData, effect, { _, item -> itemInit(item) })
 }
 
 fun <C: HTMLElement,T> C.repeatLive(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect = NoEffect, itemInit: C.(Int, T) -> Unit) {

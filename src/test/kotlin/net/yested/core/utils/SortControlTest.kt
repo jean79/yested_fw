@@ -2,7 +2,7 @@ package net.yested.core.utils
 
 import net.yested.core.html.*
 import net.yested.core.properties.*
-import org.junit.Test
+import kotlin.test.Test
 import spec.*
 import kotlin.comparisons.compareBy
 import kotlin.dom.appendText
