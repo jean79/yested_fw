@@ -36,6 +36,7 @@ fun HTMLElement.h3(init:(HTMLHeadingElement.()->Unit)? = null) = tag(this, tagNa
 fun HTMLElement.h4(init:(HTMLHeadingElement.()->Unit)? = null) = tag(this, tagName = "h4", init = init)
 fun HTMLElement.h5(init:(HTMLHeadingElement.()->Unit)? = null) = tag(this, tagName = "h5", init = init)
 fun HTMLElement.h6(init:(HTMLHeadingElement.()->Unit)? = null) = tag(this, tagName = "h6", init = init)
+fun HTMLElement.small(init:(HTMLHeadingElement.()->Unit)? = null) = tag(this, tagName = "small", init = init)
 fun HTMLElement.nbsp(count: Int = 1) = (1..count).forEach { appendText(Typography.nbsp.toString()) }
 fun HTMLElement.img(init:(HTMLImageElement.()->Unit)? = null) = tag(this, tagName = "img", init = init)
 fun HTMLElement.br() = tag<HTMLHRElement>(this, tagName = "br")
