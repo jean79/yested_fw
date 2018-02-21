@@ -1,9 +1,11 @@
 package net.yested.core.properties
 
+import net.yested.core.utils.repeatWithDelayUntil
 import kotlin.test.Test
 import spec.*
 import kotlin.js.Math
 
+@Suppress("unused")
 /**
  * A test for [Property].
  * @author Eric Pabst (epabst@gmail.com)
@@ -124,6 +126,19 @@ class PropertyTest {
         disposable.dispose()
         property.set(400)
         changes.mustBe(listOf(Pair(100, 200), Pair(200, 300)))
+    }
+
+    @Test
+    fun async() {
+        val property = 100.toProperty()
+        val asyncProperty = property.async()
+        asyncProperty.get().mustBe(100)
+
+        property.set(200)
+        asyncProperty.get().mustBe(100)
+
+        repeatWithDelayUntil({ asyncProperty.get() == 200 }, 2) {}
+        asyncProperty.get().mustBe(200)
     }
 
     @Test
