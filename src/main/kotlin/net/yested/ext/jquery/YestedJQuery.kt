@@ -8,14 +8,12 @@ import org.w3c.dom.Window
  * If you need additional functions, create similar code with a different Kotlin name.
  * Your new code can extend YestedJQuery, which will enable chaining into these functions.
  */
-@JsName("$") external val yestedJQuery: YestedJQuery
-@JsName("$") external fun yestedJQuery(element: HTMLElement): YestedJQuery = definedExternally
-@JsName("$") external fun yestedJQuery(window: Window): JQueryWindow
+@JsModule("jquery") @JsNonModule @JsName("$") external val yestedJQuery: YestedJQuery
+@JsModule("jquery") @JsNonModule @JsName("$") external fun yestedJQuery(element: HTMLElement): YestedJQuery = definedExternally
+@JsModule("jquery") @JsNonModule @JsName("$") external fun yestedJQuery(window: Window): JQueryWindow
 
 external interface YestedJQuery {
     fun datetimepicker(param: Any? ): Unit
-    /** @param action "hide", "show", or null to toggle. */
-    fun collapse(action: String? = definedExternally): YestedJQuery
     fun fadeOut(duration: Int, callback:()->Unit): YestedJQuery
     fun fadeIn(duration: Int, callback:()->Unit): YestedJQuery
     fun slideUp(duration: Int = definedExternally, callback:(()->Unit)? = definedExternally): YestedJQuery

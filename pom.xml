@@ -115,6 +115,7 @@
                 <version>${kotlin.version}</version>
                 <configuration>
                     <sourceMap>true</sourceMap>
+                    <moduleKind>umd</moduleKind>
                 </configuration>
                 <executions>
                     <execution>
