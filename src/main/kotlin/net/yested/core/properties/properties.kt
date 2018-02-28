@@ -4,6 +4,7 @@ import net.yested.core.utils.SortSpecification
 import net.yested.core.utils.Tuple4
 import net.yested.core.utils.Tuple5
 import net.yested.core.utils.Tuple6
+import kotlin.browser.window
 
 interface Disposable {
     fun dispose()
@@ -124,6 +125,22 @@ fun <IN, OUT> ReadOnlyProperty<IN?>.flatMapIfNotNull(transform: (IN)->ReadOnlyPr
 
 fun <IN, OUT> ReadOnlyProperty<IN?>.mapIfNotNull(default: OUT? = null, transform: (IN)->OUT?): ReadOnlyProperty<OUT?> {
     return map { it?.let { transform(it) } ?: default }
+}
+
+/**
+ * Returns a Property that is updated asynchronously from this Property.
+ * Only the latest value is guaranteed to be propagated.
+ * This is useful for deferring work that doesn't need to happen right away,
+ * and to avoid redoing work that could be done once by waiting.
+ */
+fun <T> ReadOnlyProperty<T>.async(): ReadOnlyProperty<T> {
+    val result = Property(get())
+    onNext {
+        window.requestAnimationFrame {
+            result.set(get())
+        }
+    }
+    return result
 }
 
 /**
