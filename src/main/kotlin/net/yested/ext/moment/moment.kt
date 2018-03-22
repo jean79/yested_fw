@@ -5,7 +5,7 @@ import net.yested.core.properties.bind
 
 @JsModule("moment") @JsNonModule @JsName("moment") external private fun moment_js(): MomentJs = definedExternally
 @JsModule("moment") @JsNonModule @JsName("moment") external private fun moment_js(millisecondsSinceUnixEpoch: Long): MomentJs = definedExternally
-@JsModule("moment") @JsNonModule @JsName("moment") external private fun moment_js(input: String, format: String): MomentJs = definedExternally
+@JsModule("moment") @JsNonModule @JsName("moment") external private fun moment_js(input: String, format: String = definedExternally): MomentJs = definedExternally
 
 external
 class MomentJs {
@@ -36,6 +36,8 @@ class MomentJs {
 
 class Moment(private val moment: MomentJs) {
 
+    /** Returns the default ISO format: 2018-03-22T05:55:49-06:00 */
+    fun format(): String = moment.format()
     fun format(format: String): String = moment.format(format)
     fun format(format: FormatString): String = moment.format(format.toString())
 
@@ -91,6 +93,8 @@ class Moment(private val moment: MomentJs) {
 
     companion object {
         fun now(): Moment = Moment(moment_js())
+
+        fun parse(input: String): Moment = Moment(moment_js(input))
 
         fun parse(input: String, format: String): Moment = Moment(moment_js(input, format))
 
