@@ -228,7 +228,14 @@ fun <T> HTMLTableCellElement.sortControlWithArrow(currentSort: Property<SortSpec
                                                   sortAscending: Boolean = true,
                                                   sortNow: Boolean = false,
                                                   init: HTMLElement.() -> Unit): Property<Boolean?> {
-    val ascendingProperty = sortControl(currentSort, comparator, sortAscending, sortNow, init)
+    return sortControlWithArrow(currentSort, SortSpecification(comparator, sortAscending), sortNow, init)
+}
+
+fun <T> HTMLTableCellElement.sortControlWithArrow(currentSort: Property<SortSpecification<T>?>,
+                                                  sortSpecification: SortSpecification<T>,
+                                                  sortNow: Boolean = false,
+                                                  init: HTMLElement.() -> Unit): Property<Boolean?> {
+    val ascendingProperty = sortControl(currentSort, sortSpecification, sortNow, init)
     span {
         val icon = ascendingProperty.map { ascending ->
             hidden = ascending == null
