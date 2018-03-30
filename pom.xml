@@ -11,6 +11,7 @@
 
     <properties>
         <kotlin.version>1.2.21</kotlin.version>
+        <kotlinx.html.version>0.6.9</kotlinx.html.version>
         <build.number>0.1.0.0</build.number>
         <skip.gpg>true</skip.gpg>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -46,6 +47,14 @@
         <url>https://github.com/jean79/yested2</url>
     </scm>
 
+    <repositories>
+        <repository>
+            <id>jcenter</id>
+            <name>jcenter</name>
+            <url>https://jcenter.bintray.com</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -53,6 +62,11 @@
             <version>${kotlin.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+           <groupId>org.jetbrains.kotlinx</groupId>
+           <artifactId>kotlinx-html-js</artifactId>
+           <version>${kotlinx.html.version}</version>
+       </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test-js</artifactId>

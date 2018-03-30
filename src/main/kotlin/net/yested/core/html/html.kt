@@ -3,6 +3,8 @@ package net.yested.core.html
 import org.w3c.dom.*
 import kotlin.browser.document
 import kotlin.dom.appendText
+import kotlinx.html.dom.*
+import kotlinx.html.*
 
 fun <T : HTMLElement> tag(parent: Element, tagName: String,
                           addFirst: Boolean = false, before: HTMLElement? = null, init:(T.()->Unit)? = null): T {
@@ -13,7 +15,7 @@ fun <T : HTMLElement> tag(parent: Element, tagName: String,
     return element
 }
 
-fun HTMLElement.div(init:(HTMLDivElement.()->Unit)? = null) = tag(this, tagName = "div", init = init)
+fun HTMLElement.div(init:(HTMLDivElement.()->Unit)? = null) = (this as TagConsumer<HTMLElement>).create.div(init)
 fun HTMLElement.p(init:(HTMLParagraphElement.()->Unit)? = null) = tag(this, tagName = "p", init = init)
 fun HTMLElement.nav(init:(HTMLDivElement.()->Unit)? = null) = tag(this, tagName = "nav", init = init)
 fun HTMLElement.span(init:(HTMLSpanElement.()->Unit)? = null) = tag(this, tagName = "span", init = init)
