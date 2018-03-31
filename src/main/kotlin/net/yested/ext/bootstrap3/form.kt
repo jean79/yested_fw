@@ -37,8 +37,8 @@ enum class Size(val code: String) {
 fun HTMLElement.formGroup(
         state: ReadOnlyProperty<State> = State(status = Status.Default, errorMessage = null).toProperty(),
         size: Size = Size.Default,
-        init: HTMLDivElement.()->Unit) {
-    div {
+        init: HTMLDivElement.()->Unit): HTMLDivElement {
+    return div {
         state.onNext {
             className = "form-group ${it.status.code} form-group-${size.code}"
         }
