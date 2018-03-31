@@ -9,6 +9,7 @@ import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.HTMLSpanElement
+import org.w3c.dom.HTMLTextAreaElement
 import kotlin.browser.document
 
 fun HTMLElement.text(value: ReadOnlyProperty<String>) {
@@ -32,6 +33,25 @@ fun HTMLElement.textInput(
     id?.let { element.id = id }
     element.className = "form-control $inputTypeClass"
     element.type = "text"
+    element.bind(value)
+    element.setDisabled(disabled)
+    element.setReadOnly(readonly)
+    if (init != null) element.init()
+    this.appendChild(element)
+    return element
+}
+
+fun HTMLElement.textAreaInput(
+        value: Property<String>,
+        disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
+        readonly: ReadOnlyProperty<Boolean> = false.toProperty(),
+        id: String? = null,
+        init: (HTMLTextAreaElement.() -> Unit)? = null): HTMLTextAreaElement {
+
+    val element = document.createElement("textarea") as HTMLTextAreaElement
+
+    id?.let { element.id = id }
+    element.className = "form-control"
     element.bind(value)
     element.setDisabled(disabled)
     element.setReadOnly(readonly)

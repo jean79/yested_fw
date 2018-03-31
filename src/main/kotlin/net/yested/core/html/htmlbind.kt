@@ -27,6 +27,17 @@ fun HTMLInputElement.bind(property: Property<String>) {
     addEventListener("keyup", { updating = true; property.set(value); updating = false }, false)
 }
 
+fun HTMLTextAreaElement.bind(property: Property<String>) {
+    var updating = false
+    property.onNext {
+        if (!updating) {
+            value = it
+        }
+    }
+    addEventListener("change", { updating = true; property.set(value); updating = false }, false)
+    addEventListener("keyup", { updating = true; property.set(value); updating = false }, false)
+}
+
 fun HTMLInputElement.bindChecked(checked: Property<Boolean>) {
     val element = this
     var updating = false
@@ -96,6 +107,10 @@ fun HTMLInputElement.setDisabled(property: ReadOnlyProperty<Boolean>) {
     property.onNext { disabled = it }
 }
 
+fun HTMLTextAreaElement.setDisabled(property: ReadOnlyProperty<Boolean>) {
+    property.onNext { disabled = it }
+}
+
 fun HTMLSelectElement.setDisabled(property: ReadOnlyProperty<Boolean>) {
     property.onNext { disabled = it }
 }
@@ -105,6 +120,10 @@ fun HTMLFieldSetElement.setDisabled(property: ReadOnlyProperty<Boolean>) {
 }
 
 fun HTMLInputElement.setReadOnly(property: ReadOnlyProperty<Boolean>) {
+    property.onNext { readOnly = it }
+}
+
+fun HTMLTextAreaElement.setReadOnly(property: ReadOnlyProperty<Boolean>) {
     property.onNext { readOnly = it }
 }
 
