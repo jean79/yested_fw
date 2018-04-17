@@ -1,8 +1,9 @@
 package net.yested.core.html
 
+import net.yested.core.properties.bind
 import net.yested.core.properties.Property
 import net.yested.core.properties.ReadOnlyProperty
-import net.yested.core.properties.bind
+import net.yested.core.properties.map
 import net.yested.core.properties.zip
 import net.yested.core.utils.*
 import org.w3c.dom.*
@@ -50,6 +51,10 @@ fun HTMLInputElement.bindChecked(checked: Property<Boolean>) {
 }
 
 fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: ReadOnlyProperty<List<T>>, render: HTMLElement.(T)->Unit) {
+    bindMultiselect(selected, options, { selected.set(it) }, render)
+}
+
+fun <T> HTMLSelectElement.bindMultiselect(selected: ReadOnlyProperty<List<T>>, options: ReadOnlyProperty<List<T>>, onSelect: (List<T>) -> Unit, render: HTMLElement.(T)->Unit) {
     val selectElement = this
     options.onNext {
         removeAllChildElements()
@@ -78,15 +83,21 @@ fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: 
                 .map { (it as HTMLOptionElement).value }
                 .map { options.get()[it.toInt()] }
         updating = true
-        selected.set(selectedValues)
+        onSelect.invoke(selectedValues)
         updating = false
     }, false)
 }
 
 fun <T> HTMLSelectElement.bind(selected: Property<T>, options: ReadOnlyProperty<List<T>>, render: HTMLElement.(T)->Unit) {
     @Suppress("UNCHECKED_CAST") // T is allowed to be nullable or not-nullable.
-    val multipleSelected = selected.bind({ if (it == null) emptyList() else listOf(it) }, { it.firstOrNull() as T })
+    val multipleSelected = selected.bind({ if (it == null) emptyList<T>() else listOf(it) }, { it.firstOrNull() as T })
     bindMultiselect(multipleSelected, options, render)
+}
+
+fun <T> HTMLSelectElement.bind(selected: ReadOnlyProperty<T>, options: ReadOnlyProperty<List<T>>, onSelect: (T) -> Unit, render: HTMLElement.(T)->Unit) {
+    val multiSelected: ReadOnlyProperty<List<T>> = selected.map { if (it == null) emptyList() else listOf(it) }
+    @Suppress("UNCHECKED_CAST") // T is allowed to be nullable or not-nullable.
+    bindMultiselect(multiSelected, options, { onSelect(it.firstOrNull() as T) }, render)
 }
 
 fun HTMLElement.setClassPresence(className: String, present: ReadOnlyProperty<Boolean>) {
