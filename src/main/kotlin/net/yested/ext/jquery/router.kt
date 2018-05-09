@@ -97,3 +97,8 @@ private fun History.backToDestination() {
  */
 val History.destinationBack: String? get() = historyDestinationBack
 private var historyDestinationBack: String? = null
+
+/** Clears the history going back.  This helps if there's some sort of redirect to avoid an infinite loop. */
+fun History.clearDestinationBack() {
+    historyDestinationBack = null
+}
