@@ -22,6 +22,8 @@ interface DialogControl {
 
 class DialogContext internal constructor(val header: HTMLHeadingElement, val body: HTMLDivElement, val footer: HTMLDivElement) {
 
+    var focusElement: org.w3c.dom.HTMLElement? = null
+
     fun header(init:HTMLHeadingElement.()->Unit) {
         header.init()
     }
@@ -90,9 +92,15 @@ fun prepareDialog(size: DialogSize = DialogSize.Default, init:DialogContext.(dia
         }
     }
 
+    val dialogContext = DialogContext(header = header!!, body = body!!, footer = footer!!)
+
     val dialogControl = object: DialogControl {
         override fun showDialog() {
-            yestedJQuery(dialogElement).modal("show")
+            val yestedJQuery = yestedJQuery(dialogElement)
+            yestedJQuery.modal("show")
+            yestedJQuery.on("shown.bs.modal") {
+                dialogContext.focusElement?.focus()
+            }
         }
 
         override fun hideDialog() {
@@ -104,7 +112,7 @@ fun prepareDialog(size: DialogSize = DialogSize.Default, init:DialogContext.(dia
         }
     }
 
-    DialogContext(header = header!!, body = body!!, footer = footer!!).init(dialogControl)
+    dialogContext.init(dialogControl)
 
     return dialogControl
 }
