@@ -4,7 +4,7 @@ import net.yested.core.properties.Property
 import net.yested.core.properties.bind
 
 @JsModule("moment") @JsNonModule @JsName("moment") external private fun moment_js(): MomentJs = definedExternally
-@JsModule("moment") @JsNonModule @JsName("moment") external private fun moment_js(millisecondsSinceUnixEpoch: Long): MomentJs = definedExternally
+@JsModule("moment") @JsNonModule @JsName("moment") external private fun moment_js(millisecondsSinceUnixEpoch: Double): MomentJs = definedExternally
 @JsModule("moment") @JsNonModule @JsName("moment") external private fun moment_js(input: String, format: String = definedExternally): MomentJs = definedExternally
 
 external
@@ -100,7 +100,7 @@ class Moment(private val moment: MomentJs) {
 
         fun parseMillisecondsSinceUnixEpoch(millisecondsSinceUnixEpoch: Long): Moment {
             requireNotNull(millisecondsSinceUnixEpoch)
-            return Moment(moment_js(millisecondsSinceUnixEpoch))
+            return Moment(moment_js(millisecondsSinceUnixEpoch.toDouble()))
         }
 
         fun setLocale(localeName: String) {
