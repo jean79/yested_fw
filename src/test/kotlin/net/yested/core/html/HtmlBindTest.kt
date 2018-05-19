@@ -5,6 +5,8 @@ import net.yested.core.properties.*
 import net.yested.core.utils.Div
 import net.yested.core.utils.NoEffect
 import net.yested.ext.bootstrap3.Collapse
+import org.w3c.dom.Element
+import org.w3c.dom.HTMLCollection
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLTableSectionElement
 import org.w3c.dom.HTMLUListElement
@@ -117,10 +119,14 @@ class HtmlBindTest {
         }
     }
 
-    private val HTMLElement.styleContent: String
-        get() = (getAttribute("style") ?: "") + children.toList().map { it.styleContent }.joinToString("")
+    private val Element.styleContent: String
+        get() = (getAttribute("style") ?: "") + children.toList().map { it?.styleContent }.joinToString("")
 
     private fun getChildIdsAsString(containerElement: HTMLElement): String {
-        return containerElement.children.toList().map { it.getAttribute("id")}.filterNotNull().joinToString(",")
+        return containerElement.children.toList().map { it?.getAttribute("id")}.filterNotNull().joinToString(",")
     }
+}
+
+fun HTMLCollection.toList(): List<Element?> {
+    return (0..(this.length - 1)).map { item(it) }
 }
