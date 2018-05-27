@@ -106,7 +106,7 @@ fun HTMLElement.setClassPresence(className: String, present: ReadOnlyProperty<Bo
 
 fun <T> HTMLElement.setClassPresence(className: String, property: ReadOnlyProperty<T>, presentValue: T) {
     property.onNext {
-        if (it == presentValue) addClass(className) else removeClass(className)
+        if (it == presentValue) addClass2(className) else removeClass2(className)
     }
 }
 

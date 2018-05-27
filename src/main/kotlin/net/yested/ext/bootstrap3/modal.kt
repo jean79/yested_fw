@@ -1,9 +1,6 @@
 package net.yested.ext.bootstrap3
 
-import net.yested.core.html.button
-import net.yested.core.html.div
-import net.yested.core.html.h4
-import net.yested.core.html.span
+import net.yested.core.html.*
 import net.yested.core.utils.Div
 import net.yested.ext.jquery.yestedJQuery
 import org.w3c.dom.HTMLDivElement
@@ -29,12 +26,12 @@ class DialogContext internal constructor(val header: HTMLHeadingElement, val bod
     }
 
     fun body(init:HTMLDivElement.()->Unit) {
-        body.removeClass("hidden")
+        body.removeClass2("hidden")
         body.init()
     }
 
     fun footer(init:HTMLDivElement.()->Unit) {
-        footer.removeClass("hidden")
+        footer.removeClass2("hidden")
         footer.init()
     }
 
@@ -81,11 +78,11 @@ fun prepareDialog(size: DialogSize = DialogSize.Default, init:DialogContext.(dia
 
                 }
                 div {
-                    addClass("modal-body hidden") // DialogContext.body will unhide this
+                    addClass2("modal-body hidden") // DialogContext.body will unhide this
                     body = this
                 }
                 div {
-                    addClass("modal-footer hidden") // DialogContext.footer will unhide this
+                    addClass2("modal-footer hidden") // DialogContext.footer will unhide this
                     footer = this
                 }
             }
