@@ -39,20 +39,12 @@ fun <T> nullProperty(): ReadOnlyProperty<T?> = nullProperty as ReadOnlyProperty<
 class Property<T>(initialValue: T): ReadOnlyProperty<T> {
 
     private var value : T = initialValue
-    private var valueHashCode = value?.hashCode()
     private val listeners = mutableSetOf<PropertyChangeListener<T>>()
 
     fun set(newValue: T) {
-        // check the hashCode in case the value is mutable, the same instance is provided, but its contents have changed.
-        val newValueHashCode = newValue?.hashCode()
-        if (newValue != value || newValueHashCode != valueHashCode) {
+        if (newValue != value) {
             value = newValue
-            valueHashCode = newValueHashCode
-            listeners.forEach {
-                if ((value == newValue) && (valueHashCode == newValueHashCode)) {
-                    it.onNext(value)
-                } //else one of the listeners or another thread may have changed it again, which will have its own notification
-            }
+            listeners.forEach { it.onNext(value) }
         }
     }
 

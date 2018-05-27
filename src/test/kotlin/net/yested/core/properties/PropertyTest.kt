@@ -14,42 +14,6 @@ import kotlin.js.Math
  */
 class PropertyTest {
     @Test
-    fun onNext_shouldIgnoreSetWithSameValue() {
-        val property = 123.toProperty()
-        var onNextCount = 0
-        property.onNext { onNextCount++ }
-        onNextCount.mustBe(1)
-
-        property.set(123)
-        onNextCount.mustBe(1)
-    }
-
-    @Test
-    fun onNext_shouldPropagateSetWithDifferentHashCode() {
-        val list = mutableListOf(1, 2, 3)
-        val property = list.toProperty()
-        var onNextCount = 0
-        property.onNext { onNextCount++ }
-        onNextCount.mustBe(1)
-
-        list.add(4)
-        property.set(list)
-        onNextCount.mustBe(2)
-    }
-
-    @Test
-    fun onNext_shouldIgnoreSetWithSameHashCode() {
-        val list = mutableListOf(1, 2, 3)
-        val property = list.toProperty()
-        var onNextCount = 0
-        property.onNext { onNextCount++ }
-        onNextCount.mustBe(1)
-
-        property.set(list)
-        onNextCount.mustBe(1)
-    }
-
-    @Test
     fun onNext_reentrantAvoidsInfiniteLoopForSameValue() {
         val property = 123.toProperty()
         property.onNext { property.set(300) }
