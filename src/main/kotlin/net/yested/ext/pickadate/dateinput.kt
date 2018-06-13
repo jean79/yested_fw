@@ -48,7 +48,7 @@ fun HTMLElement.dateInput(data: Property<Moment?>,
             selectMonths = true,
             selectYears = true,
             clear = clearLabel,
-            onSet = { context -> data.set(context.select?.let { Moment.parseMillisecondsSinceUnixEpoch(it) }) }
+            onSet = { context -> data.set(context.select?.let { Moment.fromMillisecondsSinceUnixEpoch(it) }) }
     )
 
     whenAddedToDom {

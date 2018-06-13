@@ -99,8 +99,17 @@ class Moment(private val moment: MomentJs) {
         fun parse(input: String, format: String): Moment = Moment(moment_js(input, format))
 
         fun parseMillisecondsSinceUnixEpoch(millisecondsSinceUnixEpoch: Long): Moment {
+            return fromMillisecondsSinceUnixEpoch(millisecondsSinceUnixEpoch)
+        }
+
+        fun fromMillisecondsSinceUnixEpoch(millisecondsSinceUnixEpoch: Long): Moment {
             requireNotNull(millisecondsSinceUnixEpoch)
-            return Moment(moment_js(millisecondsSinceUnixEpoch.toDouble()))
+            return fromMillisecondsSinceUnixEpoch(millisecondsSinceUnixEpoch.toDouble())
+        }
+
+        fun fromMillisecondsSinceUnixEpoch(millisecondsSinceUnixEpoch: Double): Moment {
+            requireNotNull(millisecondsSinceUnixEpoch)
+            return Moment(moment_js(millisecondsSinceUnixEpoch))
         }
 
         fun setLocale(localeName: String) {

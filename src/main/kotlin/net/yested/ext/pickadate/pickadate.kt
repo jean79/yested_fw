@@ -9,7 +9,7 @@ import net.yested.ext.jquery.YestedJQuery
  * Time: 6:44 AM
  */
 class DateContext {
-    var select: Long? = null
+    var select: Double? = null
 }
 
 @JsModule("pickadate/lib/picker.date") @JsNonModule @JsName("$") external val requirePickadate: Any = definedExternally
