@@ -22,10 +22,12 @@ import kotlin.browser.document
 /**
  * A dateInput.
  * @param clearLabel the label to put on the "Clear" button on the pick-a-date dialog.
+ * @param containerSelector any valid CSS selector for the container to place the picker's root element.
  */
 fun HTMLElement.dateInput(data: Property<Moment?>,
                           placeholder: String? = null,
                           clearLabel: String = "Clear",
+                          containerSelector: String? = null,
                           formatter: FormatStringBuilder.()-> FormatString,
                           init: (HTMLInputElement.() -> Unit)? = null) {
 
@@ -48,6 +50,7 @@ fun HTMLElement.dateInput(data: Property<Moment?>,
             selectMonths = true,
             selectYears = true,
             clear = clearLabel,
+            container = containerSelector,
             onSet = { context -> data.set(context.select?.let { Moment.fromMillisecondsSinceUnixEpoch(it) }) }
     )
 

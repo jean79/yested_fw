@@ -18,6 +18,7 @@ class PickADateOptions(var format: String,
                        var selectMonths: Boolean = false,
                        var selectYears: Boolean = false,
                        var clear: String = "Clear",
+                       var container: String? = null,
                        var onSet: (DateContext) -> Unit) {
     companion object {
         init { console.info(requirePickadate) }
