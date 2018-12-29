@@ -9,7 +9,7 @@ import net.yested.ext.jquery.YestedJQuery
  * Time: 6:44 AM
  */
 class DateContext {
-    var select: Long? = null
+    var select: Double? = null
 }
 
 @JsModule("pickadate/lib/picker.date") @JsNonModule @JsName("$") external val requirePickadate: Any = definedExternally
@@ -18,6 +18,7 @@ class PickADateOptions(var format: String,
                        var selectMonths: Boolean = false,
                        var selectYears: Boolean = false,
                        var clear: String = "Clear",
+                       var container: String? = null,
                        var onSet: (DateContext) -> Unit) {
     companion object {
         init { console.info(requirePickadate) }

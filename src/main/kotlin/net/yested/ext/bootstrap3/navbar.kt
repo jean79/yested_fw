@@ -95,7 +95,7 @@ class NavbarContext(
     }
 
     fun brand(init:HTMLElement.()->Unit) {
-        navbarToggle?.removeClass("pull-left")
+        navbarToggle?.removeClass2("pull-left")
         navbarHeader.a { className = "navbar-brand"; href = "#"
             init ()
         }
@@ -125,7 +125,7 @@ class NavbarContext(
             disabled: ReadOnlyProperty<Boolean>? = null,
             init: HTMLButtonElement.()->Unit) {
         contentElement.btsButton(look = look, onclick = onclick, active = active, disabled = disabled) {
-            addClass("navbar-btn", position.code)
+            addClass2("navbar-btn", position.code)
             init()
         }
     }

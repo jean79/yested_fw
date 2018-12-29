@@ -9,6 +9,7 @@ import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.HTMLSpanElement
+import org.w3c.dom.HTMLTextAreaElement
 import kotlin.browser.document
 
 fun HTMLElement.text(value: ReadOnlyProperty<String>) {
@@ -40,6 +41,25 @@ fun HTMLElement.textInput(
     return element
 }
 
+fun HTMLElement.textAreaInput(
+        value: Property<String>,
+        disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
+        readonly: ReadOnlyProperty<Boolean> = false.toProperty(),
+        id: String? = null,
+        init: (HTMLTextAreaElement.() -> Unit)? = null): HTMLTextAreaElement {
+
+    val element = document.createElement("textarea") as HTMLTextAreaElement
+
+    id?.let { element.id = id }
+    element.className = "form-control"
+    element.bind(value)
+    element.setDisabled(disabled)
+    element.setReadOnly(readonly)
+    if (init != null) element.init()
+    this.appendChild(element)
+    return element
+}
+
 fun <T> HTMLElement.selectInput(
         selected: Property<List<T>>,
         options: Property<List<T>>,
@@ -62,11 +82,20 @@ fun <T> HTMLElement.singleSelectInput(
         options: ReadOnlyProperty<List<T>>,
         disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
         render: HTMLElement.(T)->Unit): HTMLSelectElement {
+    return singleSelectInput(selected, options, disabled, { selected.set(it) }, render)
+}
+
+fun <T> HTMLElement.singleSelectInput(
+        selected: ReadOnlyProperty<T>,
+        options: ReadOnlyProperty<List<T>>,
+        disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
+        onSelect: (T) -> Unit,
+        render: HTMLElement.(T)->Unit): HTMLSelectElement {
 
     val element = document.createElement("select") as HTMLSelectElement
     element.className = "form-control input-${Size.Default.code}"
     element.multiple = false
-    element.bind(selected, options, render)
+    element.bind(selected, options, onSelect, render)
     element.setDisabled(disabled)
     this.appendChild(element)
     return element

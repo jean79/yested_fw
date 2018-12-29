@@ -15,8 +15,7 @@ private val windowLocationHash: Property<String> = window.location.bindToHash()
 
 /** A Property for window.location.hash as a split array.  It is bound to [hashProperty]. */
 val Location.splitHashProperty: Property<Array<String>> get() = splitWindowLocationHash
-// The "_" is deprecated in favor of "/".
-private val splitWindowLocationHash: Property<Array<String>> = windowLocationHash.bind({ it.split("/", "_").toTypedArray() }, { it.joinToString("/") })
+private val splitWindowLocationHash: Property<Array<String>> = windowLocationHash.bind({ it.split("/").toTypedArray() }, { it.joinToString("/") })
 
 private fun Location.bindToHash(): Property<String> {
     val property: Property<String> = Property(hash)
@@ -98,3 +97,8 @@ private fun History.backToDestination() {
  */
 val History.destinationBack: String? get() = historyDestinationBack
 private var historyDestinationBack: String? = null
+
+/** Clears the history going back.  This helps if there's some sort of redirect to avoid an infinite loop. */
+fun History.clearDestinationBack() {
+    historyDestinationBack = null
+}

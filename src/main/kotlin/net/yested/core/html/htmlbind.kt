@@ -1,8 +1,9 @@
 package net.yested.core.html
 
+import net.yested.core.properties.bind
 import net.yested.core.properties.Property
 import net.yested.core.properties.ReadOnlyProperty
-import net.yested.core.properties.bind
+import net.yested.core.properties.map
 import net.yested.core.properties.zip
 import net.yested.core.utils.*
 import org.w3c.dom.*
@@ -27,6 +28,17 @@ fun HTMLInputElement.bind(property: Property<String>) {
     addEventListener("keyup", { updating = true; property.set(value); updating = false }, false)
 }
 
+fun HTMLTextAreaElement.bind(property: Property<String>) {
+    var updating = false
+    property.onNext {
+        if (!updating) {
+            value = it
+        }
+    }
+    addEventListener("change", { updating = true; property.set(value); updating = false }, false)
+    addEventListener("keyup", { updating = true; property.set(value); updating = false }, false)
+}
+
 fun HTMLInputElement.bindChecked(checked: Property<Boolean>) {
     val element = this
     var updating = false
@@ -39,6 +51,10 @@ fun HTMLInputElement.bindChecked(checked: Property<Boolean>) {
 }
 
 fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: ReadOnlyProperty<List<T>>, render: HTMLElement.(T)->Unit) {
+    bindMultiselect(selected, options, { selected.set(it) }, render)
+}
+
+fun <T> HTMLSelectElement.bindMultiselect(selected: ReadOnlyProperty<List<T>>, options: ReadOnlyProperty<List<T>>, onSelect: (List<T>) -> Unit, render: HTMLElement.(T)->Unit) {
     val selectElement = this
     options.onNext {
         removeAllChildElements()
@@ -67,15 +83,21 @@ fun <T> HTMLSelectElement.bindMultiselect(selected: Property<List<T>>, options: 
                 .map { (it as HTMLOptionElement).value }
                 .map { options.get()[it.toInt()] }
         updating = true
-        selected.set(selectedValues)
+        onSelect.invoke(selectedValues)
         updating = false
     }, false)
 }
 
 fun <T> HTMLSelectElement.bind(selected: Property<T>, options: ReadOnlyProperty<List<T>>, render: HTMLElement.(T)->Unit) {
     @Suppress("UNCHECKED_CAST") // T is allowed to be nullable or not-nullable.
-    val multipleSelected = selected.bind({ if (it == null) emptyList() else listOf(it) }, { it.firstOrNull() as T })
+    val multipleSelected = selected.bind({ if (it == null) emptyList<T>() else listOf(it) }, { it.firstOrNull() as T })
     bindMultiselect(multipleSelected, options, render)
+}
+
+fun <T> HTMLSelectElement.bind(selected: ReadOnlyProperty<T>, options: ReadOnlyProperty<List<T>>, onSelect: (T) -> Unit, render: HTMLElement.(T)->Unit) {
+    val multiSelected: ReadOnlyProperty<List<T>> = selected.map { if (it == null) emptyList() else listOf(it) }
+    @Suppress("UNCHECKED_CAST") // T is allowed to be nullable or not-nullable.
+    bindMultiselect(multiSelected, options, { onSelect(it.firstOrNull() as T) }, render)
 }
 
 fun HTMLElement.setClassPresence(className: String, present: ReadOnlyProperty<Boolean>) {
@@ -84,7 +106,7 @@ fun HTMLElement.setClassPresence(className: String, present: ReadOnlyProperty<Bo
 
 fun <T> HTMLElement.setClassPresence(className: String, property: ReadOnlyProperty<T>, presentValue: T) {
     property.onNext {
-        if (it == presentValue) addClass(className) else removeClass(className)
+        if (it == presentValue) addClass2(className) else removeClass2(className)
     }
 }
 
@@ -93,6 +115,10 @@ fun HTMLButtonElement.setDisabled(property: ReadOnlyProperty<Boolean>) {
 }
 
 fun HTMLInputElement.setDisabled(property: ReadOnlyProperty<Boolean>) {
+    property.onNext { disabled = it }
+}
+
+fun HTMLTextAreaElement.setDisabled(property: ReadOnlyProperty<Boolean>) {
     property.onNext { disabled = it }
 }
 
@@ -108,8 +134,15 @@ fun HTMLInputElement.setReadOnly(property: ReadOnlyProperty<Boolean>) {
     property.onNext { readOnly = it }
 }
 
-fun HTMLCollection.toList(): List<HTMLElement> {
-    return (0..(this.length - 1)).map { item(it)!! as HTMLElement }
+fun HTMLTextAreaElement.setReadOnly(property: ReadOnlyProperty<Boolean>) {
+    property.onNext { readOnly = it }
+}
+
+/** This exists because Kotlin's ArrayList calls throwCCE() if a non-null Element doesn't extend "Any". */
+private data class ElementWrapper(val element: Element?)
+
+private fun HTMLCollection.toWrapperList(): List<ElementWrapper> {
+    return (0..(this.length - 1)).map { ElementWrapper(item(it)) }
 }
 
 fun <C: HTMLElement,T> C.repeatLive(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect = NoEffect, itemInit: C.(T) -> Unit) {
@@ -118,7 +151,7 @@ fun <C: HTMLElement,T> C.repeatLive(orderedData: ReadOnlyProperty<Iterable<T>?>,
 
 fun <C: HTMLElement,T> C.repeatLive(orderedData: ReadOnlyProperty<Iterable<T>?>, effect: BiDirectionEffect = NoEffect, itemInit: C.(Int, T) -> Unit) {
     val containerElement = this
-    val itemsWithoutDelays = mutableListOf<List<HTMLElement>>()
+    val itemsWithoutDelays = mutableListOf<List<ElementWrapper>>()
     var operableList : DomOperableList<C,T>? = null
     var elementAfter: HTMLElement? = null
 
@@ -126,13 +159,17 @@ fun <C: HTMLElement,T> C.repeatLive(orderedData: ReadOnlyProperty<Iterable<T>?>,
         val operableListSnapshot = operableList
         if (values == null) {
             itemsWithoutDelays.flatten().forEach {
-                containerElement.removeChild(it)
+                if (it?.element?.parentElement == containerElement) {
+                    containerElement.removeChild(it.element)
+                }
             }
             itemsWithoutDelays.clear()
             operableList = null
         } else if (operableListSnapshot == null) {
             itemsWithoutDelays.flatten().forEach {
-                containerElement.removeChild(it)
+                if (it?.element?.parentElement == containerElement) {
+                    containerElement.removeChild(it.element)
+                }
             }
             itemsWithoutDelays.clear()
             val domOperableList = DomOperableList(values.toMutableList(), itemsWithoutDelays, containerElement, effect, elementAfter, itemInit)
@@ -148,23 +185,29 @@ fun <C: HTMLElement,T> C.repeatLive(orderedData: ReadOnlyProperty<Iterable<T>?>,
     operableList?.elementAfter = elementAfter
 }
 
-internal class DomOperableList<C : HTMLElement,T>(
+private class DomOperableList<C : HTMLElement,T>(
         initialData: MutableList<T>,
-        val itemsWithoutDelays: MutableList<List<HTMLElement>>,
+        val itemsWithoutDelays: MutableList<List<ElementWrapper>>,
         val container: C,
         val effect: BiDirectionEffect,
         var elementAfter: HTMLElement? = null,
         val itemInit: C.(Int, T) -> Unit) : InMemoryOperableList<T>(initialData) {
     override fun add(index: Int, item: T) {
-        addItemToContainer(container, index, item, itemsWithoutDelays, elementAfter).forEach { effect.applyIn(it) }
+        addItemToContainer(container, index, item, itemsWithoutDelays, elementAfter).forEach { if (it.element is HTMLElement) effect.applyIn(it.element) }
         super.add(index, item)
     }
 
     override fun removeAt(index: Int): T {
         val elementsForIndex = itemsWithoutDelays.removeAt(index)
         elementsForIndex.forEach {
-            effect.applyOut(it) {
-                container.removeChild(it)
+            if (it.element is HTMLElement) {
+                effect.applyOut(it.element) {
+                    if (it.element.parentElement == container) {
+                        container.removeChild(it.element)
+                    }
+                }
+            } else if (it.element?.parentElement == container) {
+                container.removeChild(it.element)
             }
         }
         return super.removeAt(index)
@@ -175,14 +218,14 @@ internal class DomOperableList<C : HTMLElement,T>(
         add(toIndex, item)
     }
 
-    fun addItemToContainer(container: C, index: Int, item: T, itemsWithoutDelays: MutableList<List<HTMLElement>>, elementAfter: HTMLElement?): List<HTMLElement> {
-        val nextElement = if (index < itemsWithoutDelays.size) itemsWithoutDelays.get(index).firstOrNull() else elementAfter
-        val childrenBefore = container.children.toList()
+    fun addItemToContainer(container: C, index: Int, item: T, itemsWithoutDelays: MutableList<List<ElementWrapper>>, elementAfter: HTMLElement?): List<ElementWrapper> {
+        val nextElement = if (index < itemsWithoutDelays.size) itemsWithoutDelays.get(index).firstOrNull()?.element else elementAfter
+        val childrenBefore = container.children.toWrapperList()
         container.itemInit(index, item)
-        val childrenLater = container.children.toList()
+        val childrenLater = container.children.toWrapperList()
         val newChildren = childrenLater.filterNot { childrenBefore.contains(it) }
-        if (nextElement != null) {
-            newChildren.forEach { container.insertBefore(it, nextElement) }
+        if (nextElement != null && nextElement.parentElement == container) {
+            newChildren.forEach { it.element?.let { container.insertBefore(it, nextElement) } }
         }
         itemsWithoutDelays.add(index, newChildren)
         return newChildren

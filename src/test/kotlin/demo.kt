@@ -36,7 +36,7 @@ fun main(args: Array<String>) {
 
     element?.with {
         navbar(inverted = true) {
-            navbar.addClass("my-custom-navbar")
+            navbar.addClass2("my-custom-navbar")
             toggle()
             brand {
                 appendText("Sample Application")

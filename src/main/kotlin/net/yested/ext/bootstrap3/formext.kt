@@ -28,9 +28,9 @@ class BtsFormContext(
     fun btsFormItem(
             labelId: String = "${++labelIdSequence}",
             state: ReadOnlyProperty<State> = State.Default.toProperty(),
-            init: BtsFormItemContext.() -> Unit) {
+            init: BtsFormItemContext.() -> Unit): HTMLDivElement {
 
-        element.formGroup(state = state) {
+        return element.formGroup(state = state) {
             val labelElement = btsLabel(width = labelWidth, htmlFor = labelId) {}
             val inputElement = if (format == FormFormat.Horizontal) {
                 col(width = inputWidth!!) {}
@@ -46,9 +46,9 @@ class BtsFormContext(
             labelId: String = "${++labelIdSequence}",
             state: ReadOnlyProperty<State> = State.Default.toProperty(),
             label: String = "",
-            init: HTMLDivElement.(labelId: String) -> Unit) {
+            init: HTMLDivElement.(labelId: String) -> Unit): HTMLDivElement {
 
-        element.formGroup(state = state) {
+        return element.formGroup(state = state) {
             btsLabel(width = labelWidth, htmlFor = labelId) {
                 appendText(label)
             }
@@ -62,9 +62,9 @@ class BtsFormContext(
         }
     }
 
-    fun btsFormStatic(label: String = "", init: HTMLParagraphElement.() -> Unit) {
+    fun btsFormStatic(label: String = "", init: HTMLParagraphElement.() -> Unit): HTMLDivElement {
 
-        element.formGroup {
+        return element.formGroup {
             btsLabel(width = labelWidth) {
                 appendText(label)
             }

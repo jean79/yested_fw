@@ -33,7 +33,13 @@ fun <T> HTMLTableCellElement.sortControl(currentSort: Property<SortSpecification
                                          sortAscending: Boolean = true,
                                          sortNow: Boolean = false,
                                          init: HTMLElement.() -> Unit): Property<Boolean?> {
-    val sortSpecification = SortSpecification(comparator, sortAscending)
+    return sortControl(currentSort, SortSpecification(comparator, sortAscending), sortNow, init)
+}
+
+fun <T> HTMLTableCellElement.sortControl(currentSort: Property<SortSpecification<T>?>,
+                                         sortSpecification: SortSpecification<T>,
+                                         sortNow: Boolean = false,
+                                         init: HTMLElement.() -> Unit): Property<Boolean?> {
     val sortControlProperty = currentSort.mapAsDefault {
         if (it == null || it.sortableId != sortSpecification.sortableId) null else it.ascending
     }
@@ -44,10 +50,10 @@ fun <T> HTMLTableCellElement.sortControl(currentSort: Property<SortSpecification
             currentSort.set(null)
         } // else leave it alone
     }
-    if (sortNow) sortControlProperty.set(sortAscending)
+    if (sortNow) sortControlProperty.set(sortSpecification.ascending)
     a {
         setAttribute("style", "cursor: pointer;")
-        onclick = { sortControlProperty.set(sortControlProperty.get()?.let { !it } ?: sortAscending) }
+        onclick = { sortControlProperty.set(sortControlProperty.get()?.let { !it } ?: sortSpecification.ascending) }
         init()
     }
     return sortControlProperty
