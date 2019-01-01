@@ -128,11 +128,11 @@ node {
     workDir = file("$project.buildDir/nodejs")
 }
 task installJsTestRunner(type: NpmTask, group: 'npm') {
-    args = ['install', "mocha@5.2.0", "jquery", "bootstrap", "popper.js", "moment", "pickadate"]
+    args = ['install', "jest", "jquery", "bootstrap", "popper.js", "moment", "pickadate"]
 }
 task runJsTests(type: NodeTask, dependsOn: [installJsTestRunner, jsMainClasses, jsTestClasses], group: 'npm') {
     environment = [ "NODE_PATH": "$jsLibDir$pathSeparator$jsTestLibDir$pathSeparator$compileKotlinJs.destinationDir" ]
-    script = file("node_modules/mocha/bin/mocha")
+    script = file("node_modules/jest/bin/jest.js")
     args = [compileTestKotlinJs.outputFile]
 }
 jsTest.dependsOn runJsTests
