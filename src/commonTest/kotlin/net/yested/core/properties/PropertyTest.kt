@@ -1,6 +1,5 @@
 package net.yested.core.properties
 
-import net.yested.core.utils.repeatWithDelayUntil
 import kotlin.test.Test
 import spec.*
 import kotlin.math.max
@@ -21,7 +20,7 @@ class PropertyTest {
     }
 
     @Test
-    fun onNext_reentrantSetNewValue() {
+    fun onNext_reentrantShouldUseCurrentAsLastNotifiedValue() {
         val property = 123.toProperty()
         val values1 = mutableListOf<Int>()
         val values2 = mutableListOf<Int>()
@@ -31,44 +30,7 @@ class PropertyTest {
 
         property.set(200)
         values1.mustBe(mutableListOf(123, 200, 300))
-        values2.mustBe(mutableListOf(123, 300))
-    }
-
-    @Test
-    fun onNext_reentrantSetNewValueHash() {
-        val list = mutableListOf(1, 2, 3)
-        val property = list.toProperty()
-        val values1 = mutableListOf<MutableList<Int>>()
-        val values2 = mutableListOf<MutableList<Int>>()
-        property.onNext { values1.add(it) }
-        property.onNext { if (values1.size == 2) {
-            list.add(400)
-            property.set(list)
-        } }
-        property.onNext { values2.add(it) }
-
-        list.add(200)
-        property.set(list)
-        values1.mustBe(mutableListOf(list, list, list))
-        values2.mustBe(mutableListOf(list, list))
-    }
-
-    @Test
-    fun onNext_reentrantModifyValueHash() {
-        val list = mutableListOf(1, 2, 3)
-        val property = list.toProperty()
-        val values1 = mutableListOf<MutableList<Int>>()
-        val values2 = mutableListOf<MutableList<Int>>()
-        property.onNext { values1.add(it) }
-        property.onNext { if (values1.size == 2) {
-            list.add(400)
-        } }
-        property.onNext { values2.add(it) }
-
-        list.add(200)
-        property.set(list)
-        values1.mustBe(mutableListOf(list, list))
-        values2.mustBe(mutableListOf(list, list))
+        values2.mustBe(mutableListOf(123, 300, 300))
     }
 
     @Test
@@ -90,19 +52,6 @@ class PropertyTest {
         disposable.dispose()
         property.set(400)
         changes.mustBe(listOf(Pair(100, 200), Pair(200, 300)))
-    }
-
-    @Test
-    fun async() {
-        val property = 100.toProperty()
-        val asyncProperty = property.async()
-        asyncProperty.get().mustBe(100)
-
-        property.set(200)
-        asyncProperty.get().mustBe(100)
-
-        repeatWithDelayUntil({ asyncProperty.get() == 200 }, 2) {}
-        asyncProperty.get().mustBe(200)
     }
 
     @Test
@@ -364,7 +313,8 @@ class PropertyTest {
         val two = 2.toProperty()
         val three = 3.toProperty()
         val listProperty = listOf(three, one, two).toProperty()
-        val comparatorProperty = Property(Comparator<Property<Int>> { obj1, obj2 -> obj1.get() - obj2.get() })
+        val comparatorProperty =
+            Property(Comparator<Property<Int>> { obj1, obj2 -> obj1.get() - obj2.get() })
         val sortedListProperty = listProperty.sortedWith(comparatorProperty)
         sortedListProperty.get().mustBe(listOf(one, two, three))
 
@@ -398,14 +348,14 @@ class PropertyTest {
         sortedListProperty.get().mustBe(listOf(one, x, three))
         onNextCount.mustBe(1)
 
-        // this should cause the list to be resorted since its value hash has changed
+        // this still doesn't cause the list to be resorted
         listProperty.detectContentChange()
-        sortedListProperty.get().mustBe(listOf(x, one, three))
-        onNextCount.mustBe(2)
+        sortedListProperty.get().mustBe(listOf(one, x, three))
+        onNextCount.mustBe(1)
     }
 
     @Test
-    fun pairOfProperties_detectChange() {
+    fun pairOfProperties_fieldChanged() {
         val one = 1.toProperty()
         val x = 2.toProperty()
         val pairProperty = Pair(one, x).toProperty()
@@ -414,14 +364,14 @@ class PropertyTest {
         pairProperty.onNext { onNextCount++ }
         onNextCount.mustBe(1)
 
-        // unfortunately (but better for performance), this won't cause the list to be resorted.
+        // unfortunately (but better for performance), this won't cause pairProperty to notify listeners
         x.set(0)
         pairProperty.get()
         onNextCount.mustBe(1)
 
-        // pinging the property should cause it to be republished since its value hash has changed
+        // pinging the property still won't cause it to notify listeners
         pairProperty.set(pairProperty.get())
-        onNextCount.mustBe(2)
+        onNextCount.mustBe(1)
     }
 
     @Test

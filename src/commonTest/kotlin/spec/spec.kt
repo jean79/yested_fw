@@ -3,7 +3,7 @@ package spec
 import kotlin.test.fail
 
 /**
- * Kotlin extensions to QUnit.
+ * Kotlin convenience methods for tests.
  * @author Eric Pabst (epabst@gmail.com)
  * Date: 6/16/16
  * Time: 5:59 AM
@@ -48,15 +48,5 @@ fun String?.mustContain(expectedSubstring: String) {
     val contains = this != null && contains(expectedSubstring)
     if (!contains) {
         fail("expected string containing '$expectedSubstring' but actual was '${this}'")
-    }
-}
-
-fun interceptAny(block: () -> Unit): Exception {
-    try {
-        block()
-        fail("expected exception")
-    } catch (exception: Exception) {
-        exception.mustNotBe(null)
-        return exception
     }
 }
