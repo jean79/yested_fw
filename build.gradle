@@ -1,0 +1,138 @@
+plugins {
+    id 'kotlin-multiplatform' version '1.3.11'
+    id 'maven-publish'
+    id 'com.moowork.node' version '1.2.0' //plugin for installing node
+}
+repositories {
+    mavenCentral()
+}
+
+group 'net.yested'
+version '1.0-SNAPSHOT'
+final kotlinRuntimeVersion = '1.3.11'
+final nodeVersion = '11.2.0'
+final pathSeparator = System.properties["path.separator"]
+
+kotlin {
+    targets {
+        fromPreset(presets.js, 'js') {
+            [compileKotlinJs, compileTestKotlinJs].each { configuration ->
+                configuration.kotlinOptions {
+                    moduleKind = 'umd'
+                }
+            }
+        }
+    }
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation 'org.jetbrains.kotlin:kotlin-stdlib-common'
+                implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core-common:1.1.0'
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation 'org.jetbrains.kotlin:kotlin-test-common'
+                implementation 'org.jetbrains.kotlin:kotlin-test-annotations-common'
+                implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.0'
+            }
+        }
+        jsMain {
+            dependencies {
+                implementation 'org.jetbrains.kotlin:kotlin-stdlib-js'
+                implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.1.0'
+            }
+        }
+        jsTest {
+            dependencies {
+                implementation 'org.jetbrains.kotlin:kotlin-test-js'
+            }
+        }
+    }
+}
+
+publishing {
+    publications {
+        js(MavenPublication) {
+            pom {
+                name = 'Yested'
+                description = 'Yested is a Kotlin framework for building single-page web applications in Javascript.'
+                url = 'http://www.yested.net/'
+                licenses {
+                    license {
+                        name = 'The MIT License (MIT)'
+                        url = 'https://github.com/jean79/yested2/blob/master/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'jean79'
+                        name = 'Jan Kovar'
+                        email = 'jan.kovar79@gmail.com'
+                    }
+                    developer {
+                        id = 'epabst'
+                        name = 'Eric Pabst'
+                        email = 'epabst@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git@github.com:jean79/yested_fw.git'
+                    developerConnection = 'scm:git:git@github.com:jean79/yested_fw.git'
+                    url = 'https://github.com/jean79/yested_fw'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "ossrh"
+            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        }
+    }
+}
+
+//Workaround to copy kotlin libraries so they are visible during testing
+def jsLibDir = "$compileKotlinJs.destinationDir/lib"
+def jsTestLibDir = "$compileTestKotlinJs.destinationDir/lib"
+configurations {
+    jsLibs
+    jsTestLibs
+}
+dependencies {
+    jsLibs "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinRuntimeVersion"
+    jsLibs "org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.1.0"
+    jsTestLibs "org.jetbrains.kotlin:kotlin-test-js:$kotlinRuntimeVersion"
+}
+task copyJsDependencies(type: Copy, dependsOn: compileKotlinJs) {
+    configurations.jsLibs.each {
+        from zipTree(it.absolutePath).matching { include '*.js'}
+    }
+    into jsLibDir
+}
+jsMainClasses.dependsOn copyJsDependencies
+task copyJsTestDependencies(type: Copy) {
+    configurations.jsTestLibs.each {
+        from zipTree(it.absolutePath).matching { include '*.js'}
+    }
+    into jsTestLibDir
+}
+jsTestClasses.dependsOn copyJsTestDependencies
+
+//Run js tests
+node {
+    version = nodeVersion
+    download = true
+    workDir = file("$project.buildDir/nodejs")
+}
+task installJsTestRunner(type: NpmTask, group: 'npm') {
+    args = ['install', "mocha@5.2.0", "jquery", "bootstrap", "popper.js", "moment", "pickadate"]
+}
+task runJsTests(type: NodeTask, dependsOn: [installJsTestRunner, jsMainClasses, jsTestClasses], group: 'npm') {
+    environment = [ "NODE_PATH": "$jsLibDir$pathSeparator$jsTestLibDir$pathSeparator$compileKotlinJs.destinationDir" ]
+    script = file("node_modules/mocha/bin/mocha")
+    args = [compileTestKotlinJs.outputFile]
+}
+jsTest.dependsOn runJsTests

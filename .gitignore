@@ -1,3 +1,5 @@
-target/
+build/
 .idea/
 *.iml
+node_modules/
+package-lock.json
