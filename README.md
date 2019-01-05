@@ -7,10 +7,10 @@ This repository hosts a new version of Yested Framework.
 The old one (https://github.com/jean79/yested) is deprecated.
 
 The main difference to the old Yested framework is the introduction of bindable properties and View Models (from WPF):
-https://github.com/jean79/yested_fw/blob/master/src/main/kotlin/net/yested/core/properties/properties.kt
+https://github.com/jean79/yested_fw/blob/master/src/commonMain/kotlin/net/yested/core/properties/properties.kt
 
 Also, I have removed the Component interface and utilize what was already developed by Kotlin guys:
-https://github.com/jean79/yested_fw/blob/master/src/main/kotlin/net/yested/core/html/html.kt
+https://github.com/jean79/yested_fw/blob/master/src/jsMain/kotlin/net/yested/core/html/html.kt
 
 This new approach is much simpler than the first version of Yested. 
 It beats in productivity compared to any other UI development framework, including WPF and JavaFX.
@@ -35,14 +35,15 @@ usually with a given context such as HTMLElement, HTMLSelectElement, or a custom
 The method generally adds content to the object it is invoked on.
 To add simple text, it will call appendText("some text").
 
+# How to build and run tests
+On the command-line run "./gradlew build".
+
 # Demo
-See https://github.com/jean79/yested_fw/blob/master/src/test/kotlin/demo.kt
+See https://github.com/jean79/yested_fw/blob/master/src/jsTest/kotlin/demo.kt
 
 ## To run demo:
 
-On the command-line run "mvn install".
-This will produce target/classes/lib/kotlin.js, target/classes/Yested.js (also in target/js), and target/test-js/Yested-tests.js.
-Note: Building the module in IntelliJ produces target/test-js/Yested_test.js instead of Yested-tests.js.
+On the command-line run "./gradlew build".
 
 In IntelliJ, right-click on index.html and "Open in Browser".
 
@@ -69,11 +70,3 @@ formGroup(state = validation) {
     }
 }
 ```
-
-# How to Run tests from IntelliJ
-
-On the command-line run "mvn install".
-This will produce target/classes/lib/kotlin.js, target/classes/Yested.js (also in target/js), and target/test-js/Yested-tests.js.
-Note: Building the module in IntelliJ produces target/test-js/Yested_test.js instead of Yested-tests.js, and doesn't add the QUnit 'assert' parameter.
-
-In IntelliJ, right-click on src/test/web/runner.html and "Open in Browser".

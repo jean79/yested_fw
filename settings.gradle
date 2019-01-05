@@ -1,0 +1,17 @@
+pluginManagement {
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "kotlin-multiplatform") {
+                useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}")
+            }
+        }
+    }
+}
+rootProject.name = 'Yested'
+
+//For some reason, enableFeaturePreview('GRADLE_METADATA') makes nodeSetup fail, so disable it unless that's complete
+if (file("build/nodejs").exists()) {
+    enableFeaturePreview('GRADLE_METADATA')
+} else {
+    println("WARNING: GRADLE_METADATA feature is disabled in order to make nodeSetup succeed.")
+}

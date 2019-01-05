@@ -5,12 +5,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="src/test/web/lib/jquery-1.11.3.min.js"></script>
-    <link rel="stylesheet" href="src/test/web/lib/bootstrap-xxs/bootstrap-patched.css" />
-    <link rel="stylesheet" href="src/test/web/lib/bootstrap-theme.css" />
-    <link rel="stylesheet" href="src/test/web/lib/qunit-1.17.1.css" />
-    <script src="src/test/web/lib/bootstrap.min.js"></script>
-    <script src="src/test/web/lib/moment-with-locales.js"></script>
+    <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="src/jsTest/web/lib/bootstrap-xxs/bootstrap-patched.css" />
+    <link rel="stylesheet" href="src/jsTest/web/lib/bootstrap-theme.css" />
+    <script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="node_modules/moment/min/moment-with-locales.js"></script>
 
     <!--<style>
         .yestedInputInvalidClass {
@@ -21,13 +20,13 @@
 </head>
 <body>
 <div id="main"></div>
-<script src="target/classes/lib/kotlin.js"></script>
-<script src="target/classes/Yested.js"></script>
+<script type="text/javascript" src="build/classes/kotlin/js/main/lib/kotlin.js"></script>
+<script type="text/javascript" src="build/classes/kotlin/js/main/lib/kotlinx-coroutines-core.js"></script>
+<script type="text/javascript" src="build/classes/kotlin/js/main/Yested.js"></script>
 
-<!-- These are only for needed to run the demo -->
-<script src="src/test/web/lib/qunit-1.17.1.js"></script>
-<script src="target/test-classes/lib/kotlin-test.js"></script>
-<script src="target/test-js/Yested-tests.js"></script>
+<!-- These are only needed to run the demo -->
+<script type="text/javascript" src="build/classes/kotlin/js/test/lib/kotlin-test.js"></script>
+<script type="text/javascript" src="build/classes/kotlin/js/test/Yested_test.js"></script>
 
 </body>
 
