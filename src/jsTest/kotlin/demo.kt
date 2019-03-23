@@ -9,7 +9,6 @@ import org.w3c.dom.HTMLElement
 import kotlin.browser.document
 import kotlin.comparisons.compareBy
 import kotlin.comparisons.naturalOrder
-import kotlin.dom.addClass
 import kotlin.dom.appendText
 
 enum class City { Prague, London }
@@ -27,7 +26,7 @@ fun main(args: Array<String>) {
 
     val p = Property("hello")
     val validation = p.validate(errorMessage = "Name is required") { it.length > 0 }.message()
-    val city = Property(City.Prague)
+    val city = Property<City?>(City.Prague)
     val active = Property(false)
 
     console.info("hello")
@@ -163,10 +162,10 @@ fun main(args: Array<String>) {
             }
             row {
                 col(width = Col.Width.Lg(4)) {
-                    singleSelectInput(selected = city, options = Property(City.values().toList()), render = { appendText(it.name) })
+                    optionalSelectInput(selected = city, options = Property(City.values().toList()), render = { appendText(it.name) })
                 }
                 col(width = Col.Width.Lg(8)) {
-                    text(city.map { it.name })
+                    text(city.map { it?.name ?: "(no city selected)" })
                 }
             }
             p {
@@ -267,9 +266,9 @@ fun main(args: Array<String>) {
                         }
                         td { text(p) }
                         td {
-                            singleSelectInput(selected = city, options = Property(City.values().toList()), render = { appendText(it.name) })
+                            optionalSelectInput(selected = city, options = Property(City.values().toList()), render = { appendText(it.name) })
                             appendText("Selected city: ")
-                            text(value = city.map { it.name })
+                            text(value = city.map { it?.name ?: "(no city selected)" })
                         }
                     }
                 }

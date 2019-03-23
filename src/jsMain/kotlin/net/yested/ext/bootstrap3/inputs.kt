@@ -1,9 +1,6 @@
 package net.yested.ext.bootstrap3
 
-import net.yested.core.html.bind
-import net.yested.core.html.bindMultiselect
-import net.yested.core.html.setDisabled
-import net.yested.core.html.setReadOnly
+import net.yested.core.html.*
 import net.yested.core.properties.*
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
@@ -96,6 +93,30 @@ fun <T> HTMLElement.singleSelectInput(
     element.className = "form-control input-${Size.Default.code}"
     element.multiple = false
     element.bind(selected, options, onSelect, render)
+    element.setDisabled(disabled)
+    this.appendChild(element)
+    return element
+}
+
+fun <T> HTMLElement.optionalSelectInput(
+    selected: Property<T?>,
+    options: ReadOnlyProperty<List<T>>,
+    disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
+    render: HTMLElement.(T)->Unit): HTMLSelectElement {
+    return optionalSelectInput(selected, options, disabled, { selected.set(it) }, render)
+}
+
+fun <T> HTMLElement.optionalSelectInput(
+    selected: ReadOnlyProperty<T?>,
+    options: ReadOnlyProperty<List<T>>,
+    disabled: ReadOnlyProperty<Boolean> = false.toProperty(),
+    onSelect: (T) -> Unit,
+    render: HTMLElement.(T)->Unit): HTMLSelectElement {
+
+    val element = document.createElement("select") as HTMLSelectElement
+    element.className = "form-control input-${Size.Default.code}"
+    element.multiple = false
+    element.bindOptional(selected, options, onSelect, render)
     element.setDisabled(disabled)
     this.appendChild(element)
     return element
