@@ -4,10 +4,10 @@ data class AjaxRequest<RESULT>(val url:String, val type:String = "POST", val dat
                        val contentType:String = "application/json; charset=utf-8",
                        val dataType:String = "json", val success: ((RESULT) -> Unit))
 
- fun <T> ajaxGet(url:String, loaded:(response:T) -> Unit) : Unit {
+fun <T> ajaxGet(url:String, loaded:(response:T) -> Unit) : Unit {
     yestedJQuery.get(url = url, loaded = loaded)
 }
 
- fun <RESULT> ajaxPost(ajaxRequest: AjaxRequest<RESULT>) : Unit {
+fun <RESULT> ajaxPost(ajaxRequest: AjaxRequest<RESULT>) : Unit {
     yestedJQuery.ajax(ajaxRequest)
 }

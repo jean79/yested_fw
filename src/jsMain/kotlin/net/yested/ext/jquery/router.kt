@@ -20,7 +20,7 @@ private val splitWindowLocationHash: Property<Array<String>> = windowLocationHas
 private fun Location.bindToHash(): Property<String> {
     val property: Property<String> = Property(hash)
     var updating = true // avoid triggering an onNext yet
-    jQueryWindow.on("hashchange") {
+    jQueryWindow.on("hashchange") { _, _ ->
         if (!updating) {
             updating = true
             try {
@@ -52,7 +52,7 @@ fun registerHashChangeListener(runNow:Boolean = true, listener:(Array<String>) -
     if (runNow) {
         window.location.splitHashProperty.onNext { listener(it) }
     } else {
-        jQueryWindow.on("hashchange") {
+        jQueryWindow.on("hashchange") { _, _ ->
             listener(window.location.splitHashProperty.get())
         }
     }

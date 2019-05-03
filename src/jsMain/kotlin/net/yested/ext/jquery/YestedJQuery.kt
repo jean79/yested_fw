@@ -1,5 +1,7 @@
 package net.yested.ext.jquery
 
+import globals.JQuery
+import globals.jQuery
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Window
 
@@ -8,30 +10,33 @@ import org.w3c.dom.Window
  * If you need additional functions, create similar code with a different Kotlin name.
  * Your new code can extend YestedJQuery, which will enable chaining into these functions.
  */
-@JsModule("jquery") @JsNonModule @JsName("$") external val yestedJQuery: YestedJQuery
-@JsModule("jquery") @JsNonModule @JsName("$") external fun yestedJQuery(element: HTMLElement): YestedJQuery = definedExternally
-@JsModule("jquery") @JsNonModule @JsName("$") external fun yestedJQuery(window: Window): JQueryWindow
+@Deprecated("use globals.jQuery", replaceWith = ReplaceWith("jQuery", "globals.jQuery"))
+val yestedJQuery: YestedJQuery = jQuery.unsafeCast<YestedJQuery>()
 
-external interface YestedJQuery {
-    fun datetimepicker(param: Any? ): Unit
-    fun fadeOut(duration: Int, callback:()->Unit): YestedJQuery
-    fun fadeIn(duration: Int, callback:()->Unit): YestedJQuery
-    fun slideUp(duration: Int = definedExternally, callback:(()->Unit)? = definedExternally): YestedJQuery
-    fun slideDown(duration: Int = definedExternally, callback:(()->Unit)? = definedExternally): YestedJQuery
-    fun show(callback:()->Unit): YestedJQuery
-    fun hide(callback:()->Unit): YestedJQuery
-    fun addClass(classNames: String): YestedJQuery
-    fun attr(name: String, value: String): YestedJQuery
-    fun children(selector: String): YestedJQuery
-    fun modal(command: String)
-    fun on(event: String, handler: ()->Unit): Unit
-    fun <T> get(url:String, loaded:(response: T) -> Unit) : Unit
-    //fun post(url:String, data:Any?, handler:()->Unit, type:String = "json") : Unit = definedExternally
-    //fun ajax(url:String, type:String, contentType:String, dataType:String, data:Any, success:()->Unit) : Unit = definedExternally
-    fun <RESULT> ajax(request: AjaxRequest<RESULT>) : Unit
+@Deprecated("use jQuery(element)", replaceWith = ReplaceWith("jQuery(element)", "globals.jQuery"))
+fun yestedJQuery(element: HTMLElement): YestedJQuery = jQuery(element)
+
+@Deprecated("use jQuery(window)", replaceWith = ReplaceWith("jQuery(window)", "globals.jQuery"))
+fun yestedJQuery(window: Window): JQueryWindow = jQuery(window)
+
+@Deprecated("use JQuery")
+typealias YestedJQuery = JQuery
+
+fun JQuery.datetimepicker(param: Any?) {
+    this.asDynamic().datetimepicker(param)
 }
 
-external interface JQueryWindow {
-    fun on(eventName:String, listener:() -> Unit):Unit
-    fun trigger(eventName:String):Unit
+fun JQuery.modal(command: String) {
+    this.asDynamic().modal(command)
 }
+
+fun <T> JQuery.get(url:String, loaded:(response: T) -> Unit) {
+    this.asDynamic().get(url, loaded)
+}
+
+fun <RESULT> JQuery.ajax(request: AjaxRequest<RESULT>) {
+    this.asDynamic().ajax(request)
+}
+
+@Deprecated("use JQuery", replaceWith = ReplaceWith("JQuery", "globals.JQuery"))
+typealias JQueryWindow = JQuery
