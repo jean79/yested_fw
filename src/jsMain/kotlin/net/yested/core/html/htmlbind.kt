@@ -8,8 +8,6 @@ import net.yested.core.properties.zip
 import net.yested.core.utils.*
 import org.w3c.dom.*
 import kotlin.browser.document
-import kotlin.dom.addClass
-import kotlin.dom.removeClass
 
 /**
  * Property binding to HTML elements.
@@ -95,6 +93,12 @@ fun <T> HTMLSelectElement.bind(selected: Property<T>, options: ReadOnlyProperty<
 }
 
 fun <T> HTMLSelectElement.bind(selected: ReadOnlyProperty<T>, options: ReadOnlyProperty<List<T>>, onSelect: (T) -> Unit, render: HTMLElement.(T)->Unit) {
+    val multiSelected: ReadOnlyProperty<List<T>> = selected.map { if (it == null) emptyList() else listOf(it) }
+    @Suppress("UNCHECKED_CAST") // T is allowed to be nullable or not-nullable.
+    bindMultiselect(multiSelected, options, { onSelect(it.firstOrNull() as T) }, render)
+}
+
+fun <T> HTMLSelectElement.bindOptional(selected: ReadOnlyProperty<T?>, options: ReadOnlyProperty<List<T>>, onSelect: (T) -> Unit, render: HTMLElement.(T)->Unit) {
     val multiSelected: ReadOnlyProperty<List<T>> = selected.map { if (it == null) emptyList() else listOf(it) }
     @Suppress("UNCHECKED_CAST") // T is allowed to be nullable or not-nullable.
     bindMultiselect(multiSelected, options, { onSelect(it.firstOrNull() as T) }, render)

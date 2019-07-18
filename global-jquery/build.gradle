@@ -1,0 +1,31 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+plugins {
+    id 'org.jetbrains.kotlin.multiplatform'
+    id 'maven-publish'
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+}
+
+kotlin {
+    js {
+        browser {
+        }
+    }
+    sourceSets {
+        jsMain {
+            dependencies {
+                implementation kotlin('stdlib-js')
+                implementation npm("jquery", "3.4.1")
+            }
+        }
+    }
+}

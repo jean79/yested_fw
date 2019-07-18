@@ -1,33 +1,29 @@
 package net.yested.ext.bootstrap3
 
+import globals.JQuery
+import globals.jQuery
 import net.yested.core.utils.Effect
 import net.yested.core.utils.SimpleBiDirectionEffect
 import net.yested.core.html.*
-import net.yested.ext.jquery.YestedJQuery
-import net.yested.ext.jquery.yestedJQuery
 import org.w3c.dom.HTMLElement
 import kotlin.browser.window
-import kotlin.dom.hasClass
 
-private val DURATION = 200
-private val COLLAPSE_DURATION = DURATION * 2
+private const val DURATION = 200
+private const val COLLAPSE_DURATION = DURATION * 2
 
-@JsModule("bootstrap") @JsNonModule external interface CollapseJQuery {
-    /** @param action "hide", "show", or null to toggle. */
-    fun collapse(action: String? = definedExternally): YestedJQuery
-}
+@Suppress("unused")
+private val requireGlobalJQuery = jQuery
 
+@Suppress("unused")
 @JsModule("bootstrap") @JsNonModule @JsName("$") external val requireBootstrap: Any = definedExternally
-object LoadDeps { init { console.info(requireBootstrap) } }
 
-@Suppress("UNCHECKED_CAST_TO_NATIVE_INTERFACE")
-fun YestedJQuery.collapse(action: String?): YestedJQuery {
-    return (this as CollapseJQuery).collapse(action)
+fun JQuery.collapse(action: String? = null): JQuery {
+    return asDynamic().collapse(action).unsafeCast<JQuery>()
 }
 
 class CollapseIn(private val duration: Int = COLLAPSE_DURATION) : Effect {
     override fun apply(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        val jqElement = yestedJQuery(htmlElement)
+        val jqElement = jQuery(htmlElement)
         if (!htmlElement.hasClass2("collapse")) {
             jqElement.addClass("collapse").children("td").children("*").addClass("collapse")
         }
@@ -38,7 +34,7 @@ class CollapseIn(private val duration: Int = COLLAPSE_DURATION) : Effect {
 
 class CollapseOut(private val duration: Int = COLLAPSE_DURATION) : Effect {
     override fun apply(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        val jqElement = yestedJQuery(htmlElement)
+        val jqElement = jQuery(htmlElement)
         if (!htmlElement.hasClass2("collapse")) {
             jqElement.addClass("collapse in").children("td").children("*").addClass("collapse in")
         }

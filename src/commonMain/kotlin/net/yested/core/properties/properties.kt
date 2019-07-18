@@ -434,3 +434,9 @@ fun <T> ReadOnlyProperty<Iterable<T>?>.sortedWith(comparator: ReadOnlyProperty<C
         }
     }
 }
+
+fun <T> ReadOnlyProperty<List<T>>.sortedWith(comparator: ReadOnlyProperty<Comparator<in T>?>): ReadOnlyProperty<List<T>> {
+    return mapWith(comparator) { toSort, _comparator ->
+        if (_comparator == null) toSort else toSort.sortedWith(_comparator)
+    }
+}

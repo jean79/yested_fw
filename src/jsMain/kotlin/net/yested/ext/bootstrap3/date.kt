@@ -4,6 +4,7 @@ import net.yested.core.html.div
 import net.yested.core.html.span
 import net.yested.core.properties.Property
 import net.yested.core.utils.whenAddedToDom
+import net.yested.ext.jquery.datetimepicker
 import net.yested.ext.jquery.yestedJQuery
 import net.yested.ext.moment.FormatString
 import net.yested.ext.moment.FormatStringBuilder
@@ -44,7 +45,7 @@ fun HTMLElement.dateInput(data: Property<Moment?>, placeholder: String? = null, 
         js("delete param.\$metadata$")
         yestedJQuery(element).datetimepicker(param)
 
-        yestedJQuery(element).on("dp.change", {
+        yestedJQuery(element).on("dp.change", { _, _ ->
             text.set(inputElement!!.value)
         })
     }
