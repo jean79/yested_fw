@@ -14,8 +14,10 @@ private const val COLLAPSE_DURATION = DURATION * 2
 @Suppress("unused")
 private val requireGlobalJQuery = jQuery
 
+@JsModule("bootstrap") @JsNonModule @JsName("$") external val bootstrap: Any = definedExternally
+
 @Suppress("unused")
-@JsModule("bootstrap") @JsNonModule @JsName("$") external val requireBootstrap: Any = definedExternally
+private val requireBootstrap = bootstrap
 
 fun JQuery.collapse(action: String? = null): JQuery {
     return asDynamic().collapse(action).unsafeCast<JQuery>()
