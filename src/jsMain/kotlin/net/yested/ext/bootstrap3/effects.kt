@@ -14,7 +14,7 @@ private const val COLLAPSE_DURATION = DURATION * 2
 @Suppress("unused")
 private val requireGlobalJQuery = jQuery
 
-@JsModule("bootstrap") @JsNonModule @JsName("$") external val bootstrap: Any = definedExternally
+@JsModule("bootstrap") @JsNonModule @JsName("$") private external val bootstrap: Any = definedExternally
 
 @Suppress("unused")
 private val requireBootstrap = bootstrap
