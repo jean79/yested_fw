@@ -11,16 +11,17 @@ import kotlin.browser.window
 private const val DURATION = 200
 private const val COLLAPSE_DURATION = DURATION * 2
 
-@Suppress("unused")
-private val requireGlobalJQuery = jQuery
+@JsModule("bootstrap") @JsNonModule
+private external val bootstrap: Any = definedExternally
 
-@JsModule("bootstrap") @JsNonModule @JsName("$") private external val bootstrap: Any = definedExternally
-
-@Suppress("unused")
-private val requireBootstrap = bootstrap
+@JsModule("bootstrap") @JsNonModule
+private external interface BootstrapJQuery {
+    fun collapse(action: String?): JQuery
+}
 
 fun JQuery.collapse(action: String? = null): JQuery {
-    return asDynamic().collapse(action).unsafeCast<JQuery>()
+    @Suppress("UNUSED_VARIABLE") val requireBootstrap = bootstrap
+    return this.unsafeCast<BootstrapJQuery>().collapse(action)
 }
 
 class CollapseIn(private val duration: Int = COLLAPSE_DURATION) : Effect {

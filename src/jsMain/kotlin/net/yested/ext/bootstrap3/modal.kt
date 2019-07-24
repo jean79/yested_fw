@@ -1,9 +1,9 @@
 package net.yested.ext.bootstrap3
 
+import globals.jQuery
 import net.yested.core.html.*
 import net.yested.core.utils.Div
 import net.yested.ext.jquery.modal
-import net.yested.ext.jquery.yestedJQuery
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLHeadingElement
 import kotlin.dom.appendText
@@ -92,19 +92,19 @@ fun prepareDialog(size: DialogSize = DialogSize.Default, init:DialogContext.(dia
 
     val dialogControl = object: DialogControl {
         override fun showDialog() {
-            val yestedJQuery = yestedJQuery(dialogElement)
-            yestedJQuery.modal("show")
-            yestedJQuery.on("shown.bs.modal") { _, _ ->
+            val jQuery = jQuery(dialogElement)
+            jQuery.modal("show")
+            jQuery.on("shown.bs.modal") { _, _ ->
                 dialogContext.focusElement?.focus()
             }
         }
 
         override fun hideDialog() {
-            yestedJQuery(dialogElement).modal("hide")
+            jQuery(dialogElement).modal("hide")
         }
 
         override fun destroyDialog() {
-            yestedJQuery(dialogElement).modal("destroy")
+            jQuery(dialogElement).modal("destroy")
         }
     }
 

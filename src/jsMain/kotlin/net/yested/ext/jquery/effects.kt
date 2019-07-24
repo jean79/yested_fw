@@ -1,5 +1,6 @@
 package net.yested.ext.jquery
 
+import globals.jQuery
 import net.yested.core.utils.BiDirectionEffect
 import net.yested.core.utils.Effect
 import net.yested.core.utils.SimpleBiDirectionEffect
@@ -12,37 +13,37 @@ private val SLIDE_DURATION = DURATION * 2
 
 class Show() : Effect {
     override fun apply(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        yestedJQuery(htmlElement).show { callback?.invoke() }
+        jQuery(htmlElement).show { callback?.invoke() }
     }
 }
 
 class Hide() : Effect {
     override fun apply(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        yestedJQuery(htmlElement).hide { callback?.invoke() }
+        jQuery(htmlElement).hide { callback?.invoke() }
     }
 }
 
 class SlideUp(private val duration: Int = SLIDE_DURATION) : Effect {
     override fun apply(htmlElement: HTMLElement, callback: Function0<Unit>?) {
-        yestedJQuery(htmlElement).slideUp(duration) { callback?.invoke() }
+        jQuery(htmlElement).slideUp(duration) { callback?.invoke() }
     }
 }
 
 class SlideDown(private val duration: Int = SLIDE_DURATION) : Effect {
     override fun apply(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        yestedJQuery(htmlElement).slideDown(duration) { callback?.invoke() }
+        jQuery(htmlElement).slideDown(duration) { callback?.invoke() }
     }
 }
 
 class FadeOut(private val duration: Int = DURATION) : Effect {
     override fun apply(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        yestedJQuery(htmlElement).fadeOut(duration) { callback?.invoke() }
+        jQuery(htmlElement).fadeOut(duration) { callback?.invoke() }
     }
 }
 
 class FadeIn(private val duration: Int = DURATION) : Effect {
     override fun apply(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        yestedJQuery(htmlElement).fadeIn(duration) { callback?.invoke() }
+        jQuery(htmlElement).fadeIn(duration) { callback?.invoke() }
     }
 }
 
@@ -57,7 +58,7 @@ class SlideDownTableRow(private val duration: Int = SLIDE_DURATION) : Effect {
         // start it out hidden in a way that slideDown will show it.
         startingPointEffect.apply(htmlElement) {
             // now animate showing it
-            val jq = yestedJQuery(htmlElement)
+            val jq = jQuery(htmlElement)
             val jqTdElements = jq.children("td")
             jqTdElements.slideDown(duration).children("*").slideDown(duration)
             window.setTimeout({
@@ -70,7 +71,7 @@ class SlideDownTableRow(private val duration: Int = SLIDE_DURATION) : Effect {
 
 class SlideUpTableRow(private val duration: Int = SLIDE_DURATION) : Effect {
     override fun apply(htmlElement: HTMLElement, callback: (() -> Unit)?) {
-        yestedJQuery(htmlElement).children("td").slideUp(duration).children("*").slideUp(duration)
+        jQuery(htmlElement).children("td").slideUp(duration).children("*").slideUp(duration)
         if (callback != null) {
             window.setTimeout(callback, duration)
         }

@@ -1,5 +1,6 @@
 package net.yested.ext.jquery
 
+import globals.jQuery
 import org.w3c.xhr.XMLHttpRequest
 
 data class AjaxRequest<RESULT>(val url: String,
@@ -12,10 +13,10 @@ data class AjaxRequest<RESULT>(val url: String,
 
 @Deprecated("obsolete", replaceWith = ReplaceWith("yestedJQuery.get(url, loaded)"))
 fun <T> ajaxGet(url:String, loaded:(response:T) -> Unit) {
-    yestedJQuery.get(url = url, loaded = loaded)
+    jQuery.get(url = url, loaded = loaded)
 }
 
 @Deprecated("obsolete", replaceWith = ReplaceWith("yestedJQuery.ajax(ajaxRequest)"))
 fun <RESULT> ajaxPost(ajaxRequest: AjaxRequest<RESULT>) {
-    yestedJQuery.ajax(ajaxRequest)
+    jQuery.ajax(ajaxRequest)
 }

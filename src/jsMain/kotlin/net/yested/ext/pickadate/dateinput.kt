@@ -1,9 +1,9 @@
 package net.yested.ext.pickadate
 
+import globals.jQuery
 import net.yested.core.html.bind
 import net.yested.core.properties.Property
 import net.yested.core.utils.whenAddedToDom
-import net.yested.ext.jquery.yestedJQuery
 import net.yested.ext.moment.FormatString
 import net.yested.ext.moment.FormatStringBuilder
 import net.yested.ext.moment.Moment
@@ -57,6 +57,6 @@ fun HTMLElement.dateInput(data: Property<Moment?>,
     whenAddedToDom {
         text.onNext { setAttribute("data-value", it) }
 
-        yestedJQuery(element).pickadate(options)
+        jQuery(element).pickadate(options)
     }
 }

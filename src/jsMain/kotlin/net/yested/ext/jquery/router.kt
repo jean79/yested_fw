@@ -1,5 +1,7 @@
 package net.yested.ext.jquery
 
+import globals.JQuery
+import globals.jQuery
 import net.yested.core.properties.Property
 import net.yested.core.properties.bind
 import org.w3c.dom.History
@@ -7,7 +9,7 @@ import org.w3c.dom.Location
 import kotlin.browser.document
 import kotlin.browser.window
 
-internal val jQueryWindow: JQueryWindow = yestedJQuery(window)
+internal val jQueryWindow: JQuery = jQuery(window)
 
 /** A Property for window.location.hash.  It is bound to [splitHashProperty]. */
 val Location.hashProperty: Property<String> get() = windowLocationHash
