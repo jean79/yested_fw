@@ -1,5 +1,6 @@
 package net.yested.ext.bootstrap3
 
+import globals.jQuery
 import net.yested.core.html.div
 import net.yested.core.html.span
 import net.yested.core.properties.Property
@@ -43,9 +44,9 @@ fun HTMLElement.dateInput(data: Property<Moment?>, placeholder: String? = null, 
         }
         // Hack: datetimepicker cannot handle unknown parameters, and Kotlin add a $metadata$ property to every object
         js("delete param.\$metadata$")
-        yestedJQuery(element).datetimepicker(param)
+        jQuery(element).datetimepicker(param)
 
-        yestedJQuery(element).on("dp.change", { _, _ ->
+        jQuery(element).on("dp.change", { _, _ ->
             text.set(inputElement!!.value)
         })
     }

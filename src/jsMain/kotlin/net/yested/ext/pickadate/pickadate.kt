@@ -1,6 +1,6 @@
 package net.yested.ext.pickadate
 
-import net.yested.ext.jquery.YestedJQuery
+import globals.JQuery
 
 /**
  * uses library: http://amsul.ca/pickadate.js/
@@ -12,25 +12,23 @@ class DateContext {
     var select: Double? = null
 }
 
-@JsModule("pickadate/lib/picker.date") @JsNonModule @JsName("$") external val pickadate: Any = definedExternally
-
+@Suppress("unused") // Used by pickadate itself
 class PickADateOptions(var format: String,
                        var selectMonths: Boolean = false,
                        var selectYears: Boolean = false,
                        var clear: String = "Clear",
                        var container: String? = null,
-                       var onSet: (DateContext) -> Unit) {
-    companion object {
-        @Suppress("unused")
-        private val requirePickadate = pickadate
-    }
+                       var onSet: (DateContext) -> Unit)
+
+@JsModule("pickadate/lib/picker.date") @JsNonModule
+private external val pickadate: Any = definedExternally
+
+@JsModule("pickadate/lib/picker.date") @JsNonModule
+private external interface PickADateJQuery {
+    fun pickadate(options: PickADateOptions): JQuery
 }
 
-@JsModule("pickadate/lib/picker.date") @JsNonModule external interface PickADateJQuery {
-    fun pickadate(options: PickADateOptions): YestedJQuery
-}
-
-fun YestedJQuery.pickadate(options: PickADateOptions) {
-    @Suppress("UNCHECKED_CAST_TO_NATIVE_INTERFACE")
-    (this as PickADateJQuery).pickadate(options)
+fun JQuery.pickadate(options: PickADateOptions) {
+    @Suppress("UNUSED_VARIABLE") val requirePickadate = pickadate
+    this.unsafeCast<PickADateJQuery>().pickadate(options)
 }

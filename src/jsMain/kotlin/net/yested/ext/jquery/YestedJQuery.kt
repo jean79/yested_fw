@@ -1,6 +1,7 @@
 package net.yested.ext.jquery
 
 import globals.JQuery
+import globals.JQueryStatic
 import globals.jQuery
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Window
@@ -11,13 +12,13 @@ import org.w3c.dom.Window
  * Your new code can extend YestedJQuery, which will enable chaining into these functions.
  */
 @Deprecated("use globals.jQuery", replaceWith = ReplaceWith("jQuery", "globals.jQuery"))
-val yestedJQuery: YestedJQuery = jQuery.unsafeCast<YestedJQuery>()
+val yestedJQuery: JQuery = jQuery.unsafeCast<JQuery>()
 
 @Deprecated("use jQuery(element)", replaceWith = ReplaceWith("jQuery(element)", "globals.jQuery"))
-fun yestedJQuery(element: HTMLElement): YestedJQuery = jQuery(element)
+fun yestedJQuery(element: HTMLElement): JQuery = jQuery(element)
 
 @Deprecated("use jQuery(window)", replaceWith = ReplaceWith("jQuery(window)", "globals.jQuery"))
-fun yestedJQuery(window: Window): JQueryWindow = jQuery(window)
+fun yestedJQuery(window: Window): JQuery = jQuery(window)
 
 @Deprecated("use JQuery")
 typealias YestedJQuery = JQuery
@@ -30,11 +31,11 @@ fun JQuery.modal(command: String) {
     this.asDynamic().modal(command)
 }
 
-fun <T> JQuery.get(url:String, loaded:(response: T) -> Unit) {
+fun <T> JQueryStatic.get(url:String, loaded:(response: T) -> Unit) {
     this.asDynamic().get(url, loaded)
 }
 
-fun <RESULT> JQuery.ajax(request: AjaxRequest<RESULT>) {
+fun <RESULT> JQueryStatic.ajax(request: AjaxRequest<RESULT>) {
     this.asDynamic().ajax(request)
 }
 

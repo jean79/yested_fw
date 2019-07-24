@@ -163,7 +163,7 @@ fun <C: HTMLElement,T> C.repeatLive(orderedData: ReadOnlyProperty<Iterable<T>?>,
         val operableListSnapshot = operableList
         if (values == null) {
             itemsWithoutDelays.flatten().forEach {
-                if (it?.element?.parentElement == containerElement) {
+                if (it.element?.parentElement == containerElement) {
                     containerElement.removeChild(it.element)
                 }
             }
@@ -171,7 +171,7 @@ fun <C: HTMLElement,T> C.repeatLive(orderedData: ReadOnlyProperty<Iterable<T>?>,
             operableList = null
         } else if (operableListSnapshot == null) {
             itemsWithoutDelays.flatten().forEach {
-                if (it?.element?.parentElement == containerElement) {
+                if (it.element?.parentElement == containerElement) {
                     containerElement.removeChild(it.element)
                 }
             }
