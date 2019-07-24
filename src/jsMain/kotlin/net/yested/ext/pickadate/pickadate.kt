@@ -12,7 +12,7 @@ class DateContext {
     var select: Double? = null
 }
 
-@JsModule("pickadate/lib/picker.date") @JsNonModule @JsName("$") external val requirePickadate: Any = definedExternally
+@JsModule("pickadate/lib/picker.date") @JsNonModule @JsName("$") external val pickadate: Any = definedExternally
 
 class PickADateOptions(var format: String,
                        var selectMonths: Boolean = false,
@@ -21,7 +21,8 @@ class PickADateOptions(var format: String,
                        var container: String? = null,
                        var onSet: (DateContext) -> Unit) {
     companion object {
-        init { console.info(requirePickadate) }
+        @Suppress("unused")
+        private val requirePickadate = pickadate
     }
 }
 
