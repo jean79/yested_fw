@@ -30,7 +30,8 @@ fun <T> OperableList<T>.range() = (0..(size() - 1))
 
 fun <T> OperableList<T>.reconcileTo(desiredList: List<T>) {
     // delete anything that isn't in desiredList
-    range().reversed().forEach { if (!desiredList.contains(get(it))) removeAt(it) }
+    val indicesToRemove = range().reversed().filter { !desiredList.contains(get(it)) }
+    indicesToRemove.forEach { removeAt(it) }
     val (desiredListWithoutNew, newItems) = desiredList.partition { contains(it) }
 
     var countMovingRight = 0

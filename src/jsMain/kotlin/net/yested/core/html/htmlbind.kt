@@ -229,7 +229,7 @@ private class DomOperableList<C : HTMLElement,T>(
         val childrenLater = container.children.toWrapperList()
         val newChildren = childrenLater.filterNot { childrenBefore.contains(it) }
         if (nextElement != null && nextElement.parentElement == container) {
-            newChildren.forEach { it.element?.let { container.insertBefore(it, nextElement) } }
+            newChildren.forEach { newChild -> newChild.element?.let { container.insertBefore(it, nextElement) } }
         }
         itemsWithoutDelays.add(index, newChildren)
         return newChildren
